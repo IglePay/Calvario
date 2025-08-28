@@ -21,7 +21,7 @@ export default function Dashboard() {
                 {stats.map((stat) => (
                     <div
                         key={stat.id}
-                        className={`${stat.color} ${stat.textColor} rounded-lg p-4 md:p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer `}>
+                        className={`${stat.color} ${stat.textColor} rounded-lg p-4 md:p-6 hover:scale-105 transition-transform duration-300 cursor-pointer `}>
                         <div className="flex items-center justify-between ">
                             <div className="flex-1 min-w-0">
                                 <h3 className="text-xs md:text-sm font-medium opacity-90 mb-2 truncate">
