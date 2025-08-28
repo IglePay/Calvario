@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@import "@fortawesome/fontawesome-free/css/all.css";
+@plugin "daisyui" {
+    themes: light ---default;
+}
+@plugin "daisyui/theme" {
+    name: "light";
+    color-scheme: light;
+    default: true;
+
+    --color-primary: #86b916;
+    --color-primary-content: #f1f5f9;
+
+    --color-secondary: #4e7c13;
+    --color-secondary-content: #f1f5f9;
+
+    --color-accent: #3358d3;
+    --color-accent-content: #f1f5f9;
+
+    --color-info: #f161cb;
+    --color-info-content: #242f39;
+
+    --color-warning: #ffc107;
+    --color-warning-content: #242f39;
+
+    --color-success: #33d37b;
+    --color-success-content: #242f39;
+
+    --color-error: #ef4444;
+    --color-error-content: #f1f5f9;
+}
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    color-scheme: dark;
+
+    --color-primary: #86b916;
+    --color-primary-content: #242f39;
+
+    --color-secondary: #4e7c13;
+    --color-secondary-content: #cbd1de;
+
+    --color-accent: #3358d3;
+    --color-accent-content: #cbd1de;
+
+    --color-neutral-dark: #2f4235f2;
+    --color-neutral-content-dark: #cbd1de;
+
+    --color-info: #f161cb;
+    --color-info-content: #242f39;
+
+    --color-success: #33d37b;
+    --color-success-content: #242f39;
+
+    --color-warning: #ffc107;
+    --color-warning-content: #242f39;
+
+    --color-error: #ef4444;
+    --color-error-content: #242f39;
+}
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
