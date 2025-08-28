@@ -1,8 +1,8 @@
 "use client"
 import { useState } from "react"
-import Sidebar from "../components/sidebar"
-import TopNavigation from "../components/top-navigation"
-import Dashboard from "../components/dashboard"
+import Sidebar from "../components/Sidebar"
+import TopNavigation from "../components/Top-navigation"
+import Dashboard from "../components/Dashboard"
 import { useNavigation } from "../hooks/use-navigation"
 
 export default function Home() {

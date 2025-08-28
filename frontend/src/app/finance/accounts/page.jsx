@@ -1,23 +1,26 @@
 "use client"
 import { useState } from "react"
 import Link from "next/link"
-
 const membersData = [
     {
         id: 1,
-        rol: "Admin",
-        usuario: "jesus belen",
-        email: "jesus12@gmail.com",
+        Cuenta: "ofrenda",
+        Tipo: "ingreso",
+        Fondo: "Saldo General",
+        Saldo: 2020,
+        Fecha: "12/05/2023",
     },
     {
         id: 2,
-        rol: "User",
-        usuario: "maria lopez",
-        email: "maria12@gmail.com",
+        Cuenta: "diezmo",
+        Tipo: "ingreso",
+        Fondo: "Saldo General",
+        Saldo: 2019,
+        Fecha: "10/04/2023",
     },
 ]
 
-const Users = () => {
+const Accounts = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -33,7 +36,7 @@ const Users = () => {
         <div className="flex flex-col w-full h-full p-6 bg-base-100">
             {/* Controles superiores */}
             <h2 className="text-center text-xl font-bold">
-                Listado de Usuarios
+                Listado de Cuentas
             </h2>
             <Link
                 href={"/"}
@@ -56,7 +59,7 @@ const Users = () => {
                 <div className="flex flex-col md:flex-row items-center gap-2">
                     <input
                         type="text"
-                        placeholder="Buscar por ministerio, actividad"
+                        placeholder="Buscar por cuenta, tipo, fecha"
                         className="input input-sm input-bordered w-full md:w-70"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -78,12 +81,14 @@ const Users = () => {
             {/* Tabla */}
             <div className="overflow-x-auto rounded-box border border-base-content/5 ">
                 <table className="table table-zebra w-full text-sm">
-                    <thead className="bg-gray-300 text-center">
+                    <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Rol</th>
-                            <th>Usuario</th>
-                            <th>Email</th>
+                            <th>Cuenta</th>
+                            <th>Tipo</th>
+                            <th>Fondo</th>
+                            <th>Saldo</th>
+                            <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -93,9 +98,11 @@ const Users = () => {
                             .map((member, index) => (
                                 <tr key={member.id}>
                                     <td>{member.id}</td>
-                                    <td>{member.rol}</td>
-                                    <td>{member.usuario}</td>
-                                    <td>{member.email}</td>
+                                    <td>{member.Cuenta}</td>
+                                    <td>{member.Tipo}</td>
+                                    <td>{member.Fondo}</td>
+                                    <td>{member.Saldo}</td>
+                                    <td>{member.Fecha}</td>
                                     <td className="flex gap-2">
                                         <button className="btn btn-info btn-xs">
                                             <i className="fas fa-eye"></i>
@@ -115,5 +122,4 @@ const Users = () => {
         </div>
     )
 }
-
-export default Users
+export default Accounts

@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import Link from "next/link"
 
 const membersData = [
     {
@@ -30,6 +31,11 @@ const Groups = () => {
             <h2 className="text-center text-xl font-bold">
                 Listado de Ministerios
             </h2>
+            <Link
+                href={"/"}
+                className="btn btn-primary btn-sm mt-4 w-24 rounded-xl">
+                <span>Regresar</span>
+            </Link>
             <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2 mt-5">
                 <div className="flex gap-2 flex-wrap">
                     <button className="btn btn-accent btn-sm">

@@ -1,12 +1,18 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export function useNavigation() {
+    const router = useRouter()
     const [activeSection, setActiveSection] = useState("escritorio")
     const [searchQuery, setSearchQuery] = useState("")
 
     const menuItems = [
-        { id: "escritorio", icon: "fas fa-desktop", label: "Escritorio" },
+        {
+            id: "escritorio",
+            icon: "fas fa-desktop",
+            label: "Escritorio",
+        },
         {
             id: "miembros",
             icon: "fas fa-users",
@@ -15,7 +21,8 @@ export function useNavigation() {
                 {
                     id: "miembros-lista",
                     icon: "fas fa-list",
-                    label: "Lista",
+                    label: "Listado Miembros",
+                    route: "/persons",
                 },
                 {
                     id: "miembros-agregar",
@@ -28,24 +35,90 @@ export function useNavigation() {
             id: "actividades",
             icon: "fas fa-calendar-alt",
             label: "Actividades",
+            route: "/activities",
         },
         {
             id: "areas-servicio",
             icon: "fas fa-cogs",
             label: "Áreas de servicio",
         },
-        { id: "usuarios", icon: "fas fa-user", label: "Usuarios" },
-        { id: "grupos", icon: "fas fa-users-cog", label: "Grupos" },
-        { id: "finanzas", icon: "fas fa-dollar-sign", label: "Finanzas" },
+        {
+            id: "usuarios",
+            icon: "fas fa-user",
+            label: "Usuarios",
+            route: "/users",
+        },
+        {
+            id: "grupos",
+            icon: "fas fa-users-cog",
+            label: "Grupos",
+            route: "/groups",
+        },
+        {
+            id: "finanzas",
+            icon: "fas fa-dollar-sign",
+            label: "Finanzas",
+            children: [
+                {
+                    id: "cuentas",
+                    icon: "fas fa-arrow-down",
+                    label: "Cuentas",
+                    route: "/finance/accounts",
+                },
+                {
+                    id: "fondos",
+                    icon: "fas fa-arrow-up",
+                    label: "Fondos",
+                    route: "/finance/funds",
+                },
+            ],
+        },
         {
             id: "asistencias",
             icon: "fas fa-clipboard-check",
             label: "Asistencias",
+            children: [
+                {
+                    id: "Asistencia_General",
+                    icon: "fas fa-list",
+                    label: "Asistencia General",
+                },
+                {
+                    id: "Assitencia_Individual",
+                    icon: "fas fa-user-plus",
+                    label: "Asistencia Individual",
+                },
+                {
+                    id: "Eventos",
+                    icon: "fas fa-file-alt",
+                    label: "Eventos",
+                },
+            ],
+        },
+        {
+            id: "Ajustes",
+            icon: "fas fa-cog",
+            label: "Ajustes",
+            children: [
+                {
+                    id: "Perfil",
+                    icon: "fas fa-user-cog",
+                    label: "Perfil",
+                },
+                {
+                    id: "Preferencias",
+                    icon: "fas fa-sliders-h",
+                    label: "Datos de la Iglesia",
+                },
+            ],
         },
     ]
 
-    const handleNavigation = (sectionId) => {
-        setActiveSection(sectionId)
+    const handleNavigation = (section) => {
+        setActiveSection(section.id)
+        if (section.route) {
+            router.push(section.route)
+        }
     }
 
     const handleSearch = (query) => {
