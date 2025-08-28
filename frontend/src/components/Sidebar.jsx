@@ -27,7 +27,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 {/* Header */}
                 <div className="p-4 border-b border-blue-500 flex items-center justify-center">
                     <Image
-                        src="/images/48484.webp"
+                        src="/images/iglepay.png"
                         alt="Logo"
                         width={100}
                         height={100}

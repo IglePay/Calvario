@@ -14,6 +14,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
     title: "IglePay",
     description: "Sistema de gestión para iglesias",
+    manifest: "/manifest.json",
+    icons: {
+        apple: "/icon.png",
+    },
+    themeColor: "#000000",
 }
 
 export default function RootLayout({ children }) {
