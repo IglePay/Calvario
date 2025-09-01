@@ -1,7 +1,10 @@
 # Iglesia app
+
 color de logo : #cf3476
+
 - pagina administrativa de la iglesia
 - pagina web de la iglesia
+
 * cobro
 
 * com.
@@ -15,9 +18,9 @@ pnpm dev
 # or
 bun dev
 ```
+
 pwa
 como instalar
 pnpm add next-pwa
-
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
