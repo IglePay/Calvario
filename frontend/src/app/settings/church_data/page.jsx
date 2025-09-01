@@ -24,105 +24,76 @@ export default function ChurchData() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <div className="bg-white rounded-xl shadow-md w-full max-w-2xl">
-                {/* Header con botón regresar */}
-                <div className="flex items-center justify-between bg-blue-600 text-white p-4 rounded-t-xl">
-                    <Link
-                        href="/"
-                        className="btn btn-primary btn-md rounded-xl">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <h1 className="text-2xl font-bold mb-4">Datos de la Iglesia</h1>
+
+            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6">
+                {/* Botón regresar */}
+                <div className="flex justify-start mb-6">
+                    <Link href="/" className="btn btn-primary rounded-2xl">
                         Regresar
                     </Link>
-
-                    <h2 className="text-lg font-bold">Datos de la Iglesia</h2>
-
-                    <div className="w-20" />
                 </div>
 
-                {/* Formulario */}
+                {/* Formulario en grid responsivo */}
                 <form
                     onSubmit={handleSubmit}
-                    className="flex flex-col gap-4 p-6">
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="identificacion"
-                            className="w-40 font-medium text-right">
-                            Identificación
-                        </label>
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col">
+                        <label className="label">Identificación</label>
                         <input
-                            id="identificacion"
+                            type="text"
                             name="identificacion"
                             value={form.identificacion}
                             onChange={handleChange}
-                            type="text"
-                            className="input input-bordered flex-1"
                             placeholder="NIT o Cédula"
+                            className="input input-bordered"
                         />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="nombre"
-                            className="w-40 font-medium text-right">
-                            Nombre
-                        </label>
+                    <div className="flex flex-col">
+                        <label className="label">Nombre</label>
                         <input
-                            id="nombre"
+                            type="text"
                             name="nombre"
                             value={form.nombre}
                             onChange={handleChange}
-                            type="text"
-                            className="input input-bordered flex-1"
                             placeholder="Nombre de la iglesia"
+                            className="input input-bordered"
                         />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="email"
-                            className="w-40 font-medium text-right">
-                            Email
-                        </label>
+                    <div className="flex flex-col">
+                        <label className="label">Email</label>
                         <input
-                            id="email"
+                            type="email"
                             name="email"
                             value={form.email}
                             onChange={handleChange}
-                            type="email"
-                            className="input input-bordered flex-1"
                             placeholder="correo@ejemplo.com"
+                            className="input input-bordered"
                         />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="telefono"
-                            className="w-40 font-medium text-right">
-                            Teléfono
-                        </label>
+                    <div className="flex flex-col">
+                        <label className="label">Teléfono</label>
                         <input
-                            id="telefono"
+                            type="tel"
                             name="telefono"
                             value={form.telefono}
                             onChange={handleChange}
-                            type="tel"
-                            className="input input-bordered flex-1"
                             placeholder="000-000-0000"
+                            className="input input-bordered"
                         />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="anioInicio"
-                            className="w-40 font-medium text-right">
-                            Año de inicio
-                        </label>
+                    <div className="flex flex-col">
+                        <label className="label">Año de inicio</label>
                         <select
-                            id="anioInicio"
                             name="anioInicio"
                             value={form.anioInicio}
                             onChange={handleChange}
-                            className="select select-bordered flex-1">
+                            className="select select-bordered">
                             <option value="">Seleccione un año</option>
                             {Array.from({ length: 50 }, (_, i) => {
                                 const year = new Date().getFullYear() - i
@@ -135,27 +106,23 @@ export default function ChurchData() {
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label
-                            htmlFor="direccion"
-                            className="w-40 font-medium text-right">
-                            Dirección
-                        </label>
+                    <div className="flex flex-col">
+                        <label className="label">Dirección</label>
                         <input
-                            id="direccion"
+                            type="text"
                             name="direccion"
                             value={form.direccion}
                             onChange={handleChange}
-                            type="text"
-                            className="input input-bordered flex-1"
                             placeholder="Dirección completa"
+                            className="input input-bordered"
                         />
                     </div>
 
-                    <div className="flex justify-end mt-4">
+                    {/* Botón de enviar */}
+                    <div className="col-span-full flex justify-end mt-4">
                         <button
                             type="submit"
-                            className="btn btn-primary rounded-xl px-6">
+                            className="btn btn-accent rounded-2xl px-6">
                             Actualizar
                         </button>
                     </div>

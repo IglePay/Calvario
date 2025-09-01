@@ -44,6 +44,12 @@ export function useNavigation() {
             label: "Áreas de servicio",
         },
         {
+            id: "limpieza",
+            icon: "fa fa-solid fa-broom",
+            label: "Áreas de limpieza",
+            route: "/cleaning",
+        },
+        {
             id: "usuarios",
             icon: "fas fa-user",
             label: "Usuarios",

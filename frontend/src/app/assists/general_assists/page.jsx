@@ -84,8 +84,8 @@ const General_Assists = () => {
             </div>
 
             {/* Tabla */}
-            <div className="overflow-x-auto rounded-box border border-base-content/5 md:ml-70 md:mt-5 ">
-                <table className="table table-zebra w-auto text-sm items-center justify-center">
+            <div className="overflow-x-auto rounded-box border border-base-content/5 md:mt-5 bg-base-100 ">
+                <table className="table table-zebra  text-sm items-center justify-center ">
                     <thead>
                         <tr>
                             <th>ID</th>
