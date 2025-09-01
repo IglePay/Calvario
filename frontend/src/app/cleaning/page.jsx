@@ -121,12 +121,12 @@ export default function CleaningCalendar() {
                 <button
                     onClick={() => setIsOpen(true)}
                     className="btn btn-accent rounded-xl">
-                    Registrar Persona
+                    Registrar
                 </button>
                 <button
                     onClick={() => setIsOpen(true)}
                     className="btn btn-error rounded-xl">
-                    Eliminar Persona
+                    Eliminar
                 </button>
             </div>
 

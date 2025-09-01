@@ -3,7 +3,6 @@
 export default function TopNavigation({ onMenuClick, navigation }) {
     const navItems = [
         "Actividades",
-        "Áreas de servicio",
         "Miembros",
         "Finanzas",
         "Asistencias",
@@ -31,7 +30,7 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                             onKeyPress={(e) =>
                                 e.key === "Enter" && handleSearch(searchQuery)
                             }
-                            className="w-80 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base text-gray-700"
+                            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base text-gray-700"
                         />
                         <button
                             onClick={() => handleSearch(searchQuery)}
@@ -55,18 +54,11 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                     <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                         Nuevo
                     </button>
-
-                    <button className="text-gray-700 hover:text-blue-600">
-                        <i className="fas fa-shopping-cart text-lg"></i>
-                    </button>
                 </nav>
 
                 <div className="flex items-center space-x-2 lg:hidden">
                     <button className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
                         <i className="fas fa-plus"></i>
-                    </button>
-                    <button className="text-gray-700 hover:text-blue-600">
-                        <i className="fas fa-shopping-cart"></i>
                     </button>
                 </div>
             </div>

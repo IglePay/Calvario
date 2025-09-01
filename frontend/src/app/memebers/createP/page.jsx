@@ -7,7 +7,7 @@ const CreateP = () => {
             <div className="flex flex-wrap gap-2 col-span-full w-full ">
                 <Link
                     href="/"
-                    className="btn btn-primary rounded-2xl sm:ml-10 ">
+                    className="btn btn-primary rounded-2xl ml-3 sm:ml-10 ">
                     Regresar
                 </Link>
             </div>
@@ -16,7 +16,7 @@ const CreateP = () => {
                 <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="flex flex-col">
                         <label className="label">Foto</label>
-                        <input type="file" className="file-input" />
+                        <input type="file" className="file-input w-full" />
                     </div>
 
                     <div className="flex flex-col">
@@ -24,7 +24,7 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="409011"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
@@ -33,7 +33,7 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Ingrese su nombre"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
@@ -42,7 +42,7 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Ingrese su apellido"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
@@ -51,7 +51,7 @@ const CreateP = () => {
                         <input
                             type="email"
                             placeholder="Ingrese email"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
@@ -60,18 +60,18 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Número de teléfono"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
                     <div className="flex flex-col">
                         <label className="label">Fecha de nacimiento</label>
-                        <input type="date" className="input" />
+                        <input type="date" className="input w-full" />
                     </div>
 
                     <div className="flex flex-col">
                         <label className="label">Sexo</label>
-                        <select className="input">
+                        <select className="input w-full">
                             <option value="">Seleccione</option>
                             <option value="M">Masculino</option>
                             <option value="F">Femenino</option>
@@ -83,13 +83,13 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Ingrese su dirección"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
                     <div className="flex flex-col">
                         <label className="label">Estado civil</label>
-                        <select className="input">
+                        <select className="input w-full">
                             <option value="">Seleccione</option>
                             <option value="S">Soltero</option>
                             <option value="C">Casado</option>
@@ -102,7 +102,7 @@ const CreateP = () => {
                         <label className="label">
                             Año de inicio en la iglesia
                         </label>
-                        <input type="date" className="input" />
+                        <input type="date" className="input w-full" />
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -116,7 +116,7 @@ const CreateP = () => {
 
                     <div className="flex flex-col">
                         <label className="label">Fecha de Bautismo</label>
-                        <input type="date" className="input" />
+                        <input type="date" className="input w-full" />
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -133,13 +133,13 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Ingrese procesos"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
                     <div className="flex flex-col">
                         <label className="label">Grupo al que pertenece?</label>
-                        <select className="input">
+                        <select className="input w-full">
                             <option value="">Seleccione</option>
                             <option value="S">Sí</option>
                             <option value="N">No</option>
@@ -151,7 +151,7 @@ const CreateP = () => {
                         <input
                             type="text"
                             placeholder="Ingrese área"
-                            className="input"
+                            className="input w-full"
                         />
                     </div>
 
@@ -159,10 +159,10 @@ const CreateP = () => {
                         <label className="label">
                             Lo favorito en la iglesia
                         </label>
-                        <input className="input" />
+                        <input className="input w-full" />
                     </div>
 
-                    <div className="flex flex-wrap gap-2 col-span-full">
+                    <div className="flex flex-wrap gap-2 col-span-full items-center justify-center">
                         <button className="btn btn-accent w-auto rounded-2xl">
                             Guardar
                         </button>
