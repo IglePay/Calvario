@@ -19,7 +19,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
             )}
 
             <div
-                className={`bg-blue-600 text-white w-64 flex-shrink-0 fixed lg:relative h-auto z-50 transform transition-transform duration-300 ease-in-out ${
+                className={`bg-blue-600 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${
                     isOpen
                         ? "translate-x-0"
                         : "-translate-x-full lg:translate-x-0"
@@ -42,8 +42,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 </div>
 
                 {/* Navigation Menu */}
-                {/* <nav className="mt-1 flex-1 bg-blue-600"> */}
-                <nav className=" flex-1 bg-blue-600 overflow-y-auto md:overflow-visible max-h-[calc(100vh-150px)] md:max-h-none">
+                <nav className="flex-1 bg-blue-600 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button

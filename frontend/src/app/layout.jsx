@@ -19,6 +19,12 @@ export const metadata = {
         apple: "/icon.png",
     },
     themeColor: "#000000",
+    viewport: {
+        width: "device-width",
+        initialScale: 1,
+        minimumScale: 1,
+        userScalable: false,
+    },
 }
 
 export default function RootLayout({ children }) {
