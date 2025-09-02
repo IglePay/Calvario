@@ -4,19 +4,21 @@ import Link from "next/link"
 const membersData = [
     {
         id: 1,
-        Cuenta: "ofrenda",
-        Tipo: "ingreso",
-        Fondo: "Saldo General",
-        Saldo: 2020,
+        Cuenta: "Saldo general",
+        Monto: "888.90",
         Fecha: "12/05/2023",
     },
     {
         id: 2,
         Cuenta: "diezmo",
-        Tipo: "ingreso",
-        Fondo: "Saldo General",
-        Saldo: 2019,
+        Monto: "400.50",
         Fecha: "10/04/2023",
+    },
+    {
+        id: 3,
+        Cuenta: "ayuda",
+        Monto: "150.90",
+        Fecha: "10/06/2023",
     },
 ]
 
@@ -83,9 +85,7 @@ const Funds = () => {
                         <tr>
                             <th>ID</th>
                             <th>Cuenta</th>
-                            <th>Tipo</th>
-                            <th>Fondo</th>
-                            <th>Saldo</th>
+                            <th>Monto</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
@@ -97,9 +97,7 @@ const Funds = () => {
                                 <tr key={member.id}>
                                     <td>{member.id}</td>
                                     <td>{member.Cuenta}</td>
-                                    <td>{member.Tipo}</td>
-                                    <td>{member.Fondo}</td>
-                                    <td>{member.Saldo}</td>
+                                    <td>{member.Monto}</td>
                                     <td>{member.Fecha}</td>
                                     <td className="flex gap-2">
                                         <button className="btn btn-info btn-xs">
