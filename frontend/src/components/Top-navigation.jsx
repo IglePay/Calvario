@@ -57,7 +57,7 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                 </nav>
 
                 <div className="flex items-center space-x-2 lg:hidden">
-                    <button className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm ml-1">
+                    <button className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm ml-3 md:ml-1">
                         <i className="fas fa-plus"></i>
                     </button>
                 </div>

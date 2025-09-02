@@ -68,13 +68,13 @@ export function useNavigation() {
             children: [
                 {
                     id: "cuentas",
-                    icon: "fas fa-arrow-down",
+                    icon: "fa-solid fa-wallet",
                     label: "Cuentas",
                     route: "/finance/accounts",
                 },
                 {
                     id: "fondos",
-                    icon: "fas fa-arrow-up",
+                    icon: "fa-solid fa-piggy-bank",
                     label: "Fondos",
                     route: "/finance/funds",
                 },

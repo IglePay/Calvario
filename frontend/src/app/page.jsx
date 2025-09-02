@@ -10,7 +10,7 @@ export default function Home() {
     const navigation = useNavigation()
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen ">
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
@@ -21,7 +21,7 @@ export default function Home() {
                     onMenuClick={() => setSidebarOpen(true)}
                     navigation={navigation}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto  p-4 md:p-6">
                     {navigation.activeSection === "escritorio" && <Dashboard />}
                     {navigation.activeSection !== "escritorio" && (
                         <div className="flex items-center justify-center h-full">

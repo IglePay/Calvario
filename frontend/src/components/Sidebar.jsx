@@ -25,7 +25,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                         : "-translate-x-full lg:translate-x-0"
                 }`}>
                 {/* Header */}
-                <div className="p-4 border-b border-blue-500 flex items-center justify-center">
+                <div className="p-0 border-b border-blue-500 flex items-center justify-center">
                     <Image
                         src="/images/iglepay.png"
                         alt="Logo"
@@ -42,7 +42,8 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="mt-1 flex-1 bg-blue-600">
+                {/* <nav className="mt-1 flex-1 bg-blue-600"> */}
+                <nav className=" flex-1 bg-blue-600 overflow-y-auto md:overflow-visible max-h-[calc(100vh-150px)] md:max-h-none">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button
@@ -56,7 +57,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                                 }}
                                 className={`w-full flex items-center px-4 py-3 text-sm hover:bg-blue-700 transition-colors text-left ${
                                     activeSection === item.id
-                                        ? "bg-blue-700 border-r-4 border-white"
+                                        ? "bg-blue-700 border-r-4 border-r-rose-400"
                                         : ""
                                 }`}>
                                 <i className={`${item.icon} w-5 mr-3`}></i>
