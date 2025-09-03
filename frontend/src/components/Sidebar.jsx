@@ -97,7 +97,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 {/* Settings and Logout */}
                 <div className="">
                     <a
-                        href="#"
+                        href="/"
                         className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors">
                         <i className="fas fa-sign-out-alt w-5 mr-3"></i>
                         Cerrar sesión
