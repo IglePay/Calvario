@@ -8,7 +8,7 @@ export default function Dashboard() {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
-                    <i className="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
+                    <i className="fas fa-spinner fa-spin text-4xl text-rose-500 mb-4"></i>
                     <p className="text-gray-600">Cargando estadísticas...</p>
                 </div>
             </div>

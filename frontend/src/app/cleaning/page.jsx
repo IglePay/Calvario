@@ -115,7 +115,9 @@ export default function CleaningCalendar() {
             <h1 className="text-2xl font-bold mb-4">Calendario de Limpieza</h1>
 
             <div className="flex gap-2 mb-4">
-                <Link href={"/"} className="btn btn-primary  rounded-xl">
+                <Link
+                    href={"/control/panel"}
+                    className="btn btn-primary  rounded-xl">
                     <span>Regresar</span>
                 </Link>
                 <button

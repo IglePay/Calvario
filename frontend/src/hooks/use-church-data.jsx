@@ -16,7 +16,7 @@ export function useChurchData() {
                 title: "Total de miembros",
                 value: "122",
                 icon: "fas fa-users",
-                color: "bg-blue-500",
+                color: "bg-blue-500", // rosa principal
                 textColor: "text-white",
             },
             {
@@ -24,7 +24,7 @@ export function useChurchData() {
                 title: "Hombres",
                 value: "54",
                 icon: "fas fa-mars",
-                color: "bg-emerald-500",
+                color: "bg-gray-700", // neutro masculino
                 textColor: "text-white",
             },
             {
@@ -40,7 +40,7 @@ export function useChurchData() {
                 title: "Servidores",
                 value: "91",
                 icon: "fas fa-id-badge",
-                color: "bg-green-600",
+                color: "bg-yellow-600", // cálido
                 textColor: "text-white",
             },
             {
@@ -48,7 +48,7 @@ export function useChurchData() {
                 title: "Niños",
                 value: "8",
                 icon: "fas fa-child",
-                color: "bg-yellow-500",
+                color: "bg-orange-500",
                 textColor: "text-white",
             },
             {
@@ -56,7 +56,7 @@ export function useChurchData() {
                 title: "Adolescentes",
                 value: "12",
                 icon: "fas fa-smile",
-                color: "bg-indigo-700",
+                color: "bg-purple-600",
                 textColor: "text-white",
             },
             {
@@ -64,7 +64,7 @@ export function useChurchData() {
                 title: "Jóvenes",
                 value: "34",
                 icon: "fas fa-glasses",
-                color: "bg-orange-600",
+                color: "bg-indigo-500",
                 textColor: "text-white",
             },
             {
@@ -72,7 +72,7 @@ export function useChurchData() {
                 title: "Adultos",
                 value: "68",
                 icon: "fas fa-user-tie",
-                color: "bg-blue-700",
+                color: "bg-orange-600",
                 textColor: "text-white",
             },
             {
@@ -80,7 +80,7 @@ export function useChurchData() {
                 title: "Miembros bautizados",
                 value: "68",
                 icon: "fas fa-water",
-                color: "bg-cyan-500",
+                color: "bg-teal-500",
                 textColor: "text-white",
             },
             {
@@ -88,7 +88,7 @@ export function useChurchData() {
                 title: "Miembros no bautizados",
                 value: "54",
                 icon: "fas fa-water",
-                color: "bg-teal-500",
+                color: "bg-gray-400",
                 textColor: "text-white",
             },
             {
@@ -104,7 +104,7 @@ export function useChurchData() {
                 title: "Solteros",
                 value: "26",
                 icon: "fas fa-user",
-                color: "bg-gray-500",
+                color: "bg-gray-600",
                 textColor: "text-white",
             },
         ]

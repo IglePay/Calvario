@@ -6,7 +6,7 @@ const CreateP = () => {
             <h1 className="text-2xl font-bold mb-4">Nuevo Registro</h1>
             <div className="flex flex-wrap gap-2 col-span-full w-full ">
                 <Link
-                    href="/"
+                    href="/control/panel"
                     className="btn btn-primary rounded-2xl ml-3 sm:ml-10 ">
                     Regresar
                 </Link>

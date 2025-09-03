@@ -37,7 +37,7 @@ const Individual_Assists = () => {
                 Listado de Asistencias Individual
             </h2>
             <Link
-                href={"/"}
+                href={"/control/panel"}
                 className="btn btn-primary btn-sm mt-4 w-24 rounded-xl">
                 <span>Regresar</span>
             </Link>

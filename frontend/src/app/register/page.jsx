@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -38,7 +39,6 @@ const Register = () => {
             const data = await res.json()
             if (!res.ok) throw new Error(data.message || "Error al registrarse")
 
-            console.log("Registro exitoso:", data)
             window.location.href = "/control/login"
         } catch (err) {
             setError(err.message)
@@ -46,20 +46,35 @@ const Register = () => {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <div className="bg-white rounded-xl shadow-md w-full max-w-md p-8">
-                <h2 className="text-2xl font-bold mb-6 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100 p-4">
+            {/* Círculo con logo */}
+            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white mb-6">
+                <Image
+                    src="/images/iglepay.png"
+                    alt="Logo Calvario"
+                    width={120}
+                    height={120}
+                    className="object-contain"
+                    priority
+                />
+            </div>
+
+            {/* Card de registro */}
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-5 border border-cyan-600">
+                <h2 className="text-2xl font-bold mb-3 text-center text-gray-800">
                     Registro
                 </h2>
 
-                <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <form
+                    className="flex flex-col items-center justify-center gap-4"
+                    onSubmit={handleSubmit}>
                     <input
                         type="text"
                         name="name"
                         value={form.name}
                         onChange={handleChange}
                         placeholder="Nombre completo"
-                        className="input input-bordered w-full"
+                        className="input input-bordered w-full rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                         required
                     />
                     <input
@@ -68,7 +83,7 @@ const Register = () => {
                         value={form.email}
                         onChange={handleChange}
                         placeholder="Correo electrónico"
-                        className="input input-bordered w-full"
+                        className="input input-bordered w-full rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                         required
                     />
 
@@ -79,11 +94,11 @@ const Register = () => {
                             value={form.password}
                             onChange={handleChange}
                             placeholder="Contraseña"
-                            className="input input-bordered w-full pr-10"
+                            className="input input-bordered w-80 sm:w-100 pr-10 rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                             required
                         />
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600"
                             onClick={() => setShowPassword((prev) => !prev)}>
                             {showPassword ? (
                                 <i className="fa-solid fa-eye-slash"></i>
@@ -100,11 +115,11 @@ const Register = () => {
                             value={form.confirmPassword}
                             onChange={handleChange}
                             placeholder="Confirmar contraseña"
-                            className="input input-bordered w-full pr-10"
+                            className="input input-bordered w-80 sm:w-100 pr-10 rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                             required
                         />
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600"
                             onClick={() => setShowConfirm((prev) => !prev)}>
                             {showConfirm ? (
                                 <i className="fa-solid fa-eye-slash"></i>
@@ -118,7 +133,7 @@ const Register = () => {
 
                     <button
                         type="submit"
-                        className="btn btn-primary rounded-xl mt-2">
+                        className="btn bg-rose-900 hover:bg-rose-700 text-white font-semibold rounded-full">
                         Registrarse
                     </button>
                 </form>
@@ -126,8 +141,8 @@ const Register = () => {
                 <p className="mt-4 text-center text-sm text-gray-500">
                     ¿Ya tienes cuenta?{" "}
                     <Link
-                        href="/control/login"
-                        className="text-blue-500 font-semibold">
+                        href="/"
+                        className="text-cyan-600 font-semibold hover:underline">
                         Inicia sesión
                     </Link>
                 </p>

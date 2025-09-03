@@ -30,7 +30,9 @@ export default function ChurchData() {
             <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6">
                 {/* Botón regresar */}
                 <div className="flex justify-start mb-6">
-                    <Link href="/" className="btn btn-primary rounded-2xl">
+                    <Link
+                        href="/control/panel"
+                        className="btn btn-primary rounded-2xl">
                         Regresar
                     </Link>
                 </div>

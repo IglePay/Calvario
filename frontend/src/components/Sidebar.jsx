@@ -19,13 +19,13 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
             )}
 
             <div
-                className={`bg-blue-600 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${
+                className={`bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${
                     isOpen
                         ? "translate-x-0"
                         : "-translate-x-full lg:translate-x-0"
                 }`}>
                 {/* Header */}
-                <div className="p-0 border-b border-blue-500 flex items-center justify-center">
+                <div className="p-0 border-b border-gray-700 flex items-center justify-center">
                     <Image
                         src="/images/iglepay.png"
                         alt="Logo"
@@ -36,13 +36,13 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                     />
                     <button
                         onClick={onClose}
-                        className="lg:hidden text-white hover:text-gray-200">
+                        className="lg:hidden text-white hover:text-gray-300">
                         <i className="fas fa-times text-lg"></i>
                     </button>
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 bg-blue-600 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+                <nav className="flex-1 bg-gray-900 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button
@@ -54,9 +54,9 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                                         onClose()
                                     }
                                 }}
-                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-blue-700 transition-colors text-left ${
+                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${
                                     activeSection === item.id
-                                        ? "bg-blue-700 border-r-4 border-r-rose-400"
+                                        ? "bg-gray-900 border-r-4 border-r-rose-400"
                                         : ""
                                 }`}>
                                 <i className={`${item.icon} w-5 mr-3`}></i>
@@ -82,7 +82,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                                                 handleNavigation(child)
                                                 onClose()
                                             }}
-                                            className="w-full flex items-center px-3 py-2 text-sm hover:bg-blue-700 rounded">
+                                            className="w-full flex items-center px-3 py-2 text-sm hover:bg-gray-500 rounded">
                                             <i
                                                 className={`${child.icon} w-4 mr-2`}></i>
                                             {child.label}
@@ -98,7 +98,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 <div className="">
                     <a
                         href="#"
-                        className="flex items-center px-4 py-3 text-sm bg-blue-600 hover:bg-blue-700 transition-colors">
+                        className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors">
                         <i className="fas fa-sign-out-alt w-5 mr-3"></i>
                         Cerrar sesión
                     </a>
