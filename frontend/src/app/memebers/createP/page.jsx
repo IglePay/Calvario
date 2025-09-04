@@ -2,7 +2,7 @@ import Link from "next/link"
 
 const CreateP = () => {
     return (
-        <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-100 ">
+        <div className="flex flex-col items-center justify-center w-full min-h-screen bg-base-100 ">
             <h1 className="text-2xl font-bold mb-4">Nuevo Registro</h1>
             <div className="flex flex-wrap gap-2 col-span-full w-full ">
                 <Link
@@ -12,7 +12,7 @@ const CreateP = () => {
                 </Link>
             </div>
 
-            <div className="w-full max-w-7xl bg-white p-3 rounded-lg shadow-lg mt-4">
+            <div className="w-full max-w-7xl bg-base-200 p-3 rounded-lg shadow-lg mt-4">
                 <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="flex flex-col">
                         <label className="label">Foto</label>

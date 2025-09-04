@@ -1,14 +1,11 @@
 "use client"
+import { ThemeContext } from "@/hooks/themeContext"
+import { useContext } from "react"
 
 export default function TopNavigation({ onMenuClick, navigation }) {
-    const navItems = [
-        "Actividades",
-        "Miembros",
-        "Finanzas",
-        "Asistencias",
-        "Usuarios",
-    ]
+    const navItems = ["Miembros", "Finanzas", "Asistencias", "Usuarios"]
     const { searchQuery, handleSearch, setSearchQuery } = navigation
+    const { theme, toggleTheme } = useContext(ThemeContext)
 
     return (
         <header className=" shadow-sm border-b border-gray-400">
@@ -30,7 +27,7 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                             onKeyPress={(e) =>
                                 e.key === "Enter" && handleSearch(searchQuery)
                             }
-                            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base text-gray-700"
+                            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base text-gray-700 dark:text-white"
                         />
                         <button
                             onClick={() => handleSearch(searchQuery)}
@@ -46,7 +43,7 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                         <a
                             key={index}
                             href="#"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors whitespace-nowrap text-base">
+                            className="text-gray-700 hover:text-blue-600 dark:text-white font-medium transition-colors whitespace-nowrap text-base">
                             {item}
                         </a>
                     ))}
@@ -61,6 +58,12 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                         <i className="fas fa-plus"></i>
                     </button>
                 </div>
+                {/* Theme Toggle */}
+                <button onClick={toggleTheme} className="rounded-md ml-2">
+                    <i
+                        className={`fa-solid ${theme === "light" ? "fa-moon text-gray-800" : "fa-sun text-yellow-400"} text-2xl`}
+                    />
+                </button>
             </div>
         </header>
     )

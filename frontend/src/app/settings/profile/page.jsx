@@ -22,10 +22,10 @@ export default function Profile() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-base-100 p-4">
             <h1 className="text-2xl font-bold mb-4">Editar Usuario</h1>
 
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6">
+            <div className="w-full max-w-3xl bg-base-200 rounded-2xl shadow-lg p-6">
                 {/* Botón regresar */}
                 <div className="flex justify-start mb-6">
                     <Link
