@@ -19,17 +19,27 @@ const Home = ({ role }) => {
         setError("")
 
         try {
-            const res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, role }),
-            })
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: form.email,
+                        password: form.password,
+                    }),
+                },
+            )
 
             const data = await res.json()
             if (!res.ok)
                 throw new Error(data.message || "Error al iniciar sesión")
 
-            window.location.href = "/dashboard"
+            // ✅ Guardar token
+            localStorage.setItem("token", data.access_token)
+
+            // ✅ Redirigir
+            window.location.href = "/control/panel"
         } catch (err) {
             setError(err.message)
         }
