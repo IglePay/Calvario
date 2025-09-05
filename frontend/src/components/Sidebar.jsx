@@ -96,12 +96,15 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
 
                 {/* Settings and Logout */}
                 <div className="">
-                    <a
-                        href="/"
-                        className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors">
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("token")
+                            window.location.href = "/"
+                        }}
+                        className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors w-full text-left">
                         <i className="fas fa-sign-out-alt w-5 mr-3"></i>
                         Cerrar sesión
-                    </a>
+                    </button>
                 </div>
             </div>
         </>
