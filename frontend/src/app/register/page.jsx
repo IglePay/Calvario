@@ -24,22 +24,36 @@ const Register = () => {
         e.preventDefault()
         setError("")
 
+        // Validación de contraseñas
         if (form.password !== form.confirmPassword) {
             setError("Las contraseñas no coinciden")
             return
         }
 
         try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            })
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: form.name,
+                        email: form.email,
+                        password: form.password,
+                    }),
+                },
+            )
 
             const data = await res.json()
-            if (!res.ok) throw new Error(data.message || "Error al registrarse")
+            console.log("Respuesta backend:", res.status, data) // Para depuración
 
-            window.location.href = "/control/login"
+            if (!res.ok) {
+                throw new Error(data.message || "Error al registrarse")
+            }
+
+            // Redirige al login solo si todo está OK
+            window.location.href = "/"
         } catch (err) {
             setError(err.message)
         }
