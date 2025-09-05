@@ -26,6 +26,6 @@ export class UsersController {
             tenantId: number;
         },
     ) {
-        return this.usersService.create(body);
+        return this.usersService.createUser(body);
     }
 }

@@ -11,7 +11,7 @@ export class UsersService {
         });
     }
 
-    async create(data: {
+    async createUser(data: {
         name: string;
         email: string;
         password: string;

@@ -30,4 +30,19 @@ export class AuthService {
             access_token: this.jwtService.sign(payload),
         };
     }
+
+    async findByEmail(email: string) {
+        return this.usersService.findByEmail(email);
+    }
+
+    async register(name: string, email: string, password: string) {
+        const hashed = await bcrypt.hash(password, 10);
+        return this.usersService.createUser({
+            name,
+            email,
+            password: hashed,
+            tenantId: 1, // o el tenant que necesites
+            roleId: 1, // rol por defecto
+        });
+    }
 }

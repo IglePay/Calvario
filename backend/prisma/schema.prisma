@@ -1,20 +1,20 @@
+datasource db {
+  provider = "mysql"  // <-- esto debe ser exactamente "mysql"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 model User {
-  id        Int     @id @default(autoincrement())
-  tenantId  Int
-  name      String
-  email     String  @unique
-  password  String
-  roleId    Int
-  createdAt DateTime @default(now())
+  id        Int      @id @default(autoincrement()) @map("id_usuario")
+  tenantId  Int                        @map("id_tenant")
+  name      String                     @map("nombre")
+  email     String   @unique           @map("email")
+  password  String                     @map("contrasena")
+  roleId    Int                        @map("id_rol")
+  createdAt DateTime @default(now())   @map("fecha_creacion")
 
-  @@map("TBuser")
+  @@map("tb_users")   // nombre real de la tabla
 }
