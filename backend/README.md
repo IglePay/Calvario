@@ -1,10 +1,8 @@
 - paquetes inistalados
-pnpm add @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt
-pnpm add -D @types/passport-jwt @types/bcrypt
--
-pnpm add @prisma/client
-pnpm add -D prisma
-
+  pnpm add @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt
+  pnpm add -D @types/passport-jwt @types/bcrypt
+- pnpm add @prisma/client
+  pnpm add -D prisma
 
 ## Description
 
@@ -41,7 +39,6 @@ $ pnpm run test:e2e
 # test coverage
 $ pnpm run test:cov
 ```
-
 
 ```bash
 $ pnpm install -g @nestjs/mau
