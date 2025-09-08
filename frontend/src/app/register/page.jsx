@@ -60,9 +60,9 @@ const Register = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100 p-4">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100  dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 p-4">
             {/* Círculo con logo */}
-            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white mb-6">
+            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white dark:bg-transparent mb-6">
                 <Image
                     src="/images/iglepay.png"
                     alt="Logo Calvario"
@@ -74,8 +74,8 @@ const Register = () => {
             </div>
 
             {/* Card de registro */}
-            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-5 border border-cyan-600">
-                <h2 className="text-2xl font-bold mb-3 text-center text-gray-800">
+            <div className="bg-white dark:bg-base-200 rounded-2xl shadow-lg w-full max-w-md p-5 border border-cyan-600">
+                <h2 className="text-2xl font-bold mb-3 text-center text-gray-800 dark:text-white">
                     Registro
                 </h2>
 
@@ -152,7 +152,7 @@ const Register = () => {
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500">
+                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100">
                     ¿Ya tienes cuenta?{" "}
                     <Link
                         href="../login"

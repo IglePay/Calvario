@@ -63,9 +63,9 @@ const Login = ({ role }) => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100 ">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100  dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
             {/* Círculo con logo */}
-            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white mb-3">
+            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white dark:bg-transparent mb-3">
                 <Image
                     src="/images/iglepay.png"
                     alt="Logo Calvario"
@@ -77,10 +77,10 @@ const Login = ({ role }) => {
             </div>
 
             {/* Card del login */}
-            <div className="bg-white rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
+            <div className="bg-white dark:bg-base-200 rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
                 <div className="flex flex-col items-center mb-6">
                     {getRoleIcon()}
-                    <h2 className="text-2xl font-bold mt-2 text-gray-800 capitalize">
+                    <h2 className="text-2xl font-bold mt-2 text-gray-800 dark:text-white capitalize">
                         {role} Bienvenido
                     </h2>
                 </div>
@@ -128,7 +128,7 @@ const Login = ({ role }) => {
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500">
+                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100">
                     ¿No tienes cuenta?{" "}
                     <Link
                         href="../register"
