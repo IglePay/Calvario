@@ -19,9 +19,18 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /var/www/iglepay-backend
+            # Ir a la carpeta correcta del backend
+            cd /var/www/iglepay-backend/Calvario/backend
+
+            # Actualizar repositorio
             git pull origin main
+
+            # Instalar dependencias
             pnpm install --prod
+
+            # Construir proyecto
             pnpm build
-            pm2 restart all
+
+            # Reiniciar con pm2 usando ruta completa (por si no está en PATH)
+            /usr/bin/pm2 restart all || /usr/local/bin/pm2 restart all
 
