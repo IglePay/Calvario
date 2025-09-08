@@ -19,6 +19,18 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            # Configurar SSH para que GitHub sea host conocido
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+
+            # Asegurarse que la clave privada esté con permisos correctos
+            echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+
+            # Configurar Git para usar la clave privada
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no"
+
             # Ir a la carpeta correcta del backend
             cd /var/www/iglepay-backend/Calvario/backend
 
@@ -31,6 +43,6 @@ jobs:
             # Construir proyecto
             pnpm build
 
-            # Reiniciar con pm2 usando ruta completa (por si no está en PATH)
-            /usr/bin/pm2 restart all || /usr/local/bin/pm2 restart all
+            # Reiniciar pm2 usando ruta absoluta
+            /home/debian/.local/share/pnpm/pm2 restart all
 
