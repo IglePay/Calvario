@@ -59,3 +59,40 @@
 }
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Fondo base del calendario */
+.rbc-month-view,
+.rbc-time-view {
+    background-color: hsl(var(--b1)) !important; /* DaisyUI base-100 */
+}
+
+/* Días fuera del mes actual */
+.rbc-off-range-bg {
+    background-color: hsl(var(--b2)) !important; /* DaisyUI base-200 */
+}
+/* Quitar fondo blanco/gris de las celdas */
+.rbc-day-bg,
+.rbc-time-slot,
+.rbc-row-bg {
+    background-color: transparent !important;
+}
+
+/* El contenedor del modal de eventos (cuando hay muchos en el mismo día) */
+.rbc-overlay {
+    background-color: transparent !important; /* fondo transparente */
+    max-height: 200px; /* o lo que quieras */
+    overflow-y: auto; /* mini scroll */
+    box-shadow: none !important; /* quitar sombra blanca */
+    border: none !important; /* sin borde */
+    padding: 0.25rem; /* opcional, espacio interno */
+    z-index: 50; /* asegurar que quede encima */
+}
+
+/* La cabecera del modal (día/hora que muestra) */
+.rbc-overlay-header {
+    background-color: hsl(var(--b1)) !important; /* DaisyUI base-100 , esta b1*/
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 600;
+    color: hsl(var(--bc));
+}
