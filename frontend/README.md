@@ -8,7 +8,6 @@ color de logo : #cf3476
 * cobro
 
 * com.
-preparar los entornos
 
 ```bash
 npm run dev
