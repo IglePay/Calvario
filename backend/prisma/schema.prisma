@@ -1,20 +1,45 @@
-datasource db {
-  provider = "mysql"  // <-- esto debe ser exactamente "mysql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        Int      @id @default(autoincrement()) @map("id_usuario")
-  tenantId  Int                        @map("id_tenant")
-  name      String                     @map("nombre")
-  email     String   @unique           @map("email")
-  password  String                     @map("contrasena")
-  roleId    Int                        @map("id_rol")
-  createdAt DateTime @default(now())   @map("fecha_creacion")
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
 
-  @@map("tb_users")   // nombre real de la tabla
+model User {
+  id         Int        @id @default(autoincrement()) @map("id_usuario")
+  tenantId   Int        @map("id_tenant")
+  name       String     @map("nombre") @db.VarChar(100)
+  email      String     @unique(map: "email") @map("email") @db.VarChar(100)
+  password   String     @map("contrasena") @db.VarChar(255)
+  roleId     Int        @map("id_rol")
+  createdAt  DateTime   @default(now()) @map("fecha_creacion") @db.Timestamp(0)
+  role       Role       @relation("UserRole", fields: [roleId], references: [id], onUpdate: Restrict, map: "fk_user_rol")
+  tb_tenants tb_tenants @relation(fields: [tenantId], references: [id_tenant], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_tenant")
+
+  @@index([roleId], map: "fk_user_rol")
+  @@index([tenantId], map: "fk_user_tenant")
+  @@map("tb_users")
+}
+
+model Role {
+  id          Int     @id @default(autoincrement()) @map("id_rol")
+  nombre      String  @unique(map: "nombre") @map("nombre") @db.VarChar(50)
+  descripcion String? @db.VarChar(255)
+  users       User[]  @relation("UserRole")
+
+  @@map("tb_roles")
+}
+
+model tb_tenants {
+  id_tenant      Int       @id @default(autoincrement())
+  dpi            String    @unique(map: "dpi") @db.VarChar(20)
+  nombre         String    @db.VarChar(100)
+  email          String    @unique(map: "email") @db.VarChar(100)
+  telefono       String?   @db.VarChar(20)
+  fecha_inicio   DateTime? @db.Date
+  direccion      String?   @db.VarChar(255)
+  fecha_creacion DateTime  @default(now()) @db.Timestamp(0)
+  tb_users       User[]
 }

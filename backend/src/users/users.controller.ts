@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Body,
+    Param,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -10,13 +18,28 @@ export class UsersController {
         return this.usersService.findAll();
     }
 
+    @Get('full')
+    async findAllFull() {
+        return this.usersService.findAllWithDetails();
+    }
+
     @Get(':email')
     findByEmail(@Param('email') email: string) {
         return this.usersService.findByEmail(email);
     }
 
+    @Get('roles')
+    async findRoles() {
+        return this.usersService.findRoles();
+    }
+
+    @Get('tenants')
+    async findTenants() {
+        return this.usersService.findTenants();
+    }
+
     @Post()
-    create(
+    async create(
         @Body()
         body: {
             name: string;
@@ -27,5 +50,26 @@ export class UsersController {
         },
     ) {
         return this.usersService.createUser(body);
+    }
+
+    @Put(':id')
+    update(
+        @Param('id') id: string,
+        @Body()
+        data: {
+            name?: string;
+            email?: string;
+            password?: string;
+            roleId?: number;
+            tenantId?: number;
+        },
+    ) {
+        // Llama al servicio que maneja la actualización
+        return this.usersService.updateUser(+id, data);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.usersService.deleteUser(+id);
     }
 }

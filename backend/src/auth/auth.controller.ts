@@ -6,7 +6,6 @@ import {
     Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
-
 import { AuthService } from './auth.service';
 
 @Controller('auth')
