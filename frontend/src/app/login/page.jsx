@@ -1,11 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
 
-const Login = ({ role }) => {
-    const [form, setForm] = useState({ email: "", password: "" })
+const Login = () => {
+    const searchParams = useSearchParams()
+    const role = searchParams.get("role") || "miembro"
+
+    const [form, setForm] = useState({
+        email: "",
+        password: "",
+        iglesia: "",
+    })
     const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState("")
 
@@ -13,21 +21,27 @@ const Login = ({ role }) => {
         const { name, value } = e.target
         setForm((prev) => ({ ...prev, [name]: value }))
     }
-
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
 
         try {
+            const body = {
+                email: form.email,
+                password: form.password,
+            }
+
+            // Solo enviar iglesia si es miembro
+            if (role === "miembro") {
+                body.iglesia = form.iglesia
+            }
+
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email: form.email,
-                        password: form.password,
-                    }),
+                    body: JSON.stringify(body),
                     credentials: "include",
                 },
             )
@@ -36,7 +50,6 @@ const Login = ({ role }) => {
             if (!res.ok)
                 throw new Error(data.message || "Error al iniciar sesión")
 
-            // ✅ Redirigir
             window.location.href = "/control"
         } catch (err) {
             setError(err.message)
@@ -47,15 +60,15 @@ const Login = ({ role }) => {
         switch (role) {
             case "miembro":
                 return (
-                    <i className="fa-solid fa-users text-3xl text-cyan-600"></i>
+                    <i className="fa-solid fa-users text-4xl text-cyan-600"></i>
                 )
             case "pastor":
                 return (
-                    <i className="fa-solid fa-user-tie text-3xl text-rose-600"></i>
+                    <i className="fa-solid fa-user-tie text-4xl text-rose-600"></i>
                 )
             case "admin":
                 return (
-                    <i className="fa-solid fa-user-shield text-3xl text-gray-700"></i>
+                    <i className="fa-solid fa-user-shield text-4xl text-gray-700 dark:text-gray-100"></i>
                 )
             default:
                 return null
@@ -88,6 +101,20 @@ const Login = ({ role }) => {
                 <form
                     className="flex flex-col items-center justify-center gap-2"
                     onSubmit={handleSubmit}>
+                    {role === "miembro" && (
+                        <select
+                            name="iglesia"
+                            value={form.iglesia}
+                            onChange={handleChange}
+                            className="select select-sm  w-full md:w-100 input-bordered border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
+                            required>
+                            <option>Selecciona tu iglesia</option>
+                            <option>Iglesia carcha</option>
+                            <option>Iglesia coban</option>
+                            <option>Iglesia chamelco</option>
+                        </select>
+                    )}
+
                     <input
                         type="email"
                         name="email"
