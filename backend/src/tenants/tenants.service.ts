@@ -7,7 +7,13 @@ export class TenantsService {
 
     // Obtener todos los tenants
     async findAll() {
-        return this.prisma.tb_tenants.findMany();
+        const tenants = await this.prisma.tb_tenants.findMany();
+        return tenants.map((t) => ({
+            ...t,
+            fecha_inicio: t.fecha_inicio
+                ? t.fecha_inicio.toISOString().split('T')[0]
+                : null,
+        }));
     }
 
     // Obtener tenant por id
@@ -31,6 +37,15 @@ export class TenantsService {
 
     // Actualizar tenant
     async update(id: number, data: any) {
+        const { id_tenant, fecha_creacion, ...updateData } = data; // Excluir id_tenant de los datos a actualizar
+
+        if (
+            updateData.fecha_inicio &&
+            typeof updateData.fecha_inicio === 'string'
+        ) {
+            updateData.fecha_inicio = new Date(updateData.fecha_inicio);
+        }
+
         return this.prisma.tb_tenants.update({
             where: { id_tenant: id },
             data,
