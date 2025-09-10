@@ -22,5 +22,6 @@ bun dev
 pwa
 como instalar
 pnpm add next-pwa
+pnpm add xlsx jspdf jspdf-autotable
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

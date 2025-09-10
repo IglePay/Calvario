@@ -105,7 +105,7 @@ const Persons = () => {
                         {filteredMembers
                             .slice(0, rowsPerPage)
                             .map((member, index) => (
-                                <tr key={member.id}>
+                                <tr key={member.id} className="text-center">
                                     <td>{member.id}</td>
                                     <td>{member.nombre}</td>
                                     <td>{member.edad}</td>
@@ -115,10 +115,7 @@ const Persons = () => {
                                     <td>{member.bautismo}</td>
                                     <td>{member.procesos}</td>
                                     <td>{member.areas}</td>
-                                    <td className="flex gap-2">
-                                        <button className="btn btn-info btn-xs">
-                                            <i className="fas fa-eye"></i>
-                                        </button>
+                                    <td className="flex gap-2 items-center justify-center">
                                         <button className="btn btn-warning btn-xs">
                                             <i className="fas fa-edit"></i>
                                         </button>

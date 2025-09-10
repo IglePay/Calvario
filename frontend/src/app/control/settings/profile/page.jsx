@@ -2,21 +2,22 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-console.log("API_URL", API_URL)
-export default function Profile() {
-    const [modalOpen, setModalOpen] = useState(false)
+import { exportToExcel, exportToPDF } from "@/utils/exportData"
+import { useUsers } from "@/hooks/profile/useUsers"
 
-    // Tabla / listado
-    const [users, setUsers] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+export default function Profile() {
+    const {
+        users,
+        loading,
+        error,
+        roles,
+        tenants,
+        createOrUpdateUser,
+        deleteUser,
+    } = useUsers()
+    const [modalOpen, setModalOpen] = useState(false)
     const [search, setSearch] = useState("")
     const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [roles, setRoles] = useState([])
-    const [tenants, setTenants] = useState([])
-
-    // Formulario
     const [form, setForm] = useState({
         id_usuario: null,
         usuario: "",
@@ -26,14 +27,11 @@ export default function Profile() {
         iglesia: "",
     })
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setForm((prev) => ({ ...prev, [name]: value }))
-    }
+    const handleChange = (e) =>
+        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
     const openModal = (user = null) => {
         if (user) {
-            // Editar usuario existente
             setForm({
                 id_usuario: user.id,
                 usuario: user.name,
@@ -43,60 +41,34 @@ export default function Profile() {
                 iglesia: user.tb_tenants?.id_tenant?.toString() || "",
             })
         } else {
-            // Crear nuevo usuario
             setForm({
                 id_usuario: null,
                 usuario: "",
                 email: "",
                 password: "",
-                id_rol: "2", // miembro por defecto
+                id_rol: "2",
                 iglesia: tenants[0]?.id_tenant?.toString() || "",
             })
         }
         setModalOpen(true)
     }
 
-    const fetchRolesAndTenants = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault()
         try {
-            const [rolesRes, tenantsRes] = await Promise.all([
-                fetch(`${API_URL}/roles`, { credentials: "include" }),
-                fetch(`${API_URL}/tenants`, { credentials: "include" }),
-            ])
-
-            if (!rolesRes.ok || !tenantsRes.ok)
-                throw new Error("No se pudo cargar roles o iglesias")
-
-            setRoles(await rolesRes.json())
-            setTenants(await tenantsRes.json())
+            await createOrUpdateUser(form)
+            setModalOpen(false)
         } catch (err) {
-            console.error(err)
+            alert(err.message)
         }
     }
 
-    const fetchUsers = async () => {
-        try {
-            setLoading(true)
-            setError(null)
-            const res = await fetch(`${API_URL}/users/full`, {
-                cache: "no-store",
-                credentials: "include",
-            })
-            if (!res.ok)
-                throw new Error("No se pudo cargar la lista de usuarios")
-            const data = await res.json()
-            // Ajusta según responda tu API: data o data.data
-            setUsers(Array.isArray(data) ? data : (data.data ?? []))
-        } catch (e) {
-            setError(e.message)
-        } finally {
-            setLoading(false)
-        }
+    const handleDelete = (id) => {
+        deleteUser(id)
+            .then
+            // () => console.log("Usuario eliminado")
+            ()
     }
-
-    useEffect(() => {
-        fetchUsers()
-        fetchRolesAndTenants()
-    }, [])
 
     const filteredMembers = useMemo(() => {
         const q = search.trim().toLowerCase()
@@ -104,46 +76,19 @@ export default function Profile() {
         return users.filter((u) =>
             [u.name, u.email, u.role?.nombre, u.tb_tenants?.nombre]
                 .filter(Boolean)
-                .some((v) => v.toString().toLowerCase().includes(q)),
+                .some((v) => v.toLowerCase().includes(q)),
         )
     }, [users, search])
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        const method = form.id_usuario ? "PUT" : "POST"
-        const url = form.id_usuario
-            ? `${API_URL}/users/${form.id_usuario}`
-            : `${API_URL}/users`
-
-        const body = {
-            name: form.usuario, // 👈 Prisma usa `name` (mapeado a `nombre`)
-            email: form.email,
-            password: form.password || undefined,
-            roleId: parseInt(form.id_rol),
-            tenantId: parseInt(form.iglesia), // por ahora fijo, luego lo puedes cambiar dinámico
-        }
-
-        const res = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-            credentials: "include",
-        })
-
-        if (!res.ok) return alert("Error al guardar")
-        setModalOpen(false)
-        fetchUsers()
-    }
-
-    const handleDelete = async (id) => {
-        if (!confirm("¿Seguro que deseas eliminar este usuario?")) return
-        const res = await fetch(`${API_URL}/users/${id}`, {
-            method: "DELETE",
-            credentials: "include",
-        })
-        if (!res.ok) return alert("Error al eliminar")
-        fetchUsers()
-    }
+    // Genera datos planos para exportar
+    const exportData = filteredMembers.map((user) => ({
+        ID: user.id, // venía de backend
+        Rol: user.role?.nombre || "", // depende si tu backend manda `nombre` o `name`
+        Usuario: user.name || "", // nombre del usuario
+        Email: user.email || "",
+        Contraseña: "••••••",
+        Iglesia: user.tb_tenants?.nombre || "", // nombre de la iglesia
+    }))
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
@@ -158,11 +103,15 @@ export default function Profile() {
                     className="btn btn-accent btn-sm">
                     <i className="fas fa-plus mr-1"></i> Agregar
                 </button>
-                <button className="btn btn-secondary btn-sm">
+                <button
+                    onClick={() => exportToExcel(exportData, "usuarios.xlsx")}
+                    className="btn btn-secondary btn-sm">
                     <i className="fas fa-file-excel mr-1"></i> Excel
                 </button>
-                <button className="btn btn-warning btn-sm">
-                    <i className="fas fa-print mr-1"></i> Imprimir
+                <button
+                    onClick={() => exportToPDF(exportData, "usuarios.pdf")}
+                    className="btn btn-warning btn-sm">
+                    <i className="fas fa-print mr-1"></i> PDF
                 </button>
             </div>
 
