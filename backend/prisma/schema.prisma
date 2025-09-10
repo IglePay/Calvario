@@ -6,7 +6,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
+//=============Usuarios===========
 model User {
   id         Int        @id @default(autoincrement()) @map("id_usuario")
   tenantId   Int        @map("id_tenant")
@@ -22,7 +22,7 @@ model User {
   @@index([tenantId], map: "fk_user_tenant")
   @@map("tb_users")
 }
-
+//=============Roles===========
 model Role {
   id          Int     @id @default(autoincrement()) @map("id_rol")
   nombre      String  @unique(map: "nombre") @map("nombre") @db.VarChar(50)
@@ -31,7 +31,7 @@ model Role {
 
   @@map("tb_roles")
 }
-
+//=============tenants por iglesia===========
 model tb_tenants {
   id_tenant      Int       @id @default(autoincrement())
   dpi            String    @unique(map: "dpi") @db.VarChar(20)
@@ -41,5 +41,93 @@ model tb_tenants {
   fecha_inicio   DateTime? @db.Date
   direccion      String?   @db.VarChar(255)
   fecha_creacion DateTime  @default(now()) @db.Timestamp(0)
+
+  grupos         tb_grupo[]
+  miembros       tb_miembros[]
   tb_users       User[]
+  @@map("tb_tenants")
+}
+
+//=============genero===========
+model tb_genero {
+  idGenero      Int          @id @default(autoincrement())
+  nombregenero  String       @db.VarChar(50)
+  fechaCreacion DateTime     @default(now()) @db.Timestamp(0)
+
+  miembros tb_miembros[]
+
+  @@map("tb_genero")
+}
+
+//=============estado civil===========
+model tb_estadocivil {
+  idEstado      Int          @id @default(autoincrement())
+  nombreEstado  String       @db.VarChar(50)
+
+  miembros tb_miembros[]
+
+  @@map("tb_estadocivil")
+}
+
+//=============grupo===========
+model tb_grupo {
+  idGrupo       Int          @id @default(autoincrement())
+  idTenant      Int
+  nombregrupo   String       @db.VarChar(100)
+  fechaCreacion DateTime     @default(now()) @db.Timestamp(0)
+
+  tenant       tb_tenants   @relation(fields: [idTenant], references: [id_tenant], map: "fk_grupo_tenant")
+  miembros     tb_miembros[]
+  miembroGrupo tb_miembrogrupo[]
+
+  @@index([idTenant], map: "fk_grupo_tenant")
+  @@map("tb_grupo")
+}
+
+//=============miembros===========
+model tb_miembros {
+  idMiembro        Int       @id @default(autoincrement())
+  idTenant         Int
+  dpi              String?   @db.VarChar(20)
+  nombre           String    @db.VarChar(100)
+  apellido         String    @db.VarChar(100)
+  email            String?   @db.VarChar(100)
+  telefono         String?   @db.VarChar(20)
+  fechanacimiento  DateTime? @db.Date
+  idGenero         Int?
+  direccion        String?   @db.VarChar(255)
+  idEstado         Int?
+  fechallegada     DateTime? @db.Date
+  bautismo         String?   @default("N") @db.VarChar(10)
+  fechabautismo    DateTime? @db.Date
+  servidor         String?   @default("N") @db.VarChar(10)
+  procesosterminado String?  @db.VarChar(255)
+  idGrupo          Int?
+  legusta          String?   @db.Text
+  fechaCreacion    DateTime  @default(now()) @db.Timestamp(0)
+
+  tenant        tb_tenants      @relation(fields: [idTenant], references: [id_tenant], map: "fk_miembro_tenant")
+  genero        tb_genero?      @relation(fields: [idGenero], references: [idGenero], map: "fk_miembro_genero")
+  estadoCivil   tb_estadocivil? @relation(fields: [idEstado], references: [idEstado], map: "fk_miembro_estado")
+  grupo         tb_grupo?       @relation(fields: [idGrupo], references: [idGrupo], map: "fk_miembro_grupo")
+  miembroGrupo  tb_miembrogrupo[]
+
+  @@index([idTenant], map: "fk_miembro_tenant")
+  @@index([idGenero], map: "fk_miembro_genero")
+  @@index([idEstado], map: "fk_miembro_estado")
+  @@index([idGrupo], map: "fk_miembro_grupo")
+  @@map("tb_miembros")
+}
+
+//=============miembroGrupo muchos a muchos===========
+model tb_miembrogrupo {
+  idMiembro   Int
+  idGrupo     Int
+  fechaUnion  DateTime @default(now()) @db.Date
+
+  miembro tb_miembros @relation(fields: [idMiembro], references: [idMiembro], onDelete: Cascade, map: "fk_miembrogrupo_miembro")
+  grupo   tb_grupo    @relation(fields: [idGrupo], references: [idGrupo], onDelete: Cascade, map: "fk_miembrogrupo_grupo")
+
+  @@id([idMiembro, idGrupo])
+  @@map("tb_miembrogrupo")
 }
