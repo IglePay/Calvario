@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { GrupoService } from './grupo.service';
 
-@Controller('grupo')
+@Controller('grupos')
 export class GrupoController {
     constructor(private readonly grupoService: GrupoService) {}
 
