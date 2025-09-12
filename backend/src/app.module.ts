@@ -7,6 +7,8 @@ import { TenantsModule } from './tenants/tenants.module';
 import { GeneroModule } from './genero/genero.module';
 import { EstadoCivilModule } from './estado-civil/estado-civil.module';
 import { GrupoModule } from './grupos/grupo.module';
+import { MiembrosModule } from './miembros/miembros.module';
+import { LimpiezaModule } from './limpieza/limpieza.module';
 
 @Global()
 @Module({
@@ -18,6 +20,8 @@ import { GrupoModule } from './grupos/grupo.module';
         GeneroModule,
         EstadoCivilModule,
         GrupoModule,
+        MiembrosModule,
+        LimpiezaModule,
     ],
     controllers: [],
     providers: [PrismaService],
