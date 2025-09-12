@@ -19,7 +19,7 @@ export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-base-100 p-6 rounded shadow-lg w-96">
                 <h2 className="text-xl font-bold mb-4">
                     {initialData ? "Editar Grupo" : "Agregar Grupo"}

@@ -56,7 +56,7 @@ export default function Groups() {
                 </button>
                 <button
                     onClick={() => exportToPDF(exportData, "Ministerios.pdf")}
-                    className="btn btn-warning btn-sm">
+                    className="btn bg-rose-800 text-white btn-sm">
                     <i className="fas fa-print mr-1"></i> PDF
                 </button>
             </div>
