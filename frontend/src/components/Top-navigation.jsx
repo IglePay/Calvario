@@ -1,11 +1,31 @@
 "use client"
 import { ThemeContext } from "@/hooks/themeContext"
-import { useContext } from "react"
+import { useContext, useState } from "react"
+import MembersModal from "../app/control/memebers/components/MembersModal"
+import { useMembers } from "@/hooks/members/useMembers"
 
 export default function TopNavigation({ onMenuClick, navigation }) {
     const navItems = ["Miembros", "Finanzas", "Asistencias", "Usuarios"]
     const { searchQuery, handleSearch, setSearchQuery } = navigation
     const { theme, toggleTheme } = useContext(ThemeContext)
+
+    const { members, loading, error } = useMembers()
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [editData, setEditData] = useState(null)
+
+    const handleSubmit = async (data) => {
+        try {
+            if (editData) {
+                await updateMember(editData.idMiembro, data)
+            } else {
+                await createMember(data)
+            }
+            setIsModalOpen(false)
+            setEditData(null)
+        } catch (err) {
+            console.error("Error al guardar el miembro:", err)
+        }
+    }
 
     return (
         <header className=" shadow-sm border-b border-gray-400">
@@ -64,6 +84,13 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                         className={`fa-solid ${theme === "light" ? "fa-moon text-gray-800" : "fa-sun text-yellow-400"} text-2xl`}
                     />
                 </button>
+                <MembersModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSubmit={handleSubmit}
+                    initialData={editData}
+                    mode={editData ? "edit" : "create"}
+                    grupos={[]}></MembersModal>
             </div>
         </header>
     )

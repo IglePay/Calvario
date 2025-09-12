@@ -95,9 +95,15 @@ export default function Iglesias() {
 
                 <button
                     onClick={() => exportToPDF(exportData, "iglesias.pdf")}
-                    className="btn btn-warning btn-sm">
-                    <i className="fas fa-file-pdf mr-1"></i> PDF
+                    className="btn bg-rose-800 btn-sm text-white">
+                    <i className="fa-solid fa-file-pdf mr-1 "></i> PDF
                 </button>
+                <Link
+                    href={"/control/settings/profile"}
+                    className="btn btn-primary btn-sm ">
+                    <i className="fas fa-user mr-1"></i>
+                    Perfil
+                </Link>
             </div>
 
             {/* Buscador y rows */}

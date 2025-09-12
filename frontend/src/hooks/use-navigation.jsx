@@ -38,11 +38,11 @@ export function useNavigation() {
             label: "Actividades",
             route: "/control/activities",
         },
-        {
-            id: "areas-servicio",
-            icon: "fas fa-cogs",
-            label: "Áreas de servicio",
-        },
+        // {
+        //     id: "areas-servicio",
+        //     icon: "fas fa-cogs",
+        //     label: "Áreas de servicio",
+        // },
         {
             id: "limpieza",
             icon: "fa fa-solid fa-broom",
@@ -52,7 +52,7 @@ export function useNavigation() {
         {
             id: "usuarios",
             icon: "fas fa-user",
-            label: "Usuarios",
+            label: "Colaborador",
             route: "/control/users",
         },
         {
