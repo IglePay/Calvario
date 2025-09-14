@@ -8,12 +8,14 @@ const membersData = [
         rol: "Admin",
         usuario: "jesus belen",
         email: "jesus12@gmail.com",
+        contrasena: "*****",
     },
     {
         id: 2,
         rol: "User",
         usuario: "maria lopez",
         email: "maria12@gmail.com",
+        contrasena: "*****",
     },
 ]
 
@@ -33,7 +35,7 @@ const Users = () => {
         <div className="flex flex-col w-full h-full p-6 bg-base-100">
             {/* Controles superiores */}
             <h2 className="text-center text-xl font-bold">
-                Listado de Usuarios
+                Listado de Colaboradores
             </h2>
             <Link
                 href={"/control"}
@@ -84,6 +86,7 @@ const Users = () => {
                             <th>Rol</th>
                             <th>Usuario</th>
                             <th>Email</th>
+                            <th>Contraseña</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -96,6 +99,7 @@ const Users = () => {
                                     <td>{member.rol}</td>
                                     <td>{member.usuario}</td>
                                     <td>{member.email}</td>
+                                    <td>{member.contrasena}</td>
                                     <td className="flex gap-2">
                                         <button className="btn btn-info btn-xs">
                                             <i className="fas fa-eye"></i>

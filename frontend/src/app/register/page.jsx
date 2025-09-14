@@ -155,7 +155,7 @@ const Register = () => {
                 <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100">
                     ¿Ya tienes cuenta?{" "}
                     <Link
-                        href="../login"
+                        href="/"
                         className="text-cyan-600 font-semibold hover:underline">
                         Inicia sesión
                     </Link>

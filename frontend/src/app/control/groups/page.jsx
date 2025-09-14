@@ -40,6 +40,7 @@ export default function Groups() {
                 <Link
                     href={"/control"}
                     className="btn btn-primary btn-sm w-24 ">
+                    {" "}
                     Regresar
                 </Link>
                 <button

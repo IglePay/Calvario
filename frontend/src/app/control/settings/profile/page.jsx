@@ -288,7 +288,7 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            <div className="modal-action">
+                            <div className="flex justify-center modal-action">
                                 <button
                                     type="button"
                                     onClick={() => setModalOpen(false)}

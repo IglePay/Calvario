@@ -28,7 +28,7 @@ export function useMembers() {
             // 🔹 Normalizamos "S"/"N" → true/false
             const normalizados = miembros.map((m) => ({
                 ...m,
-                bautizo: m.bautismo === "S",
+                bautismo: m.bautismo === "S",
                 servidor: m.servidor === "S",
             }))
 
