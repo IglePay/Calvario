@@ -1,123 +1,174 @@
 "use client"
 import { useState } from "react"
+import ActivityModal from "./components/ActivityModal"
 import Link from "next/link"
+import useActivities from "@/hooks/activities/useActivities"
 
-const membersData = [
-    {
-        id: 1,
-        nombre: "Caballeros",
-        actividades: "ayuno, oracion, estudio biblico",
-        fecha: "10/08/2023",
-        hora: "19:00",
-    },
-    {
-        id: 2,
-        nombre: "Damas",
-        actividades: "vigilia por la familia y el ministerio de niños",
-        fecha: "11/08/2023",
-        hora: "19:00",
-    },
-]
+function prettyDate(iso) {
+    if (!iso) return "_"
+    return new Date(iso).toLocaleDateString("es-GT", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    })
+}
 
-const Activities = () => {
+const ActivitiesPage = () => {
+    //se importa el hook useActivities para obtener las actividades
+    const {
+        activities,
+        miembros,
+        grupos,
+        loading,
+        error,
+        createActivity,
+        updateActivity,
+        deleteActivity,
+    } = useActivities()
+
+    const [modalOpen, setModalOpen] = useState(false)
+    const [editingActivity, setEditingActivity] = useState(null)
+
+    const [search, setSearch] = useState("")
     const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [searchQuery, setSearchQuery] = useState("")
 
-    // Filtrar miembros según búsqueda
-    const filteredMembers = membersData.filter((member) =>
-        Object.values(member)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-    )
+    const handleSave = (data) => {
+        if (editingActivity) {
+            updateActivity(editingActivity.idActividad, data).then(() => {
+                setEditingActivity(null)
+                setModalOpen(false)
+            })
+        } else {
+            createActivity(data).then(() => setModalOpen(false))
+        }
+    }
+
+    const handleEdit = (activity) => {
+        setEditingActivity(activity)
+        setModalOpen(true)
+    }
+
+    const handleDelete = (id) => {
+        if (confirm("¿Deseas eliminar esta actividad?")) {
+            deleteActivity(id)
+        }
+    }
 
     return (
-        <div className="flex flex-col w-full h-full p-6 bg-base-100">
-            {/* Controles superiores */}
-            <h2 className="text-center text-xl font-bold">
-                Actividades por Ministerios
-            </h2>
-            <Link
-                href={"/control"}
-                className="btn btn-primary btn-sm mt-4 w-24 rounded-xl">
-                <span>Regresar</span>
-            </Link>
-            <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2 mt-5">
-                <div className="flex gap-2 flex-wrap">
-                    <button className="btn btn-accent btn-sm">
-                        <i className="fas fa-plus mr-1"></i> Agregar
-                    </button>
-                    <button className="btn btn-secondary btn-sm">
-                        <i className="fas fa-file-excel mr-1"></i> Excel
-                    </button>
-                    <button className="btn btn-warning btn-sm">
-                        <i className="fas fa-print mr-1"></i> Imprimir
-                    </button>
-                </div>
+        <div className=" flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
+            <h1 className="text-2xl font-bold">Listado de Actividades</h1>
 
-                <div className="flex flex-col md:flex-row items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="Buscar por ministerio, actividad"
-                        className="input input-sm input-bordered w-full md:w-70"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <select
-                        value={rowsPerPage}
-                        onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                        className="select select-sm w-30">
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={75}>75</option>
-                        <option value={100}>100</option>
-                        <option value={membersData.length}>Todos</option>
-                    </select>
-                </div>
+            <div className="flex gap-2 mt-4">
+                <Link href={"/control"} className="btn btn-primary btn-sm ">
+                    {" "}
+                    Regresar
+                </Link>
+
+                <button
+                    className="btn btn-accent btn-sm "
+                    onClick={() => setModalOpen(true)}>
+                    <i className="fas fa-plus mr-1"></i> Agregar
+                </button>
             </div>
 
-            {/* Tabla */}
-            <div className="overflow-x-auto rounded-box border border-base-content/5 ">
-                <table className="table table-zebra w-full text-sm">
-                    <thead className="bg-base-300 text-center">
-                        <tr>
-                            <th>ID</th>
-                            <th>Ministerios</th>
-                            <th>Actividades</th>
-                            <th>fecha</th>
-                            <th>hora</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredMembers
-                            .slice(0, rowsPerPage)
-                            .map((member, index) => (
-                                <tr key={member.id}>
-                                    <td>{member.id}</td>
-                                    <td>{member.nombre}</td>
-                                    <td>{member.actividades}</td>
-                                    <td>{member.fecha}</td>
-                                    <td>{member.hora}</td>
-                                    <td className="flex gap-2">
-                                        <button className="btn btn-info btn-xs">
-                                            <i className="fas fa-eye"></i>
-                                        </button>
-                                        <button className="btn btn-warning btn-xs">
-                                            <i className="fas fa-edit"></i>
-                                        </button>
-                                        <button className="btn btn-error btn-xs">
-                                            <i className="fas fa-trash"></i>
-                                        </button>
+            {/* Buscador y rows */}
+            <div className="flex flex-col md:flex-row items-center gap-2 mt-4 w-full max-w-6xl">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar por título, descripción, grupo, miembro"
+                    className="input input-sm input-bordered w-full md:flex-1"
+                />
+                <select
+                    value={rowsPerPage}
+                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                    className="select select-sm w-36">
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={75}>75</option>
+                    <option value={100}>100</option>
+                </select>
+            </div>
+
+            <div className=" overflow-x-auto rounded-box border border-base-content/5 mt-5 w-full max-w-6xl">
+                {error && (
+                    <div className="alert alert-error">
+                        <span>{error}</span>
+                    </div>
+                )}
+                {loading ? (
+                    <div className="p-6 text-center">Cargando...</div>
+                ) : (
+                    <table className="table table-zebra w-full">
+                        <thead className="bg-base-300 text-center">
+                            <tr>
+                                <th>N.</th>
+                                <th>Título</th>
+                                <th>Descripción</th>
+                                <th>Grupo</th>
+                                <th>Miembro</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-center">
+                            {activities.length === 0 && !loading ? (
+                                <tr key="no-activities">
+                                    <td colSpan={5} className="text-center">
+                                        No hay actividades registradas
                                     </td>
                                 </tr>
-                            ))}
-                    </tbody>
-                </table>
+                            ) : (
+                                activities.map((act) => (
+                                    <tr key={act.idActividad}>
+                                        <td>{act.idActividad}</td>
+                                        <td>{act.titulo}</td>
+                                        <td>{act.descripcion ?? "-"}</td>
+                                        <td>{act.grupo ?? "-"}</td>
+                                        <td>{act.miembro ?? "-"}</td>
+                                        <td>
+                                            {prettyDate(act.fechaActividad)}
+                                        </td>
+
+                                        <td className="flex gap-2 items-center justify-center">
+                                            <button
+                                                onClick={() => handleEdit(act)}
+                                                className="btn btn-warning btn-xs">
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        act.idActividad,
+                                                    )
+                                                }
+                                                className="btn btn-error btn-xs">
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
+
+            <ActivityModal
+                isOpen={modalOpen}
+                onClose={() => {
+                    setModalOpen(false)
+                    setEditingActivity(null)
+                }}
+                onSave={handleSave}
+                initialData={editingActivity}
+                miembros={miembros}
+                grupos={grupos}
+            />
         </div>
     )
 }
 
-export default Activities
+export default ActivitiesPage

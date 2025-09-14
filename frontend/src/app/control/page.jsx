@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Sidebar from "../../components/Sidebar.jsx"
 import TopNavigation from "../../components/Top-navigation.jsx"
 import Dashboard from "../../components/Dashboard.jsx"
@@ -7,10 +8,47 @@ import { useNavigation } from "../../hooks/use-navigation.jsx"
 
 export default function Control() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState(null)
     const navigation = useNavigation()
+    const router = useRouter()
+
+    useEffect(() => {
+        async function checkUser() {
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
+                    {
+                        credentials: "include",
+                    },
+                )
+
+                if (!res.ok) {
+                    router.replace("/login")
+                    return
+                }
+
+                const data = await res.json()
+                setUser(data)
+                setLoading(false)
+            } catch (err) {
+                router.replace("/login")
+            }
+        }
+
+        checkUser()
+    }, [router])
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p>Cargando...</p>
+            </div>
+        )
+    }
 
     return (
-        <div className="flex h-screen ">
+        <div className="flex h-screen">
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
