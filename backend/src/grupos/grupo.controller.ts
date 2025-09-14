@@ -20,37 +20,31 @@ import { UpdateGrupoDto } from './dto/update-grupo.dto';
 export class GrupoController {
     constructor(private readonly grupoService: GrupoService) {}
 
-    @Post()
-    create(@Body() dto: CreateGrupoDto, @Req() req) {
-        const tenantId = req.user?.tenantId; // 👈 cambiar a tenantId
-
-        if (!tenantId) {
-            throw new UnauthorizedException('Usuario sin tenant');
-        }
-
-        return this.grupoService.create({
-            ...dto,
-            idTenant: tenantId,
-        });
-    }
-
     @Get()
-    findAll() {
-        return this.grupoService.findAll();
+    findAll(@Req() req) {
+        return this.grupoService.findAllByTenant(req.user.tenantId);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.grupoService.findOne(+id);
+    findOne(@Param('id') id: string, @Req() req) {
+        return this.grupoService.findOneByTenant(+id, req.user.tenantId);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateGrupoDto: UpdateGrupoDto) {
-        return this.grupoService.update(+id, updateGrupoDto);
+    update(@Param('id') id: string, @Body() dto: UpdateGrupoDto, @Req() req) {
+        return this.grupoService.updateByTenant(+id, dto, req.user.tenantId);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.grupoService.remove(+id);
+    remove(@Param('id') id: string, @Req() req) {
+        return this.grupoService.removeByTenant(+id, req.user.tenantId);
+    }
+
+    @Post()
+    create(@Body() dto: CreateGrupoDto, @Req() req) {
+        return this.grupoService.create({
+            ...dto,
+            idTenant: req.user.tenantId,
+        });
     }
 }
