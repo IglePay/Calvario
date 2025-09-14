@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  connect_timeout = 20
+  // connect_timeout = 20
 }
 //=============Usuarios===========
 model User {
@@ -83,6 +83,8 @@ model tb_grupo {
   miembros     tb_miembros[]
   miembroGrupo tb_miembrogrupo[]
   actividades tb_actividad[]
+  limpiezas    tb_limpieza[]
+
   @@index([idTenant], map: "fk_grupo_tenant")
   @@map("tb_grupo")
 }
@@ -140,18 +142,18 @@ model tb_miembrogrupo {
 model tb_limpieza {
   idLimpieza    Int       @id @default(autoincrement())
   idTenant      Int
-  idMiembro     Int
+  idMiembro     Int?
+  idGrupo       Int?
   fechaLimpieza DateTime
   fechaCreacion DateTime  @default(now()) @db.Timestamp(0)
 
-  // Relaciones
-  miembro tb_miembros @relation(fields: [idMiembro], references: [idMiembro], onDelete: Cascade)
-  tenant  tb_tenants  @relation(fields: [idTenant], references: [id_tenant], onDelete: Cascade)
+  miembro tb_miembros? @relation(fields: [idMiembro], references: [idMiembro], onDelete: Cascade)
+  grupo   tb_grupo?    @relation(fields: [idGrupo], references: [idGrupo], onDelete: Cascade)
+  tenant  tb_tenants   @relation(fields: [idTenant], references: [id_tenant], onDelete: Cascade)
 
   @@map("tb_limpieza")
-  @@index([idTenant], map: "fk_limpieza_tenant")
-  @@index([idMiembro], map: "fk_limpieza_miembro")
 }
+
 //==================tb_actividades==================
 model tb_actividad {
   idActividad   Int          @id @default(autoincrement())

@@ -5,8 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 export class LimpiezaService {
     constructor(private prisma: PrismaService) {}
 
-    async findAll() {
+    async findAll(idTenant: number) {
         return this.prisma.tb_limpieza.findMany({
+            where: { idTenant },
             select: {
                 idLimpieza: true,
                 fechaLimpieza: true,
@@ -16,78 +17,126 @@ export class LimpiezaService {
                         nombre: true,
                         apellido: true,
                         genero: {
-                            select: {
-                                idGenero: true,
-                                nombregenero: true,
-                            },
+                            select: { idGenero: true, nombregenero: true },
                         },
                     },
                 },
-                tenant: {
-                    select: {
-                        id_tenant: true,
-                        nombre: true,
-                    },
-                },
+                grupo: { select: { idGrupo: true, nombregrupo: true } },
             },
         });
     }
 
-    async findOne(id: number) {
-        return this.prisma.tb_limpieza.findUnique({
-            where: { idLimpieza: id },
+    async findOne(id: number, idTenant: number) {
+        return this.prisma.tb_limpieza.findFirst({
+            where: { idLimpieza: id, idTenant },
             select: {
                 idLimpieza: true,
                 fechaLimpieza: true,
                 miembro: {
-                    select: { idMiembro: true, nombre: true, apellido: true },
+                    select: {
+                        idMiembro: true,
+                        nombre: true,
+                        apellido: true,
+                        genero: {
+                            select: { idGenero: true, nombregenero: true },
+                        },
+                    },
                 },
-                tenant: {
-                    select: { id_tenant: true, nombre: true },
-                },
+                grupo: { select: { idGrupo: true, nombregrupo: true } },
             },
         });
     }
 
     async create(data: {
         idMiembro: number;
+        fechaLimpieza: string;
         idTenant: number;
-        fechaLimpieza: Date;
+        idGrupo?: number;
     }) {
-        // Validar que el miembro existe y pertenece al tenant
+        // validar miembro
         const miembro = await this.prisma.tb_miembros.findFirst({
             where: { idMiembro: data.idMiembro, idTenant: data.idTenant },
         });
-
-        if (!miembro) {
+        if (!miembro)
             throw new Error('El miembro no existe o no pertenece al tenant');
+
+        // validar grupo si viene
+        if (data.idGrupo) {
+            const grupo = await this.prisma.tb_grupo.findFirst({
+                where: { idGrupo: data.idGrupo, idTenant: data.idTenant },
+            });
+            if (!grupo)
+                throw new Error('El grupo no existe o no pertenece al tenant');
         }
 
-        return this.prisma.tb_limpieza.create({ data });
+        return this.prisma.tb_limpieza.create({
+            data: {
+                idMiembro: data.idMiembro,
+                idTenant: data.idTenant,
+                fechaLimpieza: new Date(data.fechaLimpieza),
+                ...(data.idGrupo && { idGrupo: data.idGrupo }),
+            },
+        });
     }
 
     async update(
         id: number,
-        data: { fechaLimpieza?: Date; idMiembro?: number; idTenant: number },
+        data: {
+            idMiembro?: number;
+            fechaLimpieza?: string;
+            idGrupo?: number;
+            idTenant: number;
+        },
     ) {
-        // Validar que la limpieza pertenece al tenant
+        // validar que la limpieza existe y pertenece al tenant
         const limpieza = await this.prisma.tb_limpieza.findFirst({
             where: { idLimpieza: id, idTenant: data.idTenant },
         });
-
-        if (!limpieza) {
+        if (!limpieza)
             throw new Error('La limpieza no existe o no pertenece al tenant');
+
+        // validar nuevo miembro si viene
+        if (data.idMiembro) {
+            const miembro = await this.prisma.tb_miembros.findFirst({
+                where: { idMiembro: data.idMiembro, idTenant: data.idTenant },
+            });
+            if (!miembro)
+                throw new Error(
+                    'El miembro no existe o no pertenece al tenant',
+                );
         }
 
-        return this.prisma.tb_limpieza.update({
-            where: { idLimpieza: id },
-            data,
+        // validar nuevo grupo si viene
+        if (data.idGrupo) {
+            const grupo = await this.prisma.tb_grupo.findFirst({
+                where: { idGrupo: data.idGrupo, idTenant: data.idTenant },
+            });
+            if (!grupo)
+                throw new Error('El grupo no existe o no pertenece al tenant');
+        }
+
+        // actualizar solo dentro del tenant
+        return this.prisma.tb_limpieza.updateMany({
+            where: { idLimpieza: id, idTenant: data.idTenant },
+            data: {
+                ...(data.idMiembro && { idMiembro: data.idMiembro }),
+                ...(data.fechaLimpieza && {
+                    fechaLimpieza: new Date(data.fechaLimpieza),
+                }),
+                ...(data.idGrupo && { idGrupo: data.idGrupo }),
+            },
         });
     }
 
-    async remove(id: number) {
-        return this.prisma.tb_limpieza.delete({
-            where: { idLimpieza: id },
+    async remove(id: number, idTenant: number) {
+        return this.prisma.tb_limpieza.deleteMany({
+            where: { idLimpieza: id, idTenant },
         });
     }
+
+    // async remove(id: number, idTenant: number) {
+    //     return this.prisma.tb_limpieza.delete({
+    //         where: { idLimpieza_idTenant: { idLimpieza: id, idTenant } }
+    //     })
+    // }
 }

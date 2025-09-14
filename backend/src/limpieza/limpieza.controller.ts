@@ -7,49 +7,60 @@ import {
     Delete,
     Patch,
     UseGuards,
+    Req,
 } from '@nestjs/common';
 import { LimpiezaService } from './limpieza.service';
 import { AuthGuard } from '../auth/auth.guard';
+import type { Request } from 'express';
+import { CreateLimpiezaDto } from './dto/create-limpieza.dto';
+import { UpdateLimpiezaDto } from './dto/update-limpieza.dto';
 
 @UseGuards(AuthGuard)
 @Controller('limpieza')
 export class LimpiezaController {
     constructor(private readonly limpiezaService: LimpiezaService) {}
 
-    // GET /limpieza
     @Get()
-    findAll() {
-        return this.limpiezaService.findAll();
+    findAll(@Req() req: Request) {
+        if (!req.user?.tenantId)
+            throw new Error('TenantId no encontrado en usuario autenticado');
+        const idTenant = req.user.tenantId;
+        return this.limpiezaService.findAll(idTenant);
     }
 
-    // GET /limpieza/:id
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.limpiezaService.findOne(+id);
+    findOne(@Param('id') id: string, @Req() req: Request) {
+        if (!req.user?.tenantId)
+            throw new Error('TenantId no encontrado en usuario autenticado');
+        const idTenant = req.user.tenantId;
+        return this.limpiezaService.findOne(+id, idTenant);
     }
 
-    // POST /limpieza
     @Post()
-    create(
-        @Body()
-        data: {
-            idMiembro: number;
-            idTenant: number;
-            fechaLimpieza: Date;
-        },
-    ) {
-        return this.limpiezaService.create(data);
+    create(@Body() dto: CreateLimpiezaDto, @Req() req: Request) {
+        if (!req.user?.tenantId)
+            throw new Error('TenantId no encontrado en usuario autenticado');
+        const idTenant = req.user.tenantId;
+        return this.limpiezaService.create({ ...dto, idTenant });
     }
 
-    // PATCH /limpieza/:id
     @Patch(':id')
-    update(@Param('id') id: string, @Body() data: any) {
-        return this.limpiezaService.update(+id, data);
+    update(
+        @Param('id') id: string,
+        @Body() dto: UpdateLimpiezaDto,
+        @Req() req: Request,
+    ) {
+        if (!req.user?.tenantId)
+            throw new Error('TenantId no encontrado en usuario autenticado');
+        const idTenant = req.user.tenantId;
+        return this.limpiezaService.update(+id, { ...dto, idTenant });
     }
 
-    // DELETE /limpieza/:id
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.limpiezaService.remove(+id);
+    remove(@Param('id') id: string, @Req() req: Request) {
+        if (!req.user?.tenantId)
+            throw new Error('TenantId no encontrado en usuario autenticado');
+        const idTenant = req.user.tenantId;
+        return this.limpiezaService.remove(+id, idTenant);
     }
 }
