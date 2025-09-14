@@ -44,6 +44,11 @@ export class UsersService {
         roleId: number;
         tenantId: number;
     }) {
+        const tenant = await this.prisma.tb_tenants.findUnique({
+            where: { id_tenant: data.tenantId },
+        });
+        if (!tenant) throw new Error('Tenant no válido');
+
         const hashedPassword = await bcrypt.hash(data.password, 10);
         return this.prisma.user.create({
             data: {
@@ -56,11 +61,20 @@ export class UsersService {
         });
     }
 
-    async updateUser(id: number, data: any) {
-        const updateData: any = {
-            name: data.name,
-            email: data.email,
-        };
+    async updateUser(
+        id: number,
+        data: {
+            name?: string;
+            email?: string;
+            password?: string;
+            roleId?: number;
+            tenantId?: number;
+        },
+    ) {
+        const updateData: any = {};
+
+        if (data.name) updateData.name = data.name;
+        if (data.email) updateData.email = data.email;
 
         // Si envían contraseña, la encriptamos
         if (data.password) {
@@ -69,11 +83,21 @@ export class UsersService {
 
         // Conectar rol si se envía
         if (data.roleId) {
+            // Validar que el rol existe
+            const role = await this.prisma.role.findUnique({
+                where: { id: data.roleId },
+            });
+            if (!role) throw new Error('Rol no válido');
             updateData.role = { connect: { id: data.roleId } };
         }
 
         // Conectar tenant/iglesia si se envía
         if (data.tenantId) {
+            // Validar que el tenant existe
+            const tenant = await this.prisma.tb_tenants.findUnique({
+                where: { id_tenant: data.tenantId },
+            });
+            if (!tenant) throw new Error('Tenant no válido');
             updateData.tb_tenants = { connect: { id_tenant: data.tenantId } };
         }
 

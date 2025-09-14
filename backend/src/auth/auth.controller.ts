@@ -1,53 +1,68 @@
 import {
+    Body,
     Controller,
     Post,
-    Body,
-    BadRequestException,
+    Get,
+    Req,
     Res,
+    UnauthorizedException,
+    BadRequestException,
+    UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @UseGuards(AuthGuard)
+    @Get('me')
+    getMe(@Req() req: Request) {
+        return req.user;
+    }
+
     @Post('login')
     async login(
-        @Body() body: { email: string; password: string },
+        @Body() body: LoginDto,
         @Res({ passthrough: true }) res: Response,
     ) {
         const user = await this.authService.validateUser(
             body.email,
             body.password,
         );
+
+        // Verificamos que el usuario pertenece al tenant (iglesia)
+        if (body.iglesia && user.tb_tenants.nombre !== body.iglesia) {
+            throw new UnauthorizedException('No autorizado para esta iglesia');
+        }
+
         const token = await this.authService.login(user);
 
-        // Guardamos el token en cookie segura
         res.cookie('jwt', token.access_token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production', // solo https en prod
             secure: false,
             sameSite: 'lax',
-            maxAge: 1000 * 60 * 60 * 24, // 1 día
+            maxAge: 1000 * 60 * 60 * 24,
         });
 
         return { message: 'Login exitoso' };
     }
 
     @Post('register')
-    async register(
-        @Body() body: { name: string; email: string; password: string },
-    ) {
+    async register(@Body() body: RegisterDto) {
         const existing = await this.authService.findByEmail(body.email);
         if (existing) throw new BadRequestException('El usuario ya existe');
 
-        return this.authService.register(body.name, body.email, body.password);
-    }
-
-    @Post('logout')
-    async logout(@Res({ passthrough: true }) res: Response) {
-        res.clearCookie('jwt');
-        return { message: 'Logout exitoso' };
+        return this.authService.register(
+            body.name,
+            body.email,
+            body.password,
+            body.tenantId ?? 1,
+            body.roleId ?? 2,
+        );
     }
 }

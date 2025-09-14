@@ -6,9 +6,14 @@ import {
     Delete,
     Param,
     Body,
+    UseGuards,
 } from '@nestjs/common';
 import { TenantsService } from './tenants.service';
+import { CreateTenantDto } from './dto/create-tenant.dto';
+import { UpdateTenantDto } from './dto/update-tenant.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('tenants')
 export class TenantsController {
     constructor(private tenantsService: TenantsService) {}
@@ -24,12 +29,12 @@ export class TenantsController {
     }
 
     @Post()
-    create(@Body() data: any) {
+    create(@Body() data: CreateTenantDto) {
         return this.tenantsService.create(data);
     }
 
     @Put(':id')
-    update(@Param('id') id: string, @Body() data: any) {
+    update(@Param('id') id: string, @Body() data: UpdateTenantDto) {
         return this.tenantsService.update(+id, data);
     }
 

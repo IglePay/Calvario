@@ -35,14 +35,20 @@ export class AuthService {
         return this.usersService.findByEmail(email);
     }
 
-    async register(name: string, email: string, password: string) {
+    async register(
+        name: string,
+        email: string,
+        password: string,
+        tenantId: number,
+        roleId: number,
+    ) {
         const hashed = await bcrypt.hash(password, 10);
         return this.usersService.createUser({
             name,
             email,
             password: hashed,
-            tenantId: 1, // o el tenant que necesites
-            roleId: 1, // rol por defecto
+            tenantId,
+            roleId,
         });
     }
 }

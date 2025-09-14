@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { CreateTenantDto } from './dto/create-tenant.dto';
+import { UpdateTenantDto } from './dto/update-tenant.dto';
 
 @Injectable()
 export class TenantsService {
@@ -23,32 +25,29 @@ export class TenantsService {
         });
     }
 
-    // Crear nuevo tenant
-    async create(data: {
-        dpi: string;
-        nombre: string;
-        email: string;
-        telefono?: string;
-        fecha_inicio?: Date;
-        direccion?: string;
-    }) {
-        return this.prisma.tb_tenants.create({ data });
+    async create(data: CreateTenantDto) {
+        const prismaData = {
+            ...data,
+            fecha_inicio: data.fecha_inicio
+                ? new Date(data.fecha_inicio)
+                : undefined,
+        };
+
+        return this.prisma.tb_tenants.create({ data: prismaData });
     }
 
-    // Actualizar tenant
-    async update(id: number, data: any) {
-        const { id_tenant, fecha_creacion, ...updateData } = data; // Excluir id_tenant de los datos a actualizar
-
-        if (
-            updateData.fecha_inicio &&
-            typeof updateData.fecha_inicio === 'string'
-        ) {
-            updateData.fecha_inicio = new Date(updateData.fecha_inicio);
-        }
+    async update(id: number, data: UpdateTenantDto) {
+        const prismaData = {
+            ...data,
+            // Convertimos a Date solo para Prisma
+            fecha_inicio: data.fecha_inicio
+                ? new Date(data.fecha_inicio)
+                : undefined,
+        };
 
         return this.prisma.tb_tenants.update({
             where: { id_tenant: id },
-            data,
+            data: prismaData,
         });
     }
 

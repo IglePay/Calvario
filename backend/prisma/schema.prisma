@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  connect_timeout = 20
 }
 //=============Usuarios===========
 model User {
@@ -46,7 +47,7 @@ model tb_tenants {
   miembros       tb_miembros[]
   tb_users       User[]
   limpiezas tb_limpieza[]
-
+  actividades tb_actividad[]
   @@map("tb_tenants")
 }
 
@@ -81,7 +82,7 @@ model tb_grupo {
   tenant       tb_tenants   @relation(fields: [idTenant], references: [id_tenant], map: "fk_grupo_tenant")
   miembros     tb_miembros[]
   miembroGrupo tb_miembrogrupo[]
-
+  actividades tb_actividad[]
   @@index([idTenant], map: "fk_grupo_tenant")
   @@map("tb_grupo")
 }
@@ -114,7 +115,7 @@ model tb_miembros {
   grupo         tb_grupo?       @relation(fields: [idGrupo], references: [idGrupo], map: "fk_miembro_grupo")
   miembroGrupo  tb_miembrogrupo[]
   limpiezas tb_limpieza[]
-
+  actividades tb_actividad[]
   @@index([idTenant], map: "fk_miembro_tenant")
   @@index([idGenero], map: "fk_miembro_genero")
   @@index([idEstado], map: "fk_miembro_estado")
@@ -150,4 +151,21 @@ model tb_limpieza {
   @@map("tb_limpieza")
   @@index([idTenant], map: "fk_limpieza_tenant")
   @@index([idMiembro], map: "fk_limpieza_miembro")
+}
+//==================tb_actividades==================
+model tb_actividad {
+  idActividad   Int          @id @default(autoincrement())
+  idTenant      Int
+  idMiembro     Int
+  idGrupo       Int?
+  titulo        String
+  descripcion   String?
+  fechaActividad DateTime
+  fechaCreacion DateTime     @default(now())
+
+  tenant        tb_tenants   @relation(fields: [idTenant], references: [id_tenant], onDelete: Cascade)
+  miembro       tb_miembros  @relation(fields: [idMiembro], references: [idMiembro], onDelete: Cascade)
+  grupo         tb_grupo?    @relation(fields: [idGrupo], references: [idGrupo], onDelete: SetNull)
+
+  @@map("tb_actividades")
 }
