@@ -3,16 +3,15 @@ import { useState, useEffect } from "react"
 
 export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
     const [nombregrupo, setNombregrupo] = useState("")
-    const [idTenant, setIdTenant] = useState("")
 
     useEffect(() => {
         setNombregrupo(initialData?.nombregrupo || "")
-        setIdTenant(initialData?.idTenant || "")
     }, [initialData])
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        onSave({ nombregrupo, idTenant: Number(idTenant) })
+        if (!nombregrupo.trim()) return
+        onSave({ nombregrupo: nombregrupo.trim() })
         onClose()
     }
 
@@ -33,14 +32,7 @@ export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
                         className="input input-bordered w-full"
                         required
                     />
-                    <input
-                        type="number"
-                        value={idTenant}
-                        onChange={(e) => setIdTenant(e.target.value)}
-                        placeholder="ID Tenant"
-                        className="input input-bordered w-full"
-                        required
-                    />
+
                     <div className="flex justify-end gap-2 mt-4">
                         <button
                             type="button"
