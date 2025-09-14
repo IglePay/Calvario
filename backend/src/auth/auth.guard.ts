@@ -15,10 +15,13 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest<Request>();
         const token = request.cookies['jwt'];
 
+        console.log('token recibido:', token);
+
         if (!token) throw new UnauthorizedException('No autorizado');
 
         try {
             const payload = this.jwtService.verify(token);
+            console.log('payload deccodificado:', payload);
             request.user = payload; // aquí setea el usuario en la request
             return true;
         } catch (err) {

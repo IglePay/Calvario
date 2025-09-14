@@ -48,3 +48,25 @@ $ pnpm run test:cov
 $ pnpm install -g @nestjs/mau
 $ mau deploy
 ```
+
+l flujo actual
+
+Cuando el usuario hace login:
+
+Se genera un JWT con su id, tenantId y roleId.
+
+Cada petición al backend que use AuthGuard:
+
+El guard extrae el token, lo valida y mete esos datos en req.user.
+
+En tus controladores (ej. GrupoController):
+
+Tomas req.user.tenantId y lo usas para asociar la creación de datos al tenant correct
+
+Si te logueas con usuario A → req.user.tenantId = 1 → todo lo que crees va al tenant 1.
+
+Si te logueas con usuario B → req.user.tenantId = 2 → todo lo que crees va al tenant 2.
+
+No tienes que poner el tenant a mano ni en el frontend ni en el body de la petición.
+
+El aislamiento multi-tenant ya se maneja automático según el usuario autenticado
