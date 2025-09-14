@@ -5,7 +5,11 @@
   pnpm add -D prisma
 
 ## Description
+Admin global: puede ver y crear usuarios en todos los tenants.
 
+Pastor: puede administrar usuarios dentro de su tenant.
+
+Miembro: solo puede ver y editar su propio perfil.
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Project setup

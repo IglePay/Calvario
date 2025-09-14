@@ -6,9 +6,12 @@ import {
     Param,
     Delete,
     Patch,
+    UseGuards,
 } from '@nestjs/common';
 import { LimpiezaService } from './limpieza.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('limpieza')
 export class LimpiezaController {
     constructor(private readonly limpiezaService: LimpiezaService) {}

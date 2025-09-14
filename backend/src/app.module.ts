@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -9,10 +10,17 @@ import { EstadoCivilModule } from './estado-civil/estado-civil.module';
 import { GrupoModule } from './grupos/grupo.module';
 import { MiembrosModule } from './miembros/miembros.module';
 import { LimpiezaModule } from './limpieza/limpieza.module';
+import { ActividadModule } from './actividades/actividad.module';
 
 @Global()
 @Module({
     imports: [
+        ThrottlerModule.forRoot([
+            {
+                ttl: 60000,
+                limit: 10,
+            },
+        ]),
         AuthModule,
         UsersModule,
         RolesModule,
@@ -22,6 +30,7 @@ import { LimpiezaModule } from './limpieza/limpieza.module';
         GrupoModule,
         MiembrosModule,
         LimpiezaModule,
+        ActividadModule,
     ],
     controllers: [],
     providers: [PrismaService],

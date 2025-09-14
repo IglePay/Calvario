@@ -9,7 +9,9 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { GrupoService } from './grupo.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('grupos')
 export class GrupoController {
     constructor(private readonly grupoService: GrupoService) {}

@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { EstadoCivilService } from './estado-civil.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('estado-civil')
 export class EstadoCivilController {
     constructor(private estadoCivilService: EstadoCivilService) {}
