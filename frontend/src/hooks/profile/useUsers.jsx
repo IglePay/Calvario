@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+import { apiFetch } from "@/utils/apiFetch"
 
 export function useUsers() {
     const [users, setUsers] = useState([])
@@ -10,45 +9,45 @@ export function useUsers() {
     const [roles, setRoles] = useState([])
     const [tenants, setTenants] = useState([])
 
-    const fetchRolesAndTenants = async () => {
-        try {
-            const [rolesRes, tenantsRes] = await Promise.all([
-                fetch(`${API_URL}/roles`, { credentials: "include" }),
-                fetch(`${API_URL}/tenants`, { credentials: "include" }),
-            ])
-            if (!rolesRes.ok || !tenantsRes.ok)
-                throw new Error("No se pudo cargar roles o iglesias")
-            setRoles(await rolesRes.json())
-            setTenants(await tenantsRes.json())
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
-    const fetchUsers = async () => {
-        try {
-            setLoading(true)
-            setError(null)
-            const res = await fetch(`${API_URL}/users/full`, {
-                cache: "no-store",
-                credentials: "include",
+    //  Cargar roles e iglesias
+    const fetchRolesAndTenants = () => {
+        setError(null)
+        return Promise.all([
+            apiFetch("/roles", { method: "GET" }),
+            apiFetch("/tenants", { method: "GET" }),
+        ])
+            .then(([rolesRes, tenantsRes]) =>
+                Promise.all([rolesRes.json(), tenantsRes.json()]),
+            )
+            .then(([rolesData, tenantsData]) => {
+                setRoles(rolesData)
+                setTenants(tenantsData)
             })
-            if (!res.ok)
-                throw new Error("No se pudo cargar la lista de usuarios")
-            const data = await res.json()
-            setUsers(Array.isArray(data) ? data : (data.data ?? []))
-        } catch (e) {
-            setError(e.message)
-        } finally {
-            setLoading(false)
-        }
+            .catch((err) => console.error(err))
     }
 
-    const createOrUpdateUser = async (form) => {
+    //  Cargar usuarios
+    const fetchUsers = () => {
+        setLoading(true)
+        setError(null)
+        return apiFetch("/users/full", { method: "GET" })
+            .then((res) => {
+                if (!res.ok)
+                    throw new Error("No se pudo cargar la lista de usuarios")
+                return res.json()
+            })
+            .then((data) =>
+                setUsers(Array.isArray(data) ? data : (data.data ?? [])),
+            )
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false))
+    }
+
+    //  Crear o actualizar usuario
+    const createOrUpdateUser = (form) => {
+        setError(null)
         const method = form.id_usuario ? "PUT" : "POST"
-        const url = form.id_usuario
-            ? `${API_URL}/users/${form.id_usuario}`
-            : `${API_URL}/users`
+        const url = form.id_usuario ? `/users/${form.id_usuario}` : "/users"
 
         const body = {
             name: form.usuario,
@@ -58,22 +57,32 @@ export function useUsers() {
             ...(form.iglesia && { tenantId: parseInt(form.iglesia) }),
         }
 
-        const res = await fetch(url, {
+        return apiFetch(url, {
             method,
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
-            credentials: "include",
         })
-        if (!res.ok) throw new Error("Error al guardar")
-        await fetchUsers()
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al guardar usuario")
+                return fetchUsers()
+            })
+            .catch((err) => {
+                setError(err.message)
+                throw err
+            })
     }
 
+    //  Eliminar usuario
     const deleteUser = (id) => {
-        fetch(`${API_URL}/users/${id}`, {
-            method: "DELETE",
-            credentials: "include",
-        }).then((res) => res.ok && fetchUsers())
-        // .catch((err) => console.error(err))
+        setError(null)
+        return apiFetch(`/users/${id}`, { method: "DELETE" })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al eliminar usuario")
+                return fetchUsers()
+            })
+            .catch((err) => {
+                setError(err.message)
+                throw err
+            })
     }
 
     useEffect(() => {
