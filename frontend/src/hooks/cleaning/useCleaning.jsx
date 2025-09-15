@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
+import { useAuth } from "../../hooks/auth/useAuth"
 
 export const useCleaning = () => {
+    const { user } = useAuth()
+
     const [events, setEvents] = useState([])
     const [miembros, setMiembros] = useState([])
     const [grupos, setGrupos] = useState([])
@@ -43,14 +46,19 @@ export const useCleaning = () => {
         }
     }
 
-    // ✅ fetchGrupos usando promesas
+    //  fetchGrupos usando promesas
     const fetchGrupos = () => {
         return apiFetch("/grupos")
             .then((res) => res.json())
             .then((json) => {
                 const data = Array.isArray(json) ? json : []
-                setGrupos(data)
-                return data
+
+                const gruposFiltrados = user
+                    ? data.filter((g) => g.tenantId === user.tenantId)
+                    : data
+
+                setGrupos(gruposFiltrados)
+                return gruposFiltrados
             })
             .catch((err) => {
                 console.error("Error fetchGrupos:", err)
@@ -61,35 +69,41 @@ export const useCleaning = () => {
 
     useEffect(() => {
         fetchData()
-        fetchGrupos() // llamar fetchGrupos al cargar
-    }, [])
+        fetchGrupos()
+    }, [user])
 
     const addEvent = async (data) => {
-        try {
-            const saved = await apiFetch("/limpieza", {
-                method: "POST",
-                body: JSON.stringify(data),
-            }).then((res) => res.json())
-
-            return saved
-        } catch (err) {
-            console.error(err)
-            throw err
+        const payload = {
+            ...data,
+            tenantId: user?.tenantId,
         }
+
+        return apiFetch("/limpieza", {
+            method: "POST",
+            body: JSON.stringify(payload),
+        })
+            .then((res) => res.json())
+            .catch((err) => {
+                console.error(err)
+                throw err
+            })
     }
 
-    const updateEvent = async (id, data) => {
-        try {
-            const updated = await apiFetch(`/limpieza/${id}`, {
-                method: "PATCH",
-                body: JSON.stringify(data),
-            }).then((res) => res.json())
-
-            return updated
-        } catch (err) {
-            console.error(err)
-            throw err
+    const updateEvent = (id, data) => {
+        const payload = {
+            ...data,
+            tenantId: user?.tenantId,
         }
+
+        return apiFetch(`/limpieza/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+        })
+            .then((res) => res.json())
+            .catch((err) => {
+                console.error(err)
+                throw err
+            })
     }
 
     const deleteEvent = async (id) => {
@@ -106,11 +120,11 @@ export const useCleaning = () => {
         events,
         setEvents,
         miembros,
-        grupos, // 🔹 Exponemos los grupos
+        grupos,
         addEvent,
         updateEvent,
         deleteEvent,
         fetchData,
-        fetchGrupos, // 🔹 Exponemos fetchGrupos si se necesita refrescar
+        fetchGrupos,
     }
 }
