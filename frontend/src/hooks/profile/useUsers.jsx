@@ -1,21 +1,21 @@
 "use client"
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/utils/apiFetch"
+import { useAuth } from "../../hooks/auth/useAuth"
 
 export function useUsers() {
+    const { user } = useAuth()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [roles, setRoles] = useState([])
     const [tenants, setTenants] = useState([])
 
-    //  Cargar roles e iglesias
     const fetchRolesAndTenants = () => {
+        if (!user?.tenantId) return
         setError(null)
-        return Promise.all([
-            apiFetch("/roles", { method: "GET" }),
-            apiFetch("/tenants", { method: "GET" }),
-        ])
+
+        return Promise.all([apiFetch("/roles"), apiFetch("/tenants")])
             .then(([rolesRes, tenantsRes]) =>
                 Promise.all([rolesRes.json(), tenantsRes.json()]),
             )
@@ -26,14 +26,16 @@ export function useUsers() {
             .catch((err) => console.error(err))
     }
 
-    //  Cargar usuarios
+    //  Cargar usuarios SOLO del tenant actual
     const fetchUsers = () => {
+        if (!user?.tenantId) return //  protege
+
         setLoading(true)
         setError(null)
-        return apiFetch("/users/full", { method: "GET" })
+
+        return apiFetch(`/users/full?tenantId=${user.tenantId}`) // filtras por tenant
             .then((res) => {
-                if (!res.ok)
-                    throw new Error("No se pudo cargar la lista de usuarios")
+                if (!res.ok) throw new Error("No se pudo cargar usuarios")
                 return res.json()
             })
             .then((data) =>
@@ -43,9 +45,11 @@ export function useUsers() {
             .finally(() => setLoading(false))
     }
 
-    //  Crear o actualizar usuario
+    //  Crear o actualizar usuario dentro del tenant actual
     const createOrUpdateUser = (form) => {
+        if (!user?.tenantId) return Promise.reject("No hay tenant activo")
         setError(null)
+
         const method = form.id_usuario ? "PUT" : "POST"
         const url = form.id_usuario ? `/users/${form.id_usuario}` : "/users"
 
@@ -54,7 +58,7 @@ export function useUsers() {
             email: form.email,
             ...(form.password && { password: form.password }),
             ...(form.id_rol && { roleId: parseInt(form.id_rol) }),
-            ...(form.iglesia && { tenantId: parseInt(form.iglesia) }),
+            tenantId: form.iglesia ? parseInt(form.iglesia) : user.tenantId,
         }
 
         return apiFetch(url, {
@@ -73,7 +77,9 @@ export function useUsers() {
 
     //  Eliminar usuario
     const deleteUser = (id) => {
+        if (!user?.tenantId) return Promise.reject("No hay tenant activo")
         setError(null)
+
         return apiFetch(`/users/${id}`, { method: "DELETE" })
             .then((res) => {
                 if (!res.ok) throw new Error("Error al eliminar usuario")
@@ -86,11 +92,14 @@ export function useUsers() {
     }
 
     useEffect(() => {
-        fetchUsers()
-        fetchRolesAndTenants()
-    }, [])
+        if (user?.tenantId) {
+            fetchUsers()
+            fetchRolesAndTenants()
+        }
+    }, [user])
 
     return {
+        user,
         users,
         loading,
         error,
