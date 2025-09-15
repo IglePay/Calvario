@@ -14,6 +14,7 @@ const ActivityModal = ({
         fecha: "",
         idMiembro: "",
         idGrupo: "",
+        descripcion: "",
     })
 
     useEffect(() => {
@@ -23,6 +24,15 @@ const ActivityModal = ({
                 fecha: initialData.fechaActividad || "",
                 idMiembro: initialData.idMiembro || "",
                 idGrupo: initialData.idGrupo || "",
+                descripcion: initialData.descripcion || "",
+            })
+        } else {
+            setFormData({
+                titulo: "",
+                fecha: "",
+                idMiembro: "",
+                idGrupo: "",
+                descripcion: "",
             })
         }
     }, [initialData])
@@ -34,7 +44,6 @@ const ActivityModal = ({
     const handleSubmit = (e) => {
         e.preventDefault()
         onSave(formData)
-        onClose()
     }
 
     if (!isOpen) return null
@@ -103,6 +112,17 @@ const ActivityModal = ({
                             onChange={handleChange}
                             className="input input-bordered w-full"
                             required
+                        />
+                    </div>
+
+                    <div className="form-control col-span-2">
+                        <label className="label">Descripción</label>
+                        <input
+                            type="text"
+                            name="descripcion"
+                            value={formData.descripcion}
+                            onChange={handleChange}
+                            className="input input-bordered w-full"
                         />
                     </div>
 

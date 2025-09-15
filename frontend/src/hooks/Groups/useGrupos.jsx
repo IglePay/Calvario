@@ -1,8 +1,11 @@
 "use client"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
+import { useAuth } from "../../hooks/auth/useAuth"
 
 export function useGrupos() {
+    const { user } = useAuth()
+
     const [grupos, setGrupos] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)

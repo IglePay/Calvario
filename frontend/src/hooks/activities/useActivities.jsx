@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useTenants } from "../tenants/useTenants"
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+import { apiFetch } from "@/utils/apiFetch"
+import { useAuth } from "../../hooks/auth/useAuth"
 
 export default function useActivities() {
-    const { user } = useTenants()
+    const { user } = useAuth()
     const [activities, setActivities] = useState([])
     const [miembros, setMiembros] = useState([])
     const [grupos, setGrupos] = useState([])
@@ -12,66 +12,91 @@ export default function useActivities() {
     const [error, setError] = useState(null)
 
     useEffect(() => {
+        // Solo ejecutar cuando user esté cargado
+        if (user === null) return // user aún no cargado
+        if (!user?.tenantId) {
+            return
+        }
+
         setLoading(true)
+        setError(null)
+
         Promise.all([
-            fetch(`${API_URL}/actividades`).then((res) => res.json()),
-            fetch(`${API_URL}/actividades/miembros`).then((res) => res.json()),
-            fetch(`${API_URL}/actividades/grupos`).then((res) => res.json()),
+            apiFetch("/actividades"),
+            apiFetch("/actividades/miembros"),
+            apiFetch("/actividades/grupos"),
         ])
+            .then((responses) =>
+                Promise.all(
+                    responses.map(async (res) => {
+                        if (!res.ok) throw new Error("Error al cargar datos")
+                        return res.json()
+                    }),
+                ),
+            )
             .then(([activitiesData, miembrosData, gruposData]) => {
                 setActivities(activitiesData)
                 setMiembros(miembrosData)
                 setGrupos(gruposData)
             })
-            .catch(() => setError("Error al cargar datos"))
+            .catch((err) => {
+                setError(err.message || "Error al cargar datos")
+            })
             .finally(() => setLoading(false))
-    }, [])
+    }, [user])
 
+    //  Crear actividad
     const createActivity = (data) => {
-        if (!user?.idTenant) {
-            setError("No hay usuario logueado")
-            return
-        }
+        if (!user?.tenantId) return Promise.reject("No hay usuario logueado")
 
         const payload = {
-            ...data,
-            fechaActividad: data.fecha ? new Date(data.fecha) : null,
+            titulo: data.titulo,
+            descripcion: data.descripcion || "",
+            fechaActividad: data.fecha
+                ? new Date(data.fecha).toISOString()
+                : null,
             idMiembro: Number(data.idMiembro),
             idGrupo: data.idGrupo ? Number(data.idGrupo) : null,
-            idTenant: user.idTenant,
-            descripcion: data.descripcion || "",
         }
 
-        return fetch(`${API_URL}/actividades`, {
+        return apiFetch("/actividades", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         })
-            .then((res) => res.json())
-            .then((newActivity) => {
+            .then(async (res) => {
+                if (!res.ok) throw new Error("Error al crear actividad")
+                const newActivity = await res.json()
                 setActivities((prev) => [...prev, newActivity])
                 return newActivity
             })
-            .catch(() => setError("Error al crear actividad"))
+            .catch((err) => {
+                console.error(err)
+                setError(err.message || "Error al crear actividad")
+                throw err
+            })
     }
 
+    //  Actualizar actividad
     const updateActivity = (id, data) => {
+        if (!user?.tenantId) return Promise.reject("No hay usuario logueado")
+
         const payload = {
-            ...data,
-            fechaActividad: data.fecha ? new Date(data.fecha) : null,
+            titulo: data.titulo,
+            descripcion: data.descripcion || "",
+            fechaActividad: data.fecha
+                ? new Date(data.fecha).toISOString()
+                : null,
             idMiembro: Number(data.idMiembro),
             idGrupo: data.idGrupo ? Number(data.idGrupo) : null,
-            idTenant: user.idTenant,
-            descripcion: data.descripcion || "",
         }
 
-        return fetch(`${API_URL}/actividades/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
+        return apiFetch(`/actividades/${id}`, {
+            method: "PATCH",
             body: JSON.stringify(payload),
         })
-            .then((res) => res.json())
-            .then((updatedActivity) => {
+            .then(async (res) => {
+                if (!res.ok) throw new Error("Error al actualizar actividad")
+                const updatedActivity = await res.json()
                 setActivities((prev) =>
                     prev.map((a) =>
                         a.idActividad === id ? updatedActivity : a,
@@ -79,20 +104,34 @@ export default function useActivities() {
                 )
                 return updatedActivity
             })
-            .catch(() => setError("Error al actualizar actividad"))
+            .catch((err) => {
+                console.error(err)
+                setError(err.message || "Error al actualizar actividad")
+                throw err
+            })
     }
 
+    //  Eliminar actividad
     const deleteActivity = (id) => {
-        return fetch(`${API_URL}/actividades/${id}`, { method: "DELETE" })
-            .then(() =>
+        return apiFetch(`/actividades/${id}`, { method: "DELETE" })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al eliminar actividad")
                 setActivities((prev) =>
                     prev.filter((a) => a.idActividad !== id),
-                ),
-            )
-            .catch(() => setError("Error al eliminar actividad"))
+                )
+            })
+            .catch((err) => {
+                console.error(err)
+                setError(err.message || "Error al eliminar actividad")
+                throw err
+            })
     }
 
+    // Luego en el useEffect solo llamas a esta función
+    useEffect(() => {}, [user])
+
     return {
+        user,
         activities,
         miembros,
         grupos,

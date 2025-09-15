@@ -3,51 +3,27 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useLogin } from "../hooks/login/useLogin"
 
 const Home = () => {
-    const [form, setForm] = useState({
-        email: "",
-        password: "",
-        iglesia: "",
-    })
+    const [form, setForm] = useState({ email: "", password: "" })
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState("")
+    const { login, loading, error } = useLogin()
 
     const handleChange = (e) => {
         const { name, value } = e.target
         setForm((prev) => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault()
-        setError("")
-
-        try {
-            const body = {
-                email: form.email,
-                password: form.password,
-            }
-
-            if (form.iglesia) body.iglesia = form.iglesia
-
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body),
-                    credentials: "include",
-                },
-            )
-
-            const data = await res.json()
-            if (!res.ok)
-                throw new Error(data.message || "Error al iniciar sesión")
-
-            window.location.href = "/control"
-        } catch (err) {
-            setError(err.message)
-        }
+        login(form)
+            .then(() => {
+                window.location.href = "/control"
+            })
+            .catch(() => {
+                // el error ya se guarda en el hook, no hace falta setError
+            })
     }
 
     return (
@@ -88,7 +64,7 @@ const Home = () => {
                             placeholder="Contraseña"
                             value={form.password}
                             onChange={handleChange}
-                            className="input input-bordered w-full md:w-100  rounded-lg border-gray-300 pr-10 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
+                            className="input input-bordered w-full md:w-100 rounded-lg border-gray-300 pr-10 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                             required
                         />
                         <span
@@ -106,8 +82,9 @@ const Home = () => {
 
                     <button
                         type="submit"
+                        disabled={loading}
                         className="btn bg-rose-900 hover:bg-rose-700 text-white font-semibold rounded-full w-full md:w-40">
-                        Iniciar sesión
+                        {loading ? "Entrando..." : "Iniciar sesión"}
                     </button>
                 </form>
 

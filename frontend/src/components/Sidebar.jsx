@@ -1,13 +1,34 @@
 "use client"
+
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { apiFetch } from "@/utils/apiFetch"
 
 export default function Sidebar({ isOpen, onClose, navigation }) {
     const { menuItems, activeSection, handleNavigation } = navigation
     const [openMenu, setOpenMenu] = useState(null)
+    const [user, setUser] = useState(null) // estado para el usuario logueado
 
     const toggleSubmenu = (id) => {
         setOpenMenu(openMenu === id ? null : id)
+    }
+
+    // Obtener info del usuario logueado
+    useEffect(() => {
+        apiFetch("/auth/me")
+            .then((res) => {
+                if (!res.ok) throw new Error("No autorizado")
+                return res.json()
+            })
+            .then((data) => setUser(data))
+            .catch(() => setUser(null))
+    }, [])
+
+    const handleLogout = () => {
+        apiFetch("/auth/logout", { method: "POST" }).then(() => {
+            localStorage.removeItem("token")
+            window.location.href = "/"
+        })
     }
 
     return (
@@ -25,7 +46,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                         : "-translate-x-full lg:translate-x-0"
                 }`}>
                 {/* Header */}
-                <div className="p-0 border-b border-gray-700 flex items-center justify-center">
+                <div className="p-4 border-b border-gray-700 flex flex-col items-center justify-center space-y-2">
                     <Image
                         src="/images/iglepay.png"
                         alt="Logo"
@@ -34,6 +55,13 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                         className="rounded-full"
                         priority
                     />
+                    {user && (
+                        <div className="text-center text-white">
+                            <p className="font-semibold">{user.name}</p>
+                            <p className="text-sm">{user.tenant}</p>
+                            <p className="text-sm">{user.role}</p>
+                        </div>
+                    )}
                     <button
                         onClick={onClose}
                         className="lg:hidden text-white hover:text-gray-300">
@@ -72,7 +100,6 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                                 )}
                             </button>
 
-                            {/* Render Submenu */}
                             {item.children && openMenu === item.id && (
                                 <div className="ml-8 mt-2 space-y-1">
                                     {item.children.map((child) => (
@@ -97,10 +124,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 {/* Settings and Logout */}
                 <div className="">
                     <button
-                        onClick={() => {
-                            localStorage.removeItem("token")
-                            window.location.href = "/"
-                        }}
+                        onClick={handleLogout}
                         className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors w-full text-left">
                         <i className="fas fa-sign-out-alt w-5 mr-3"></i>
                         Cerrar sesión

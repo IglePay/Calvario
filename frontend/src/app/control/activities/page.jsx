@@ -49,9 +49,7 @@ const ActivitiesPage = () => {
     }
 
     const handleDelete = (id) => {
-        if (confirm("¿Deseas eliminar esta actividad?")) {
-            deleteActivity(id)
-        }
+        deleteActivity(id)
     }
 
     return (
