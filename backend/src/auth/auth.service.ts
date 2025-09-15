@@ -22,9 +22,9 @@ export class AuthService {
 
     async login(user: any) {
         const payload = {
-            sub: user.idUsuario,
+            sub: user.id,
             tenantId: user.tenantId,
-            roleId: user.idRol,
+            roleId: user.roleId,
         };
         return {
             access_token: this.jwtService.sign(payload),
@@ -50,5 +50,9 @@ export class AuthService {
             tenantId,
             roleId,
         });
+    }
+
+    async findById(id: number) {
+        return this.usersService.findByIdWithRelations(id);
     }
 }

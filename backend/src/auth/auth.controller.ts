@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from './auth.guard';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -21,8 +22,24 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Get('me')
-    getMe(@Req() req: Request) {
-        return req.user;
+    async getMe(@Req() req: Request) {
+        // Le decimos a TypeScript que req.user tiene la forma de JwtPayload
+        const userPayload = req.user as JwtPayload;
+
+        // Usamos la propiedad correcta según tu JwtStrategy
+        const user = await this.authService.findById(userPayload.id);
+
+        if (!user) {
+            throw new UnauthorizedException('Usuario no encontrado');
+        }
+
+        return {
+            name: user.name,
+            email: user.email,
+            tenant: user.tb_tenants?.nombre,
+            role: user.role?.nombre,
+            tenantId: user.tenantId,
+        };
     }
 
     @Post('login')
@@ -64,5 +81,11 @@ export class AuthController {
             body.tenantId ?? 1,
             body.roleId ?? 2,
         );
+    }
+
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie('jwt'); // Borra la cookie del token
+        return { message: 'Logout exitoso' };
     }
 }

@@ -11,21 +11,41 @@ import { Request } from 'express';
 export class AuthGuard implements CanActivate {
     constructor(private jwtService: JwtService) {}
 
-    canActivate(context: ExecutionContext): boolean {
+    canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest<Request>();
         const token = request.cookies['jwt'];
 
         console.log('token recibido:', token);
 
-        if (!token) throw new UnauthorizedException('No autorizado');
+        // Retorna una promesa que valida el token
+        return this.verifyToken(token)
+            .then((payload) => {
+                console.log('payload decodificado:', payload);
 
-        try {
-            const payload = this.jwtService.verify(token);
-            console.log('payload deccodificado:', payload);
-            request.user = payload; // aquí setea el usuario en la request
-            return true;
-        } catch (err) {
-            throw new UnauthorizedException('Token inválido');
-        }
+                // Normalizamos la estructura de user
+                request.user = {
+                    id: payload.sub,
+                    tenantId: payload.tenantId,
+                    roleId: payload.roleId,
+                };
+
+                return true;
+            })
+            .catch(() => {
+                return Promise.reject(
+                    new UnauthorizedException('Token inválido o no autorizado'),
+                );
+            });
+    }
+
+    private verifyToken(token: string | undefined): Promise<any> {
+        return new Promise((resolve, reject) => {
+            token
+                ? this.jwtService
+                      .verifyAsync(token)
+                      .then(resolve)
+                      .catch(() => reject(new Error('Token inválido')))
+                : reject(new Error('No autorizado'));
+        });
     }
 }

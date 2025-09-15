@@ -7,7 +7,7 @@ export class UsersService {
     constructor(private prisma: PrismaService) {}
 
     async findAll() {
-        return this.prisma.user.findMany({
+        return this.prisma.tb_user.findMany({
             include: {
                 role: true,
                 tb_tenants: true,
@@ -15,8 +15,18 @@ export class UsersService {
         });
     }
 
+    async findByIdWithRelations(id: number) {
+        return this.prisma.tb_user.findUnique({
+            where: { id: id },
+            include: {
+                role: true, // relación a tb_role
+                tb_tenants: true, // relación a tb_tenants
+            },
+        });
+    }
+
     async findByEmail(email: string) {
-        return this.prisma.user.findUnique({
+        return this.prisma.tb_user.findUnique({
             where: { email },
             include: {
                 role: true,
@@ -32,8 +42,8 @@ export class UsersService {
     }
 
     async findRoles() {
-        return this.prisma.role.findMany({
-            select: { id: true, nombre: true }, // ✅ id y nombre, no id_rol
+        return this.prisma.tb_role.findMany({
+            select: { id: true, nombre: true }, //  id y nombre, no id_rol
         });
     }
 
@@ -50,7 +60,7 @@ export class UsersService {
         if (!tenant) throw new Error('Tenant no válido');
 
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        return this.prisma.user.create({
+        return this.prisma.tb_user.create({
             data: {
                 name: data.name,
                 email: data.email,
@@ -84,7 +94,7 @@ export class UsersService {
         // Conectar rol si se envía
         if (data.roleId) {
             // Validar que el rol existe
-            const role = await this.prisma.role.findUnique({
+            const role = await this.prisma.tb_role.findUnique({
                 where: { id: data.roleId },
             });
             if (!role) throw new Error('Rol no válido');
@@ -101,21 +111,21 @@ export class UsersService {
             updateData.tb_tenants = { connect: { id_tenant: data.tenantId } };
         }
 
-        return this.prisma.user.update({
+        return this.prisma.tb_user.update({
             where: { id },
             data: updateData,
         });
     }
 
     async deleteUser(id: number) {
-        return this.prisma.user.delete({
+        return this.prisma.tb_user.delete({
             where: { id },
         });
     }
 
     // para  la tabla user
     async findAllWithDetails() {
-        return this.prisma.user.findMany({
+        return this.prisma.tb_user.findMany({
             select: {
                 id: true,
                 name: true, // nombre del usuario

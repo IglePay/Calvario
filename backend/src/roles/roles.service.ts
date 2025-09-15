@@ -6,20 +6,20 @@ export class RolesService {
     constructor(private prisma: PrismaService) {}
 
     async findAll() {
-        return this.prisma.role.findMany({
+        return this.prisma.tb_role.findMany({
             select: { id: true, nombre: true }, // solo id y nombre
         });
     }
 
     async findOneById(id: number) {
-        return this.prisma.role.findUnique({
+        return this.prisma.tb_role.findUnique({
             where: { id },
             select: { id: true, nombre: true },
         });
     }
 
     async findOneByName(nombre: string) {
-        return this.prisma.role.findFirst({
+        return this.prisma.tb_role.findFirst({
             where: { nombre },
             select: { id: true, nombre: true },
         });
