@@ -8,7 +8,7 @@ datasource db {
   // connect_timeout = 20
 }
 //=============Usuarios===========
-model User {
+model tb_user {
   id         Int        @id @default(autoincrement()) @map("id_usuario")
   tenantId   Int        @map("id_tenant")
   name       String     @map("nombre") @db.VarChar(100)
@@ -16,7 +16,7 @@ model User {
   password   String     @map("contrasena") @db.VarChar(255)
   roleId     Int        @map("id_rol")
   createdAt  DateTime   @default(now()) @map("fecha_creacion") @db.Timestamp(0)
-  role       Role       @relation("UserRole", fields: [roleId], references: [id], onUpdate: Restrict, map: "fk_user_rol")
+  role       tb_role       @relation("UserRole", fields: [roleId], references: [id], onUpdate: Restrict, map: "fk_user_rol")
   tb_tenants tb_tenants @relation(fields: [tenantId], references: [id_tenant], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_tenant")
 
   @@index([roleId], map: "fk_user_rol")
@@ -24,11 +24,11 @@ model User {
   @@map("tb_users")
 }
 //=============Roles===========
-model Role {
+model tb_role {
   id          Int     @id @default(autoincrement()) @map("id_rol")
   nombre      String  @unique(map: "nombre") @map("nombre") @db.VarChar(50)
   descripcion String? @db.VarChar(255)
-  users       User[]  @relation("UserRole")
+  users       tb_user[]  @relation("UserRole")
 
   @@map("tb_roles")
 }
@@ -45,7 +45,7 @@ model tb_tenants {
 
   grupos         tb_grupo[]
   miembros       tb_miembros[]
-  tb_users       User[]
+  users       tb_user[]
   limpiezas tb_limpieza[]
   actividades tb_actividad[]
   @@map("tb_tenants")
