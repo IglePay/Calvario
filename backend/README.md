@@ -70,3 +70,10 @@ Si te logueas con usuario B → req.user.tenantId = 2 → todo lo que crees va a
 No tienes que poner el tenant a mano ni en el frontend ni en el body de la petición.
 
 El aislamiento multi-tenant ya se maneja automático según el usuario autenticado
+
+
+
+- Database-per-tenant → cada tenant tiene su propia DB/schema (más aislado, pero más complejo de gestionar).
+
+- Shared-database, tenant-id column → una sola DB y cada tabla tiene columna tenantId.
+➝ Por tu tenants/ module y dto parece que vas por esta segunda.-
