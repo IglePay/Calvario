@@ -12,6 +12,11 @@ const Persons = () => {
         createMember,
         updateMember,
         deleteMember,
+        grupos,
+        generos,
+        estados,
+        bautizados,
+        servidores,
     } = useMembers()
 
     const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -130,9 +135,9 @@ const Persons = () => {
                         <tbody>
                             {filteredMembers
                                 .slice(0, rowsPerPage)
-                                .map((member) => (
+                                .map((member, index) => (
                                     <tr
-                                        key={member.idMiembro}
+                                        key={member.idMiembro ?? index} // ahora index está definido
                                         className="text-center">
                                         <td>{member.idMiembro}</td>
                                         <td>{member.nombre}</td>
@@ -175,7 +180,11 @@ const Persons = () => {
                 onSubmit={handleSubmit}
                 initialData={editData}
                 mode={editData ? "edit" : "create"}
-                grupos={[]}></MembersModal>
+                grupos={grupos}
+                generos={generos}
+                estados={estados}
+                bautizados={bautizados}
+                servidores={servidores}></MembersModal>
         </div>
     )
 }

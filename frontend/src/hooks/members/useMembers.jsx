@@ -1,105 +1,178 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+import { apiFetch } from "@/utils/apiFetch"
+import { useAuth } from "../../hooks/auth/useAuth"
 
 export function useMembers() {
+    const { user } = useAuth()
     const [members, setMembers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const fetchMembers = async () => {
-        try {
-            setLoading(true)
-            setError(null)
+    const [grupos, setGrupos] = useState([])
+    const [generos, setGeneros] = useState([])
+    const [estados, setEstados] = useState([])
+    const [bautizados, setBautizados] = useState([])
+    const [servidores, setServidores] = useState([])
 
-            const res = await fetch(`${API_URL}/miembros`, {
-                cache: "no-store",
-                credentials: "include",
+    const normalizeFlags = (member) => ({
+        ...member,
+        bautismo: !!member.idBautizado,
+        servidor: !!member.idServidor,
+    })
+
+    // 🔹 Obtener miembros para la tabla
+    const fetchMembers = () => {
+        if (!user) return Promise.resolve()
+
+        setLoading(true)
+        setError(null)
+
+        return apiFetch("/miembros/table", { cache: "no-store" })
+            .then((res) => {
+                if (!res.ok)
+                    throw new Error("No se pudo cargar la lista de miembros")
+                return res.json()
             })
-
-            if (!res.ok)
-                throw new Error("No se pudo cargar la lista de miembros")
-
-            const data = await res.json()
-            const miembros = Array.isArray(data) ? data : (data.data ?? [])
-
-            // 🔹 Normalizamos "S"/"N" → true/false
-            const normalizados = miembros.map((m) => ({
-                ...m,
-                bautismo: m.bautismo === "S",
-                servidor: m.servidor === "S",
-            }))
-
-            setMembers(normalizados)
-        } catch (e) {
-            setError(e.message || "Error desconocido")
-        } finally {
-            setLoading(false)
-        }
+            .then((data) => {
+                const miembros = Array.isArray(data) ? data : (data.data ?? [])
+                setMembers(miembros.map(normalizeFlags))
+            })
+            .catch((e) => setError(e.message || "Error desconocido"))
+            .finally(() => setLoading(false))
     }
 
-    // 🔹 crear miembro
-    const createMember = async (member) => {
-        try {
-            const payload = {
-                ...member,
-                bautismo: member.bautizo ? "S" : "N",
-                servidor: member.servidor ? "S" : "N",
-            }
+    const createMember = (member) => {
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
-            const res = await fetch(`${API_URL}/miembros`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            })
-            if (!res.ok) throw new Error("Error al crear miembro")
-
-            await fetchMembers()
-        } catch (e) {
-            setError(e.message || "Error desconocido")
+        const payload = {
+            dpi: member.dpi || null,
+            nombre: member.nombre,
+            apellido: member.apellido,
+            email: member.email || null,
+            telefono: member.telefono || null,
+            fechaNacimiento: member.fechaNacimiento
+                ? new Date(member.fechaNacimiento).toISOString()
+                : null,
+            idGenero: member.idGenero ? Number(member.idGenero) : null,
+            direccion: member.direccion || null,
+            idEstado: member.estadoCivil ? Number(member.estadoCivil) : null,
+            fechaLlegada: member.anioLlegada
+                ? new Date(member.anioLlegada).toISOString()
+                : null,
+            procesosTerminado: member.procesosterminado || null,
+            idGrupo: member.grupo ? Number(member.grupo) : null,
+            leGusta: member.legusta || null,
+            fechaBautismo: member.fechabautizo
+                ? new Date(member.fechabautizo).toISOString()
+                : null,
+            idBautizado: member.idBautizado ? Number(member.idBautizado) : null,
+            idServidor: member.idServidor ? Number(member.idServidor) : null,
         }
-    }
-    // 🔹 Actualizar miembro
-    const updateMember = async (id, member) => {
-        try {
-            const payload = {
-                ...member,
-                bautismo: member.bautizo ? "S" : "N",
-                servidor: member.servidor ? "S" : "N",
-            }
 
-            const res = await fetch(`${API_URL}/miembros/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+        return apiFetch("/miembros", {
+            method: "POST",
+            body: JSON.stringify(payload),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al crear miembro")
+                return fetchMembers()
             })
-            if (!res.ok) throw new Error("Error al actualizar miembro")
-
-            await fetchMembers()
-        } catch (e) {
-            setError(e.message || "Error desconocido")
-        }
+            .catch((e) => setError(e.message || "Error desconocido"))
     }
 
-    // 🔹 Eliminar miembro
-    const deleteMember = async (id) => {
-        try {
-            const res = await fetch(`${API_URL}/miembros/${id}`, {
-                method: "DELETE",
-            })
-            if (!res.ok) throw new Error("Error al eliminar miembro")
+    const updateMember = (id, member) => {
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
-            await fetchMembers()
-        } catch (e) {
-            setError(e.message || "Error desconocido")
+        const payload = {
+            dpi: member.dpi || null,
+            nombre: member.nombre,
+            apellido: member.apellido,
+            email: member.email || null,
+            telefono: member.telefono || null,
+            fechaNacimiento: member.fechaNacimiento
+                ? new Date(member.fechaNacimiento).toISOString()
+                : null,
+            idGenero: member.idGenero ? Number(member.idGenero) : null,
+            direccion: member.direccion || null,
+            idEstado: member.estadoCivil ? Number(member.estadoCivil) : null,
+            fechaLlegada: member.anioLlegada
+                ? new Date(member.anioLlegada).toISOString()
+                : null,
+            procesosTerminado: member.procesosterminado || null,
+            idGrupo: member.grupo ? Number(member.grupo) : null,
+            leGusta: member.legusta || null,
+            fechaBautismo: member.fechabautizo
+                ? new Date(member.fechabautizo).toISOString()
+                : null,
+            idBautizado: member.idBautizado ? Number(member.idBautizado) : null,
+            idServidor: member.idServidor ? Number(member.idServidor) : null,
         }
+
+        return apiFetch(`/miembros/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al actualizar miembro")
+                return fetchMembers()
+            })
+            .catch((e) => setError(e.message || "Error desconocido"))
+    }
+
+    const deleteMember = (id) => {
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
+
+        return apiFetch(`/miembros/${id}`, { method: "DELETE" })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al eliminar miembro")
+                return fetchMembers()
+            })
+            .catch((e) => setError(e.message || "Error desconocido"))
     }
 
     useEffect(() => {
         fetchMembers()
-    }, [])
+
+        // 🔹 Traer selectores
+        apiFetch("/grupos")
+            .then((res) => res.json())
+            .then((data) =>
+                setGrupos(Array.isArray(data) ? data : data.data || []),
+            )
+            .catch(console.error)
+
+        apiFetch("/genero")
+            .then((res) => res.json())
+            .then((data) =>
+                setGeneros(Array.isArray(data) ? data : data.data || []),
+            )
+            .catch(console.error)
+
+        apiFetch("/estado-civil")
+            .then((res) => res.json())
+            .then((data) =>
+                setEstados(Array.isArray(data) ? data : data.data || []),
+            )
+            .catch(console.error)
+
+        // 🔹 Bautizados
+        apiFetch("/miembros/bautizados")
+            .then((res) => res.json())
+            .then((data) =>
+                setBautizados(Array.isArray(data) ? data : data.data || []),
+            )
+            .catch(console.error)
+
+        // 🔹 Servidores
+        apiFetch("/miembros/servidores")
+            .then((res) => res.json())
+            .then((data) =>
+                setServidores(Array.isArray(data) ? data : data.data || []),
+            )
+            .catch(console.error)
+    }, [user])
 
     return {
         members,
@@ -109,5 +182,10 @@ export function useMembers() {
         createMember,
         updateMember,
         deleteMember,
+        grupos,
+        generos,
+        estados,
+        bautizados,
+        servidores,
     }
 }

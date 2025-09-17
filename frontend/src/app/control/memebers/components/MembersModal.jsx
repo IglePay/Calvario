@@ -10,9 +10,10 @@ const MembersModal = ({
     grupos = [],
     generos = [],
     estados = [],
+    bautizados = [],
+    servidores = [],
 }) => {
     const [formData, setFormData] = useState({
-        foto: null,
         dpi: "",
         nombre: "",
         apellido: "",
@@ -23,10 +24,10 @@ const MembersModal = ({
         direccion: "",
         estadoCivil: "",
         anioLlegada: "",
-        bautizo: false,
+        idBautizado: "",
         fechabautizo: "",
-        servidor: false,
-        procesosTerminado: "",
+        idServidor: "",
+        procesosterminado: "",
         grupo: "",
         legusta: "",
     })
@@ -52,12 +53,16 @@ const MembersModal = ({
             anioLlegada: initialData.fechallegada
                 ? initialData.fechallegada.split("T")[0]
                 : "",
-            bautizo: initialData.bautismo === "S",
+            idBautizado: initialData.idBautizado
+                ? String(initialData.idBautizado)
+                : "",
+            idServidor: initialData.idServidor
+                ? String(initialData.idServidor)
+                : "",
             fechabautizo: initialData.fechabautismo
                 ? initialData.fechabautismo.split("T")[0]
                 : "",
-            servidor: initialData.servidor === "S",
-            procesosTerminado: initialData.procesosterminado || "",
+            procesosterminado: initialData.procesosterminado || "",
             grupo: initialData.idGrupo ? String(initialData.idGrupo) : "",
             legusta: initialData.legusta || "",
         })
@@ -78,6 +83,7 @@ const MembersModal = ({
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        console.log("formData al enviar:", formData)
 
         const payload = {
             dpi: formData.dpi || null,
@@ -85,23 +91,40 @@ const MembersModal = ({
             apellido: formData.apellido,
             email: formData.email || null,
             telefono: formData.telefono || null,
-            fechanacimiento: formData.fechaNacimiento || null,
-            sexo: formData.idGenero || null,
+            fechaNacimiento: formData.fechaNacimiento
+                ? new Date(formData.fechaNacimiento).toISOString()
+                : null,
+            idGenero: formData.idGenero ? Number(formData.idGenero) : null,
             direccion: formData.direccion || null,
-            estadoCivil: formData.estadoCivil || null,
-            anioLlegada: formData.anioLlegada || null,
-            bautismo: formData.bautizo ? "S" : "N", // enviar sólo esta
-            fechabautizo: formData.fechabautizo || null,
-            servidor: formData.servidor ? "S" : "N", // enviar sólo esta
-            procescos: formData.procesosTerminado || null,
-            grupo: formData.grupo || null,
-            legusta: formData.legusta || null,
+            idEstado: formData.estadoCivil
+                ? Number(formData.estadoCivil)
+                : null,
+            fechaLlegada: formData.anioLlegada
+                ? new Date(formData.anioLlegada).toISOString()
+                : null,
+            procesosTerminado: formData.procesosterminado || null,
+            idGrupo: formData.grupo ? Number(formData.grupo) : null,
+            leGusta: formData.legusta || null,
+            // fechaBautismo: formData.fechabautizo
+            //     ? new Date(formData.fechabautizo).toISOString()
+            //     : null,
+            idBautizado: formData.idBautizado
+                ? Number(formData.idBautizado)
+                : null,
+            idServidor: formData.idServidor
+                ? Number(formData.idServidor)
+                : null,
         }
 
+        console.log("payload para el backend:", payload)
         onSubmit(payload)
     }
 
     if (!isOpen) return null
+
+    // 👇 Aquí mismo, dentro del componente MembersModal
+    console.log("👉 Bautizados que llegan al modal:", bautizados)
+    console.log("👉 Servidores que llegan al modal:", servidores)
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -113,17 +136,6 @@ const MembersModal = ({
                 <form
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Foto */}
-                    <div className="flex flex-col">
-                        <label className="label">Foto</label>
-                        <input
-                            type="file"
-                            name="foto"
-                            onChange={handleChange}
-                            className="file-input w-full"
-                        />
-                    </div>
-
                     {/* Datos básicos */}
                     <div className="flex flex-col">
                         <label className="label">Identificación</label>
@@ -274,27 +286,45 @@ const MembersModal = ({
                         </select>
                     </div>
 
-                    {/* Checkboxes */}
-                    <div className="flex items-center space-x-2">
-                        <input
-                            name="bautizo"
-                            type="checkbox"
-                            checked={formData.bautizo}
+                    <div className="flex flex-col">
+                        <label className="label">Bautizado</label>
+                        <select
+                            name="idBautizado"
+                            value={formData.idBautizado}
                             onChange={handleChange}
-                            className="checkbox checkbox-neutral"
-                        />
-                        <label>Bautizado?</label>
+                            className="input w-full">
+                            <option value="">Seleccione</option>
+                            {bautizados.map((b) => (
+                                <option
+                                    key={b.idBautizado}
+                                    value={b.idBautizado}>
+                                    {b.bautizadoEstado}{" "}
+                                    {b.fechaBautismo
+                                        ? `(${b.fechaBautismo.split("T")[0]})`
+                                        : ""}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <input
-                            name="servidor"
-                            type="checkbox"
-                            checked={formData.servidor}
+                    {/* Servidor */}
+                    <div className="flex flex-col">
+                        <label className="label">Servidor</label>
+                        <select
+                            name="idServidor"
+                            value={formData.idServidor}
                             onChange={handleChange}
-                            className="checkbox checkbox-neutral"
-                        />
-                        <label>Es servidor en nuestra iglesia?</label>
+                            className="input w-full">
+                            <option value="">Seleccione</option>
+                            {servidores.map((s) => (
+                                <option key={s.idServidor} value={s.idServidor}>
+                                    {s.servidorEstado}{" "}
+                                    {s.fechaInicio
+                                        ? `(${s.fechaInicio.split("T")[0]})`
+                                        : ""}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* Otros */}
@@ -302,8 +332,8 @@ const MembersModal = ({
                         <label className="label">Procesos completados</label>
                         <input
                             type="text"
-                            name="procesosTerminado"
-                            value={formData.procesosTerminado}
+                            name="procesosterminado"
+                            value={formData.procesosterminado}
                             onChange={handleChange}
                             className="input w-full"
                         />
