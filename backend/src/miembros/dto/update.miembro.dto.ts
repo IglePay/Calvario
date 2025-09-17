@@ -1,9 +1,9 @@
 import { IsString, IsOptional, IsNumber, IsDateString } from 'class-validator';
 
-export class CreateMiembroDto {
+export class UpdateMiembroDto {
     @IsOptional() @IsString() dpi?: string;
-    @IsString() nombre: string;
-    @IsString() apellido: string;
+    @IsOptional() @IsString() nombre: string;
+    @IsOptional() @IsString() apellido: string;
     @IsOptional() @IsString() email?: string;
     @IsOptional() @IsString() telefono?: string;
     @IsOptional() @IsDateString() fechaNacimiento?: string;

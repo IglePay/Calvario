@@ -1,22 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateMiembroDto } from './dto/create.miembro.dto';
+import { UpdateMiembroDto } from './dto/update.miembro.dto';
 
 @Injectable()
 export class MiembrosService {
     constructor(private readonly prisma: PrismaService) {}
-
-    async findAll() {
-        return this.prisma.tb_miembros.findMany({
-            include: {
-                grupo: true,
-                genero: true,
-                estadoCivil: true,
-                servidor: true, // corregido
-                bautizado: true, // corregido
-            },
-        });
-    }
 
     async findAllForTable() {
         return this.prisma.tb_miembros.findMany({
@@ -54,6 +43,7 @@ export class MiembrosService {
                 idGrupo: dto.idGrupo || null,
                 legusta: dto.leGusta || null,
                 fechaLlegada: dto.fechaLlegada || null, // antes anioLlegada
+                fechaBautismo: dto.fechaBautismo || null,
                 // Relaciones (FKs)
                 idBautizado: dto.idBautizado || null,
                 idServidor: dto.idServidor || null,
@@ -63,7 +53,6 @@ export class MiembrosService {
                     select: {
                         idBautizado: true,
                         bautizadoEstado: true,
-                        fechaBautismo: true,
                     },
                 },
                 servidor: {
@@ -81,7 +70,7 @@ export class MiembrosService {
 
     async updateMiembro(
         idMiembro: number,
-        dto: CreateMiembroDto,
+        dto: UpdateMiembroDto,
         idTenant: number,
     ) {
         const miembro = await this.prisma.tb_miembros.findUnique({
@@ -107,6 +96,7 @@ export class MiembrosService {
                 idGrupo: dto.idGrupo || null,
                 legusta: dto.leGusta || null,
                 fechaLlegada: dto.fechaLlegada || null,
+                fechaBautismo: dto.fechaBautismo || null,
                 // Relaciones (FKs)
                 idBautizado: dto.idBautizado || null,
                 idServidor: dto.idServidor || null,
@@ -116,7 +106,6 @@ export class MiembrosService {
                     select: {
                         idBautizado: true,
                         bautizadoEstado: true,
-                        fechaBautismo: true,
                     },
                 },
                 servidor: {
@@ -166,9 +155,10 @@ export class MiembrosService {
     }
 
     async findAllForTableForTenant(idTenant: number) {
-        return this.prisma.tb_miembros.findMany({
+        const miembros = await this.prisma.tb_miembros.findMany({
             where: { idTenant },
             select: {
+                idMiembro: true,
                 nombre: true,
                 apellido: true,
                 telefono: true,
@@ -179,7 +169,44 @@ export class MiembrosService {
                 grupo: {
                     select: { nombregrupo: true },
                 },
+                fechanacimiento: true, // temporal para calcular edad
             },
+        });
+
+        // Calcular edad y eliminar fechanacimiento
+        const miembrosConEdad = miembros.map((m) => {
+            let edad: number | null = null;
+            if (m.fechanacimiento) {
+                const today = new Date();
+                const birthDate = new Date(m.fechanacimiento);
+                edad = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (
+                    monthDiff < 0 ||
+                    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+                ) {
+                    edad--;
+                }
+            }
+            const { fechanacimiento, ...rest } = m; // quitar fechanacimiento
+            return { ...rest, edad };
+        });
+
+        return miembrosConEdad;
+    }
+
+    async deleteMiembro(idMiembro: number, idTenant: number) {
+        // Primero verificamos que exista y pertenezca al tenant
+        const miembro = await this.prisma.tb_miembros.findUnique({
+            where: { idMiembro },
+        });
+
+        if (!miembro || miembro.idTenant !== idTenant) {
+            throw new Error('Miembro no encontrado o acceso denegado');
+        }
+
+        return this.prisma.tb_miembros.delete({
+            where: { idMiembro },
         });
     }
 }

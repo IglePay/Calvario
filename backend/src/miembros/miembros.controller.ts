@@ -7,22 +7,17 @@ import {
     Param,
     Req,
     UseGuards,
+    Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { MiembrosService } from './miembros.service';
 import { CreateMiembroDto } from './dto/create.miembro.dto';
+import { UpdateMiembroDto } from './dto/update.miembro.dto';
 
 @UseGuards(AuthGuard)
 @Controller('miembros')
 export class MiembrosController {
     constructor(private readonly miembrosService: MiembrosService) {}
-
-    // Obtener todos los miembros (con relaciones)
-    @Get()
-    async getAll(@Req() req) {
-        const idTenant = req.user.tenantId; // tenant del usuario logueado
-        return this.miembrosService.findAllForTenant(idTenant);
-    }
 
     // Obtener datos solo para tabla
     @Get('table')
@@ -56,7 +51,7 @@ export class MiembrosController {
     @Patch(':idMiembro')
     async update(
         @Param('idMiembro') idMiembro: string,
-        @Body() dto: CreateMiembroDto,
+        @Body() dto: UpdateMiembroDto,
         @Req() req,
     ) {
         const idTenant = req.user.tenantId;
@@ -65,5 +60,11 @@ export class MiembrosController {
             dto,
             idTenant,
         );
+    }
+
+    @Delete(':idMiembro')
+    async remove(@Param('idMiembro') idMiembro: string, @Req() req) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.deleteMiembro(Number(idMiembro), idTenant);
     }
 }

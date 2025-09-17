@@ -98,7 +98,6 @@ model tb_bautizados {
   idBautizado      Int       @id @default(autoincrement())
   idTenant         Int
   bautizadoEstado  String?   @db.VarChar(5)
-  fechaBautismo    DateTime? @db.Date
   fechaCreacion    DateTime  @default(now()) @db.Timestamp(0)
 
   // Relaciones
@@ -138,6 +137,7 @@ model tb_miembros {
   direccion         String?   @db.VarChar(255)
   idEstado          Int?
   fechaLlegada      DateTime? @db.Date
+  fechaBautismo    DateTime? @db.Date
   procesosterminado String?   @db.VarChar(255)
   idGrupo           Int?
   legusta           String?   @db.Text
