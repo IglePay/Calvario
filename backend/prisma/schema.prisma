@@ -48,6 +48,9 @@ model tb_tenants {
   users       tb_user[]
   limpiezas tb_limpieza[]
   actividades tb_actividad[]
+  bautizados tb_bautizados[]
+  servidores tb_servidores[]
+
   @@map("tb_tenants")
 }
 
@@ -89,41 +92,80 @@ model tb_grupo {
   @@map("tb_grupo")
 }
 
-//=============miembros===========
-model tb_miembros {
-  idMiembro        Int       @id @default(autoincrement())
+
+//=========tb_bautizados=========
+model tb_bautizados {
+  idBautizado      Int       @id @default(autoincrement())
   idTenant         Int
-  dpi              String?   @db.VarChar(20)
-  nombre           String    @db.VarChar(100)
-  apellido         String    @db.VarChar(100)
-  email            String?   @db.VarChar(100)
-  telefono         String?   @db.VarChar(20)
-  fechanacimiento  DateTime? @db.Date
-  idGenero         Int?
-  direccion        String?   @db.VarChar(255)
-  idEstado         Int?
-  fechallegada     DateTime? @db.Date
-  bautismo         String?   @default("N") @db.VarChar(10)
-  fechabautismo    DateTime? @db.Date
-  servidor         String?   @default("N") @db.VarChar(10)
-  procesosterminado String?  @db.VarChar(255)
-  idGrupo          Int?
-  legusta          String?   @db.Text
+  bautizadoEstado  String?   @db.VarChar(5)
+  fechaBautismo    DateTime? @db.Date
   fechaCreacion    DateTime  @default(now()) @db.Timestamp(0)
 
+  // Relaciones
+  miembros         tb_miembros[]  // relación inversa 1:N
+  tenant           tb_tenants     @relation(fields: [idTenant], references: [id_tenant], map: "fk_bautizado_tenant")
+
+  @@index([idTenant], map: "fk_bautizado_tenant")
+  @@map("tb_bautizados")
+}
+
+//=========tb_servidores=========
+model tb_servidores {
+  idServidor      Int       @id @default(autoincrement())
+  idTenant        Int
+  servidorEstado  String?   @db.VarChar(5)
+  fechaCreacion   DateTime  @default(now()) @db.Timestamp(0)
+
+  // Relaciones
+  miembros        tb_miembros[]  // relación inversa 1:N
+  tenant          tb_tenants     @relation(fields: [idTenant], references: [id_tenant], map: "fk_servidor_tenant")
+
+  @@index([idTenant], map: "fk_servidor_tenant")
+  @@map("tb_servidores")
+}
+
+//=========tb_miembros=========
+model tb_miembros {
+  idMiembro         Int       @id @default(autoincrement())
+  idTenant          Int
+  dpi               String?   @db.VarChar(20)
+  nombre            String    @db.VarChar(100)
+  apellido          String    @db.VarChar(100)
+  email             String?   @db.VarChar(100)
+  telefono          String?   @db.VarChar(20)
+  fechanacimiento   DateTime? @db.Date
+  idGenero          Int?
+  direccion         String?   @db.VarChar(255)
+  idEstado          Int?
+  fechaLlegada      DateTime? @db.Date
+  procesosterminado String?   @db.VarChar(255)
+  idGrupo           Int?
+  legusta           String?   @db.Text
+  fechaCreacion     DateTime  @default(now()) @db.Timestamp(0)
+
+  // Relaciones FKs
+  idBautizado       Int?      // FK a tb_bautizados
+  idServidor        Int?      // FK a tb_servidores
+
+  // Relaciones
   tenant        tb_tenants      @relation(fields: [idTenant], references: [id_tenant], map: "fk_miembro_tenant")
   genero        tb_genero?      @relation(fields: [idGenero], references: [idGenero], map: "fk_miembro_genero")
   estadoCivil   tb_estadocivil? @relation(fields: [idEstado], references: [idEstado], map: "fk_miembro_estado")
   grupo         tb_grupo?       @relation(fields: [idGrupo], references: [idGrupo], map: "fk_miembro_grupo")
+  bautizado     tb_bautizados?  @relation(fields: [idBautizado], references: [idBautizado])
+  servidor      tb_servidores?  @relation(fields: [idServidor], references: [idServidor])
+
   miembroGrupo  tb_miembrogrupo[]
-  limpiezas tb_limpieza[]
-  actividades tb_actividad[]
+  limpiezas     tb_limpieza[]
+  actividades   tb_actividad[]
+
   @@index([idTenant], map: "fk_miembro_tenant")
   @@index([idGenero], map: "fk_miembro_genero")
   @@index([idEstado], map: "fk_miembro_estado")
   @@index([idGrupo], map: "fk_miembro_grupo")
   @@map("tb_miembros")
 }
+
 
 //=============miembroGrupo muchos a muchos===========
 model tb_miembrogrupo {

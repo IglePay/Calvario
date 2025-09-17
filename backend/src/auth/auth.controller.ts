@@ -23,10 +23,8 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @Get('me')
     async getMe(@Req() req: Request) {
-        // Le decimos a TypeScript que req.user tiene la forma de JwtPayload
         const userPayload = req.user as JwtPayload;
 
-        // Usamos la propiedad correcta según tu JwtStrategy
         const user = await this.authService.findById(userPayload.id);
 
         if (!user) {

@@ -5,41 +5,65 @@ import {
     Body,
     Patch,
     Param,
-    Delete,
+    Req,
     UseGuards,
 } from '@nestjs/common';
-
-import { MiembrosService } from './miembros.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { MiembrosService } from './miembros.service';
+import { CreateMiembroDto } from './dto/create.miembro.dto';
 
 @UseGuards(AuthGuard)
 @Controller('miembros')
 export class MiembrosController {
     constructor(private readonly miembrosService: MiembrosService) {}
 
-    @Post()
-    create(@Body() createMiembroDto: any) {
-        const tenantId = 1;
-        return this.miembrosService.create(createMiembroDto, tenantId);
-    }
-
+    // Obtener todos los miembros (con relaciones)
     @Get()
-    findAll() {
-        return this.miembrosService.findAll();
+    async getAll(@Req() req) {
+        const idTenant = req.user.tenantId; // tenant del usuario logueado
+        return this.miembrosService.findAllForTenant(idTenant);
     }
 
-    @Get('id/:id')
-    findOne(@Param('id') id: string) {
-        return this.miembrosService.findOne(+id);
+    // Obtener datos solo para tabla
+    @Get('table')
+    async getAllForTable(@Req() req) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.findAllForTableForTenant(idTenant);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateMiembroDto: any) {
-        return this.miembrosService.update(+id, updateMiembroDto);
+    // Obtener bautizados para select
+    @Get('bautizados')
+    async getBautizados(@Req() req) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.getBautizados(idTenant);
     }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.miembrosService.remove(+id);
+    // Obtener servidores para select
+    @Get('servidores')
+    async getServidores(@Req() req) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.getServidores(idTenant);
+    }
+
+    // Crear miembro
+    @Post()
+    async create(@Body() dto: CreateMiembroDto, @Req() req) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.createMiembro(dto, idTenant);
+    }
+
+    // Editar miembro
+    @Patch(':idMiembro')
+    async update(
+        @Param('idMiembro') idMiembro: string,
+        @Body() dto: CreateMiembroDto,
+        @Req() req,
+    ) {
+        const idTenant = req.user.tenantId;
+        return this.miembrosService.updateMiembro(
+            Number(idMiembro),
+            dto,
+            idTenant,
+        );
     }
 }

@@ -22,7 +22,6 @@ export class AuthGuard implements CanActivate {
             .then((payload) => {
                 console.log('payload decodificado:', payload);
 
-                // Normalizamos la estructura de user
                 request.user = {
                     id: payload.sub,
                     tenantId: payload.tenantId,
