@@ -102,7 +102,7 @@ const ActivitiesPage = () => {
                 {loading ? (
                     <div className="p-6 text-center">Cargando...</div>
                 ) : (
-                    <table className="table table-zebra w-full">
+                    <table className="table table-zebra w-full text-sm">
                         <thead className="bg-base-300 text-center">
                             <tr>
                                 <th>N.</th>

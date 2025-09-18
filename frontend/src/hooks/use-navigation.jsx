@@ -53,7 +53,7 @@ export function useNavigation() {
             id: "usuarios",
             icon: "fas fa-user",
             label: "Colaborador",
-            route: "/control/users",
+            route: "/control/collaborator",
         },
         {
             id: "grupos",
