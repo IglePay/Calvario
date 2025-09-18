@@ -24,6 +24,7 @@ const ActivitiesPage = () => {
         createActivity,
         updateActivity,
         deleteActivity,
+        fetchActivities,
     } = useActivities()
 
     const [modalOpen, setModalOpen] = useState(false)
@@ -37,9 +38,11 @@ const ActivitiesPage = () => {
             updateActivity(editingActivity.idActividad, data).then(() => {
                 setEditingActivity(null)
                 setModalOpen(false)
+                fetchActivities()
             })
         } else {
             createActivity(data).then(() => setModalOpen(false))
+            fetchActivities()
         }
     }
 

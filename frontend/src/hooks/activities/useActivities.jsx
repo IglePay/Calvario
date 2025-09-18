@@ -45,6 +45,14 @@ export default function useActivities() {
             .finally(() => setLoading(false))
     }, [user])
 
+    const fetchActivities = () => {
+        setLoading(true)
+        apiFetch("/actividades")
+            .then((res) => res.json())
+            .then((data) => setActivities(data))
+            .finally(() => setLoading(false))
+    }
+
     //  Crear actividad
     const createActivity = (data) => {
         if (!user?.tenantId) return Promise.reject("No hay usuario logueado")
@@ -140,5 +148,6 @@ export default function useActivities() {
         createActivity,
         updateActivity,
         deleteActivity,
+        fetchActivities,
     }
 }
