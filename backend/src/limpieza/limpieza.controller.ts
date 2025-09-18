@@ -27,19 +27,19 @@ export class LimpiezaController {
 
     @Get()
     findAll(@Req() req: AuthenticatedRequest) {
-        return this.limpiezaService.findAll(req.user.tenantID);
+        return this.limpiezaService.findAll(req.user.tenantId);
     }
 
     @Get(':id')
     findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
-        return this.limpiezaService.findOne(+id, req.user.tenantID);
+        return this.limpiezaService.findOne(+id, req.user.tenantId);
     }
 
     @Post()
     create(@Body() dto: CreateLimpiezaDto, @Req() req: AuthenticatedRequest) {
         return this.limpiezaService.create({
             ...dto,
-            idTenant: req.user.tenantID,
+            idTenant: req.user.tenantId,
         });
     }
 
@@ -51,12 +51,12 @@ export class LimpiezaController {
     ) {
         return this.limpiezaService.update(+id, {
             ...dto,
-            idTenant: req.user.tenantID,
+            idTenant: req.user.tenantId,
         });
     }
 
     @Delete(':id')
     remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
-        return this.limpiezaService.remove(+id, req.user.tenantID);
+        return this.limpiezaService.remove(+id, req.user.tenantId);
     }
 }

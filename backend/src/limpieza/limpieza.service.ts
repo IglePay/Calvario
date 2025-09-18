@@ -5,9 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 export class LimpiezaService {
     constructor(private prisma: PrismaService) {}
 
-    async findAll(idTenant: number) {
+    async findAll(tenantId: number) {
         return this.prisma.tb_limpieza.findMany({
-            where: { idTenant },
+            where: { tenantId },
             select: {
                 idLimpieza: true,
                 fechaLimpieza: true,
@@ -26,9 +26,9 @@ export class LimpiezaService {
         });
     }
 
-    async findOne(id: number, idTenant: number) {
+    async findOne(id: number, tenantId: number) {
         return this.prisma.tb_limpieza.findFirst({
-            where: { idLimpieza: id, idTenant },
+            where: { idLimpieza: id, tenantId },
             select: {
                 idLimpieza: true,
                 fechaLimpieza: true,
@@ -55,7 +55,7 @@ export class LimpiezaService {
     }) {
         // validar miembro
         const miembro = await this.prisma.tb_miembros.findFirst({
-            where: { idMiembro: data.idMiembro, idTenant: data.idTenant },
+            where: { idMiembro: data.idMiembro, tenantId: data.idTenant },
         });
         if (!miembro)
             throw new Error('El miembro no existe o no pertenece al tenant');
@@ -63,7 +63,7 @@ export class LimpiezaService {
         // validar grupo si viene
         if (data.idGrupo) {
             const grupo = await this.prisma.tb_grupo.findFirst({
-                where: { idGrupo: data.idGrupo, idTenant: data.idTenant },
+                where: { idGrupo: data.idGrupo, tenantId: data.idTenant },
             });
             if (!grupo)
                 throw new Error('El grupo no existe o no pertenece al tenant');
@@ -72,7 +72,7 @@ export class LimpiezaService {
         return this.prisma.tb_limpieza.create({
             data: {
                 idMiembro: data.idMiembro,
-                idTenant: data.idTenant,
+                tenantId: data.idTenant,
                 fechaLimpieza: new Date(data.fechaLimpieza),
                 ...(data.idGrupo && { idGrupo: data.idGrupo }),
             },
@@ -90,7 +90,7 @@ export class LimpiezaService {
     ) {
         // validar que la limpieza existe y pertenece al tenant
         const limpieza = await this.prisma.tb_limpieza.findFirst({
-            where: { idLimpieza: id, idTenant: data.idTenant },
+            where: { idLimpieza: id, tenantId: data.idTenant },
         });
         if (!limpieza)
             throw new Error('La limpieza no existe o no pertenece al tenant');
@@ -98,7 +98,7 @@ export class LimpiezaService {
         // validar nuevo miembro si viene
         if (data.idMiembro) {
             const miembro = await this.prisma.tb_miembros.findFirst({
-                where: { idMiembro: data.idMiembro, idTenant: data.idTenant },
+                where: { idMiembro: data.idMiembro, tenantId: data.idTenant },
             });
             if (!miembro)
                 throw new Error(
@@ -109,7 +109,7 @@ export class LimpiezaService {
         // validar nuevo grupo si viene
         if (data.idGrupo) {
             const grupo = await this.prisma.tb_grupo.findFirst({
-                where: { idGrupo: data.idGrupo, idTenant: data.idTenant },
+                where: { idGrupo: data.idGrupo, tenantId: data.idTenant },
             });
             if (!grupo)
                 throw new Error('El grupo no existe o no pertenece al tenant');
@@ -117,7 +117,7 @@ export class LimpiezaService {
 
         // actualizar solo dentro del tenant
         return this.prisma.tb_limpieza.updateMany({
-            where: { idLimpieza: id, idTenant: data.idTenant },
+            where: { idLimpieza: id, tenantId: data.idTenant },
             data: {
                 ...(data.idMiembro && { idMiembro: data.idMiembro }),
                 ...(data.fechaLimpieza && {
@@ -128,9 +128,9 @@ export class LimpiezaService {
         });
     }
 
-    async remove(id: number, idTenant: number) {
+    async remove(id: number, tenantId: number) {
         return this.prisma.tb_limpieza.deleteMany({
-            where: { idLimpieza: id, idTenant },
+            where: { idLimpieza: id, tenantId },
         });
     }
 
