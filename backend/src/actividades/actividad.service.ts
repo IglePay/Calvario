@@ -13,7 +13,7 @@ export class ActividadService {
 
     async findAll(tenantId: number) {
         const actividades = await this.prisma.tb_actividad.findMany({
-            where: { idTenant: tenantId },
+            where: { tenantId: tenantId },
             select: {
                 idActividad: true,
                 titulo: true,
@@ -38,14 +38,14 @@ export class ActividadService {
 
     findAllMiembros(tenantId: number) {
         return this.prisma.tb_miembros.findMany({
-            where: { idTenant: tenantId },
+            where: { tenantId: tenantId },
             select: { idMiembro: true, nombre: true, apellido: true },
         });
     }
 
     findAllGrupos(tenantId: number) {
         return this.prisma.tb_grupo.findMany({
-            where: { idTenant: tenantId },
+            where: { tenantId: tenantId },
             select: { idGrupo: true, nombregrupo: true },
         });
     }
@@ -56,21 +56,37 @@ export class ActividadService {
         });
 
         if (!actividad) throw new NotFoundException('Actividad no encontrada');
-        if (actividad.idTenant !== tenantId)
+        if (actividad.tenantId !== tenantId)
             throw new ForbiddenException('No autorizado');
 
         return actividad;
     }
 
+    // Servicio
     create(data: CreateActividadDto, tenantId: number) {
-        return this.prisma.tb_actividad.create({
-            data: {
-                ...data,
-                fechaActividad: new Date(data.fechaActividad),
-                idGrupo: data.idGrupo ?? null,
-                idTenant: tenantId,
-            },
-        });
+        return this.prisma.tb_actividad
+            .create({
+                data: {
+                    ...data,
+                    fechaActividad: new Date(data.fechaActividad),
+                    idGrupo: data.idGrupo ?? null,
+                    tenantId,
+                },
+                include: {
+                    miembro: { select: { nombre: true, apellido: true } },
+                    grupo: { select: { nombregrupo: true } },
+                },
+            })
+            .then((a) => ({
+                idActividad: a.idActividad,
+                titulo: a.titulo,
+                descripcion: a.descripcion,
+                fechaActividad: a.fechaActividad.toISOString().split('T')[0],
+                miembro: a.miembro
+                    ? `${a.miembro.nombre} ${a.miembro.apellido}`
+                    : null,
+                grupo: a.grupo ? a.grupo.nombregrupo : null,
+            }));
     }
 
     async update(id: number, data: UpdateActividadDto, tenantId: number) {
@@ -78,10 +94,10 @@ export class ActividadService {
             where: { idActividad: id },
         });
         if (!actividad) throw new NotFoundException('Actividad no encontrada');
-        if (actividad.idTenant !== tenantId)
+        if (actividad.tenantId !== tenantId)
             throw new ForbiddenException('No autorizado');
 
-        return this.prisma.tb_actividad.update({
+        const updated = await this.prisma.tb_actividad.update({
             where: { idActividad: id },
             data: {
                 ...data,
@@ -89,7 +105,22 @@ export class ActividadService {
                     ? new Date(data.fechaActividad)
                     : actividad.fechaActividad,
             },
+            include: {
+                miembro: { select: { nombre: true, apellido: true } },
+                grupo: { select: { nombregrupo: true } },
+            },
         });
+
+        return {
+            idActividad: updated.idActividad,
+            titulo: updated.titulo,
+            descripcion: updated.descripcion,
+            fechaActividad: updated.fechaActividad.toISOString().split('T')[0],
+            miembro: updated.miembro
+                ? `${updated.miembro.nombre} ${updated.miembro.apellido}`
+                : null,
+            grupo: updated.grupo ? updated.grupo.nombregrupo : null,
+        };
     }
 
     async remove(id: number, tenantId: number) {
@@ -97,7 +128,7 @@ export class ActividadService {
             where: { idActividad: id },
         });
         if (!actividad) throw new NotFoundException('Actividad no encontrada');
-        if (actividad.idTenant !== tenantId)
+        if (actividad.tenantId !== tenantId)
             throw new ForbiddenException('No autorizado');
 
         return this.prisma.tb_actividad.delete({ where: { idActividad: id } });
