@@ -12,33 +12,33 @@ export class GrupoService {
         return this.prisma.tb_grupo.create({
             data: {
                 nombregrupo: data.nombregrupo,
-                idTenant: data.idTenant,
+                tenantId: data.idTenant,
             },
         });
     }
 
-    findAllByTenant(idTenant: number) {
+    findAllByTenant(tenantId: number) {
         return this.prisma.tb_grupo.findMany({
-            where: { idTenant }, // ✅ solo grupos del tenant
+            where: { tenantId }, // solo grupos del tenant
         });
     }
 
-    findOneByTenant(id: number, idTenant: number) {
+    findOneByTenant(id: number, tenantId: number) {
         return this.prisma.tb_grupo.findFirst({
-            where: { idGrupo: id, idTenant }, // ✅ filtra por tenant
+            where: { idGrupo: id, tenantId }, // filtra por tenant
         });
     }
 
-    updateByTenant(id: number, data: UpdateGrupoDto, idTenant: number) {
+    updateByTenant(id: number, data: UpdateGrupoDto, tenantId: number) {
         return this.prisma.tb_grupo.updateMany({
-            where: { idGrupo: id, idTenant }, // ✅ solo puede actualizar su tenant
+            where: { idGrupo: id, tenantId }, //  solo puede actualizar su tenant
             data: { nombregrupo: data.nombregrupo },
         });
     }
 
-    removeByTenant(id: number, idTenant: number) {
+    removeByTenant(id: number, tenantId: number) {
         return this.prisma.tb_grupo.deleteMany({
-            where: { idGrupo: id, idTenant }, // ✅ solo puede borrar su tenant
+            where: { idGrupo: id, tenantId }, //  solo puede borrar su tenant
         });
     }
 }
