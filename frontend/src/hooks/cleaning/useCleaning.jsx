@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
 import { useAuth } from "../../hooks/auth/useAuth"
+import moment from "moment"
 
 export const useCleaning = () => {
     const { user } = useAuth()
@@ -23,17 +24,12 @@ export const useCleaning = () => {
 
             const formatted = eventos.map((item) => ({
                 id: item.idLimpieza,
-                title: item.grupo?.nombregrupo
-                    ? item.grupo.nombregrupo
-                    : `${item.miembro.nombre} ${item.miembro.apellido}`,
-                start: new Date(item.fechaLimpieza),
-                end: new Date(
-                    new Date(item.fechaLimpieza).getTime() + 2 * 60 * 60 * 1000,
-                ),
-                gender:
-                    item.miembro.genero?.nombregenero === "Femenino"
-                        ? "F"
-                        : "M",
+                title:
+                    item.grupo?.nombregrupo ||
+                    `${item.miembro.nombre} ${item.miembro.apellido}`,
+                start: moment.utc(item.fechaLimpieza).toDate(),
+                end: moment.utc(item.fechaLimpieza).add(2, "hours").toDate(),
+                gender: item.miembro.genero?.idGenero === 2 ? "F" : "M",
                 idMiembro: item.miembro.idMiembro,
                 idGrupo: item.grupo?.idGrupo || null,
             }))
@@ -46,41 +42,28 @@ export const useCleaning = () => {
         }
     }
 
-    //  fetchGrupos usando promesas
-    const fetchGrupos = () => {
-        return apiFetch("/grupos")
-            .then((res) => res.json())
-            .then((json) => {
-                const data = Array.isArray(json) ? json : []
+    const fetchGrupos = async () => {
+        try {
+            const json = await apiFetch("/grupos").then((res) => res.json())
+            const data = Array.isArray(json) ? json : []
 
-                const gruposFiltrados = user
-                    ? data.filter((g) => g.tenantId === user.tenantId)
-                    : data
+            const gruposFiltrados = user
+                ? data.filter((g) => g.tenantId === user.tenantId)
+                : data
 
-                setGrupos(gruposFiltrados)
-                return gruposFiltrados
-            })
-            .catch((err) => {
-                console.error("Error fetchGrupos:", err)
-                setGrupos([])
-                return []
-            })
+            setGrupos(gruposFiltrados)
+            return gruposFiltrados
+        } catch (err) {
+            console.error("Error fetchGrupos:", err)
+            setGrupos([])
+            return []
+        }
     }
 
-    useEffect(() => {
-        fetchData()
-        fetchGrupos()
-    }, [user])
-
     const addEvent = async (data) => {
-        const payload = {
-            ...data,
-            tenantId: user?.tenantId,
-        }
-
         return apiFetch("/limpieza", {
             method: "POST",
-            body: JSON.stringify(payload),
+            body: JSON.stringify(data),
         })
             .then((res) => res.json())
             .catch((err) => {
@@ -90,14 +73,9 @@ export const useCleaning = () => {
     }
 
     const updateEvent = (id, data) => {
-        const payload = {
-            ...data,
-            tenantId: user?.tenantId,
-        }
-
         return apiFetch(`/limpieza/${id}`, {
             method: "PATCH",
-            body: JSON.stringify(payload),
+            body: JSON.stringify(data),
         })
             .then((res) => res.json())
             .catch((err) => {
@@ -115,6 +93,11 @@ export const useCleaning = () => {
             throw err
         }
     }
+
+    useEffect(() => {
+        fetchData()
+        fetchGrupos()
+    }, [user])
 
     return {
         events,

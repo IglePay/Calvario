@@ -26,8 +26,9 @@ const messages = {
 }
 
 export default function CleaningCalendar() {
+    const [view, setView] = useState("month")
     const [errorMessage, setErrorMessage] = useState("")
-
+    const [currentDate, setCurrentDate] = useState(new Date())
     const {
         events,
         setEvents,
@@ -47,14 +48,12 @@ export default function CleaningCalendar() {
         id: null,
         idMiembro: "",
         idGrupo: "",
-        title: "",
         date: "",
         startTime: "",
         endTime: "",
         gender: "M",
     })
 
-    // Traer datos iniciales
     useEffect(() => {
         fetchData()
         fetchGrupos().then((data) => setGrupos(data))
@@ -70,7 +69,6 @@ export default function CleaningCalendar() {
                 id: null,
                 idMiembro: "",
                 idGrupo: "",
-                title: "",
                 date: "",
                 startTime: "",
                 endTime: "",
@@ -85,7 +83,6 @@ export default function CleaningCalendar() {
             id: event.id,
             idMiembro: event.idMiembro,
             idGrupo: event.idGrupo || "",
-            title: event.title,
             date: moment(event.start).format("YYYY-MM-DD"),
             startTime: moment(event.start).format("HH:mm"),
             endTime: moment(event.end).format("HH:mm"),
@@ -107,14 +104,13 @@ export default function CleaningCalendar() {
             if (miembro) {
                 setModalData((prev) => ({
                     ...prev,
-                    gender:
-                        miembro.genero?.nombregenero === "Femenino" ? "F" : "M",
+                    gender: miembro.genero?.idGenero === 2 ? "F" : "M",
                 }))
             }
         }
     }
 
-    const handleAddEvent = async () => {
+    const handleAddOrUpdateEvent = async (isUpdate = false) => {
         if (!modalData.idMiembro) {
             setErrorMessage("Debes seleccionar un miembro")
             return
@@ -128,106 +124,52 @@ export default function CleaningCalendar() {
             return
         }
 
-        const start = new Date(
-            `${modalData.date}T${modalData.startTime || "00:00"}`,
-        )
+        const datePart = modalData.date
+        const timePart = modalData.startTime || "12:00"
+        const start = moment(`${datePart}T${timePart}`).toDate()
 
-        const newEvent = {
-            idMiembro: parseInt(modalData.idMiembro),
-            fechaLimpieza: start,
+        const newEventData = {
+            idMiembro: miembroSel.idMiembro,
+            fechaLimpieza: start.toISOString(),
             idGrupo: modalData.idGrupo
                 ? parseInt(modalData.idGrupo)
                 : miembroSel.idGrupo || undefined,
         }
 
         try {
-            const saved = await addEvent(newEvent)
-            const grupoSel = grupos.find((g) => g.idGrupo === newEvent.idGrupo)
+            const saved = isUpdate
+                ? await updateEvent(modalData.id, newEventData)
+                : await addEvent(newEventData)
 
-            setEvents((prev) => [
-                ...prev,
-                {
-                    id: saved.idLimpieza,
-                    title: grupoSel
-                        ? grupoSel.nombregrupo
-                        : `${miembroSel.nombre} ${miembroSel.apellido}`,
-                    start,
-                    end: new Date(start.getTime() + 2 * 60 * 60 * 1000),
-                    gender:
-                        miembroSel.genero?.nombregenero === "Femenino"
-                            ? "F"
-                            : "M",
-                    idMiembro: newEvent.idMiembro,
-                    idGrupo: newEvent.idGrupo || null,
-                },
-            ])
-            setIsOpen(false)
-            setErrorMessage("")
-        } catch (err) {
-            console.error(err)
-            setErrorMessage("Ocurrió un error al registrar la limpieza")
-        }
-    }
-
-    const handleUpdateEvent = async () => {
-        if (!modalData.idMiembro) {
-            setErrorMessage("Debes seleccionar un miembro")
-            return
-        }
-
-        const miembroSel = miembros.find(
-            (m) => m.idMiembro === parseInt(modalData.idMiembro),
-        )
-        if (!miembroSel) {
-            setErrorMessage("Miembro no encontrado")
-            return
-        }
-
-        const start = new Date(
-            `${modalData.date}T${modalData.startTime || "00:00"}`,
-        )
-
-        const updatedEvent = {
-            idMiembro: parseInt(modalData.idMiembro),
-            fechaLimpieza: start,
-            idGrupo: modalData.idGrupo
-                ? parseInt(modalData.idGrupo)
-                : miembroSel.idGrupo || undefined,
-        }
-
-        try {
-            await updateEvent(modalData.id, updatedEvent)
             const grupoSel = grupos.find(
-                (g) => g.idGrupo === updatedEvent.idGrupo,
+                (g) => g.idGrupo === newEventData.idGrupo,
             )
+
+            const eventObj = {
+                id: saved.idLimpieza,
+                title:
+                    grupoSel?.nombregrupo ||
+                    `${miembroSel.nombre} ${miembroSel.apellido}`,
+                start,
+                end: moment(start).add(2, "hours").toDate(),
+                gender: miembroSel.genero?.idGenero === 2 ? "F" : "M",
+                idMiembro: saved.idMiembro,
+                idGrupo: saved.idGrupo || null,
+            }
 
             setEvents((prev) =>
-                prev.map((e) =>
-                    e.id === modalData.id
-                        ? {
-                              ...e,
-                              title: grupoSel
-                                  ? grupoSel.nombregrupo
-                                  : `${miembroSel.nombre} ${miembroSel.apellido}`,
-                              start,
-                              end: new Date(
-                                  start.getTime() + 2 * 60 * 60 * 1000,
-                              ),
-                              gender:
-                                  miembroSel.genero?.nombregenero === "Femenino"
-                                      ? "F"
-                                      : "M",
-                              idMiembro: updatedEvent.idMiembro,
-                              idGrupo: updatedEvent.idGrupo || null,
-                          }
-                        : e,
-                ),
+                isUpdate
+                    ? prev.map((e) => (e.id === modalData.id ? eventObj : e))
+                    : [...prev, eventObj],
             )
+
             setIsOpen(false)
             setErrorMessage("")
         } catch (err) {
             console.error(err)
-            setErrorMessage("Ocurrió un error al actualizar la limpieza")
+            setErrorMessage(
+                `Ocurrió un error al ${isUpdate ? "actualizar" : "registrar"} la limpieza`,
+            )
         }
     }
 
@@ -244,8 +186,7 @@ export default function CleaningCalendar() {
     }
 
     const eventStyleGetter = (event) => {
-        const gender = (event.gender || "M").toUpperCase()
-        const backgroundColor = gender === "M" ? "#3B82F6" : "#F472B6"
+        const backgroundColor = event.gender === "F" ? "#F472B6" : "#3B82F6"
         return {
             style: {
                 backgroundColor,
@@ -285,10 +226,15 @@ export default function CleaningCalendar() {
                     eventPropGetter={eventStyleGetter}
                     onSelectEvent={handleSelectEvent}
                     popup
+                    date={currentDate}
+                    onNavigate={(date) => setCurrentDate(date)}
+                    view={view}
+                    onView={(newView) => setView(newView)}
+                    views={["month", "week", "day", "agenda"]}
+                    defaultView="month"
                 />
             </div>
 
-            {/* Modal */}
             {isOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-base-200 rounded-xl p-6 w-full max-w-md">
@@ -298,7 +244,6 @@ export default function CleaningCalendar() {
                                 : "Editar / Eliminar Limpieza"}
                         </h2>
 
-                        {/* Mensaje de error */}
                         {errorMessage && (
                             <div className="bg-red-100 text-red-800 p-2 rounded mb-3">
                                 {errorMessage}
@@ -316,8 +261,7 @@ export default function CleaningCalendar() {
                                     <option
                                         key={m.idMiembro}
                                         value={m.idMiembro}>
-                                        {m.nombre} {m.apellido} (
-                                        {m.genero?.nombregenero})
+                                        {m.nombre} {m.apellido}
                                     </option>
                                 ))}
                             </select>
@@ -344,19 +288,30 @@ export default function CleaningCalendar() {
                                 onChange={handleChange}
                                 className="input input-bordered w-full"
                             />
+                            <input
+                                type="time"
+                                name="startTime"
+                                value={modalData.startTime}
+                                onChange={handleChange}
+                                className="input input-bordered w-full"
+                            />
                         </div>
 
                         <div className="flex justify-end gap-2 mt-4">
                             {mode === "create" ? (
                                 <button
-                                    onClick={handleAddEvent}
+                                    onClick={() =>
+                                        handleAddOrUpdateEvent(false)
+                                    }
                                     className="btn btn-primary rounded-xl px-4">
                                     Registrar
                                 </button>
                             ) : (
                                 <>
                                     <button
-                                        onClick={handleUpdateEvent}
+                                        onClick={() =>
+                                            handleAddOrUpdateEvent(true)
+                                        }
                                         className="btn btn-primary rounded-xl px-4">
                                         Editar
                                     </button>
