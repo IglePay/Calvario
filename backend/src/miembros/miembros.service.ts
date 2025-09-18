@@ -26,10 +26,10 @@ export class MiembrosService {
     }
 
     // miembros.service.ts
-    async createMiembro(dto: CreateMiembroDto, idTenant: number) {
+    async createMiembro(dto: CreateMiembroDto, tenantId: number) {
         return this.prisma.tb_miembros.create({
             data: {
-                idTenant,
+                tenantId,
                 nombre: dto.nombre,
                 apellido: dto.apellido,
                 email: dto.email || null,
@@ -76,7 +76,7 @@ export class MiembrosService {
         const miembro = await this.prisma.tb_miembros.findUnique({
             where: { idMiembro },
         });
-        if (!miembro || miembro.idTenant !== idTenant) {
+        if (!miembro || miembro.tenantId !== idTenant) {
             throw new Error('Miembro no encontrado o acceso denegado');
         }
 
@@ -121,9 +121,9 @@ export class MiembrosService {
         });
     }
 
-    async getBautizados(idTenant: number) {
+    async getBautizados(tenantId: number) {
         return this.prisma.tb_bautizados.findMany({
-            where: { idTenant },
+            where: { tenantId },
             select: {
                 idBautizado: true,
                 bautizadoEstado: true,
@@ -131,9 +131,9 @@ export class MiembrosService {
         });
     }
 
-    async getServidores(idTenant: number) {
+    async getServidores(tenantId: number) {
         return this.prisma.tb_servidores.findMany({
-            where: { idTenant },
+            where: { tenantId },
             select: {
                 idServidor: true,
                 servidorEstado: true,
@@ -141,9 +141,9 @@ export class MiembrosService {
         });
     }
 
-    async findAllForTenant(idTenant: number) {
+    async findAllForTenant(tenantId: number) {
         return this.prisma.tb_miembros.findMany({
-            where: { idTenant },
+            where: { tenantId },
             include: {
                 grupo: true,
                 genero: true,
@@ -154,9 +154,9 @@ export class MiembrosService {
         });
     }
 
-    async findAllForTableForTenant(idTenant: number) {
+    async findAllForTableForTenant(tenantId: number) {
         const miembros = await this.prisma.tb_miembros.findMany({
-            where: { idTenant },
+            where: { tenantId },
             select: {
                 idMiembro: true,
                 nombre: true,
@@ -201,7 +201,7 @@ export class MiembrosService {
             where: { idMiembro },
         });
 
-        if (!miembro || miembro.idTenant !== idTenant) {
+        if (!miembro || miembro.tenantId !== idTenant) {
             throw new Error('Miembro no encontrado o acceso denegado');
         }
 
