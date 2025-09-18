@@ -11,6 +11,7 @@ import { GrupoModule } from './grupos/grupo.module';
 import { MiembrosModule } from './miembros/miembros.module';
 import { LimpiezaModule } from './limpieza/limpieza.module';
 import { ActividadModule } from './actividades/actividad.module';
+import { ColaboradorModule } from './colaborador/colaborador.module';
 
 @Global()
 @Module({
@@ -31,6 +32,7 @@ import { ActividadModule } from './actividades/actividad.module';
         MiembrosModule,
         LimpiezaModule,
         ActividadModule,
+        ColaboradorModule,
     ],
     controllers: [],
     providers: [PrismaService],
