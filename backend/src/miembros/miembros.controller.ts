@@ -19,6 +19,12 @@ import { UpdateMiembroDto } from './dto/update.miembro.dto';
 export class MiembrosController {
     constructor(private readonly miembrosService: MiembrosService) {}
 
+    @Get()
+    findAll(@Req() req: Request & { user: any }) {
+        const tenantId = req.user.tenantId;
+        return this.miembrosService.findAllForTenant(tenantId);
+    }
+
     // Obtener datos solo para tabla
     @Get('table')
     async getAllForTable(@Req() req) {

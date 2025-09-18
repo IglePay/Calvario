@@ -38,7 +38,7 @@ export class LimpiezaService {
                         nombre: true,
                         apellido: true,
                         genero: {
-                            select: { idGenero: true, nombregenero: true },
+                            select: { idGenero: true },
                         },
                     },
                 },
@@ -57,24 +57,45 @@ export class LimpiezaService {
         const miembro = await this.prisma.tb_miembros.findFirst({
             where: { idMiembro: data.idMiembro, tenantId: data.idTenant },
         });
-        if (!miembro)
+        if (!miembro) {
             throw new Error('El miembro no existe o no pertenece al tenant');
+        }
 
         // validar grupo si viene
         if (data.idGrupo) {
             const grupo = await this.prisma.tb_grupo.findFirst({
                 where: { idGrupo: data.idGrupo, tenantId: data.idTenant },
             });
-            if (!grupo)
+            if (!grupo) {
                 throw new Error('El grupo no existe o no pertenece al tenant');
+            }
         }
 
+        // crear registro y devolver datos relacionados
         return this.prisma.tb_limpieza.create({
             data: {
                 idMiembro: data.idMiembro,
                 tenantId: data.idTenant,
                 fechaLimpieza: new Date(data.fechaLimpieza),
                 ...(data.idGrupo && { idGrupo: data.idGrupo }),
+            },
+            select: {
+                idLimpieza: true,
+                fechaLimpieza: true,
+                idMiembro: true,
+                idGrupo: true,
+                miembro: {
+                    select: {
+                        idMiembro: true,
+                        nombre: true,
+                        apellido: true,
+                        genero: {
+                            //  aquí anidamos
+                            select: { idGenero: true },
+                        },
+                    },
+                },
+                grupo: { select: { idGrupo: true, nombregrupo: true } },
             },
         });
     }
@@ -92,18 +113,20 @@ export class LimpiezaService {
         const limpieza = await this.prisma.tb_limpieza.findFirst({
             where: { idLimpieza: id, tenantId: data.idTenant },
         });
-        if (!limpieza)
+        if (!limpieza) {
             throw new Error('La limpieza no existe o no pertenece al tenant');
+        }
 
         // validar nuevo miembro si viene
         if (data.idMiembro) {
             const miembro = await this.prisma.tb_miembros.findFirst({
                 where: { idMiembro: data.idMiembro, tenantId: data.idTenant },
             });
-            if (!miembro)
+            if (!miembro) {
                 throw new Error(
                     'El miembro no existe o no pertenece al tenant',
                 );
+            }
         }
 
         // validar nuevo grupo si viene
@@ -111,19 +134,40 @@ export class LimpiezaService {
             const grupo = await this.prisma.tb_grupo.findFirst({
                 where: { idGrupo: data.idGrupo, tenantId: data.idTenant },
             });
-            if (!grupo)
+            if (!grupo) {
                 throw new Error('El grupo no existe o no pertenece al tenant');
+            }
         }
 
-        // actualizar solo dentro del tenant
-        return this.prisma.tb_limpieza.updateMany({
-            where: { idLimpieza: id, tenantId: data.idTenant },
+        // actualizar y devolver datos relacionados
+        return this.prisma.tb_limpieza.update({
+            where: { idLimpieza: id },
             data: {
                 ...(data.idMiembro && { idMiembro: data.idMiembro }),
                 ...(data.fechaLimpieza && {
                     fechaLimpieza: new Date(data.fechaLimpieza),
                 }),
                 ...(data.idGrupo && { idGrupo: data.idGrupo }),
+            },
+            select: {
+                idLimpieza: true,
+                fechaLimpieza: true,
+                idMiembro: true,
+                idGrupo: true,
+                miembro: {
+                    select: {
+                        idMiembro: true,
+                        nombre: true,
+                        apellido: true,
+                        genero: {
+                            //  incluimos el género
+                            select: { idGenero: true, nombregenero: true },
+                        },
+                    },
+                },
+                grupo: {
+                    select: { idGrupo: true, nombregrupo: true },
+                },
             },
         });
     }
@@ -133,10 +177,4 @@ export class LimpiezaService {
             where: { idLimpieza: id, tenantId },
         });
     }
-
-    // async remove(id: number, idTenant: number) {
-    //     return this.prisma.tb_limpieza.delete({
-    //         where: { idLimpieza_idTenant: { idLimpieza: id, idTenant } }
-    //     })
-    // }
 }
