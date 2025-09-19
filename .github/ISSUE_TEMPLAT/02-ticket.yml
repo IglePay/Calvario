@@ -1,0 +1,62 @@
+---
+name: "Nueva Característica o Funcionalidad"
+description: "Formulario para sugerir nuevas funciones o mejoras en el sistema de administración de la iglesia"
+title: "[Titulo]: "
+labels: ["feature"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tu aporte! Completa este formulario para ayudarnos a entender y evaluar tu propuesta de mejora o nueva funcionalidad.
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: "Tipo de implementación"
+      description: "Selecciona si se trata de una nueva función o una mejora de una existente."
+      options:
+        - "Mejora de una función existente"
+        - "Implementación de una nueva funcionalidad"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: modulo
+    attributes:
+      label: "Módulo relacionado"
+      description: "Selecciona el módulo del sistema al que se refiere esta propuesta."
+      options:
+        - "Miembros"
+        - "Colaboradores"
+        - "Actividades"
+        - "Asistencias"
+        - "Finanzas"
+        - "Grupos"
+        - "Configuración"
+        - "Otro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: "Descripción de la funcionalidad"
+      description: "Describe de manera clara y concisa qué se necesita implementar o mejorar."
+      placeholder: "Por ejemplo: Permitir enviar notificaciones automáticas a los miembros..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: "Prioridad"
+      description: "Indica la importancia o urgencia de implementar esta función."
+      options:
+        - "Alta"
+        - "Media"
+        - "Baja"
+    validations:
+      required: true
+
+
