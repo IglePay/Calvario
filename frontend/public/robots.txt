@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /control
+Disallow: /register
+Disallow: /api
+
+# Host
+Host: https://iglepay.com
+
+# Sitemaps
+Sitemap: https://iglepay.com/sitemap.xml

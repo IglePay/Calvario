@@ -1,12 +1,19 @@
-/** @type {import('next').NextConfig} */
 import withPWA from "next-pwa"
 
-const nextConfig = withPWA({
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    poweredByHeader: false,
+    reactStrictMode: true,
+    turbopack: {
+        root: ".",
+    },
+}
+
+// Configuración válida de PWA
+const pwaConfig = {
     dest: "public",
     register: true,
     skipWaiting: true,
-})({
-    reactStrickMode: true,
-})
+}
 
-export default nextConfig
+export default withPWA(pwaConfig)(nextConfig)
