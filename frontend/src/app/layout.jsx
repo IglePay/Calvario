@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+import Googleanalytics from "@/components/Googleanalytics"
 import { ThemeProvider } from "@/hooks/themeContext"
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
         <html lang="en" suppressHydrationWarning>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                <Googleanalytics />
                 <ThemeProvider>{children}</ThemeProvider>
             </body>
         </html>
