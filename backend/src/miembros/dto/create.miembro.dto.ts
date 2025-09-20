@@ -10,11 +10,11 @@ export class CreateMiembroDto {
     @IsOptional() @IsNumber() idGenero?: number;
     @IsOptional() @IsString() direccion?: string;
     @IsOptional() @IsNumber() idEstado?: number;
+    @IsOptional() @IsString() procesosterminado?: string;
+    @IsOptional() @IsNumber() idGrupo?: number;
+    @IsOptional() @IsString() legusta?: string;
     @IsOptional() @IsDateString() fechaLlegada?: string;
     @IsOptional() @IsDateString() fechaBautismo?: string;
-    @IsOptional() @IsString() procesosTerminado?: string;
-    @IsOptional() @IsNumber() idGrupo?: number;
-    @IsOptional() @IsString() leGusta?: string;
     @IsOptional() @IsNumber() idBautizado?: number;
     @IsOptional() @IsNumber() idServidor?: number;
 }

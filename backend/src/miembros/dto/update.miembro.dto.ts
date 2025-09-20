@@ -12,9 +12,9 @@ export class UpdateMiembroDto {
     @IsOptional() @IsNumber() idEstado?: number;
     @IsOptional() @IsDateString() fechaLlegada?: string;
     @IsOptional() @IsDateString() fechaBautismo?: string;
-    @IsOptional() @IsString() procesosTerminado?: string;
+    @IsOptional() @IsString() procesosterminado?: string;
     @IsOptional() @IsNumber() idGrupo?: number;
-    @IsOptional() @IsString() leGusta?: string;
+    @IsOptional() @IsString() legusta?: string;
     @IsOptional() @IsNumber() idBautizado?: number;
     @IsOptional() @IsNumber() idServidor?: number;
 }

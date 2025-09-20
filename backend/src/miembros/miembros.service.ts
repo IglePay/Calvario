@@ -30,18 +30,18 @@ export class MiembrosService {
         return this.prisma.tb_miembros.create({
             data: {
                 tenantId,
+                dpi: dto.dpi || null,
                 nombre: dto.nombre,
                 apellido: dto.apellido,
                 email: dto.email || null,
                 telefono: dto.telefono || null,
-                dpi: dto.dpi || null,
                 fechanacimiento: dto.fechaNacimiento || null,
                 idGenero: dto.idGenero || null,
-                idEstado: dto.idEstado || null,
                 direccion: dto.direccion || null,
-                procesosterminado: dto.procesosTerminado || null,
+                idEstado: dto.idEstado || null,
+                procesosterminado: dto.procesosterminado || null,
                 idGrupo: dto.idGrupo || null,
-                legusta: dto.leGusta || null,
+                legusta: dto.legusta || null,
                 fechaLlegada: dto.fechaLlegada || null, // antes anioLlegada
                 fechaBautismo: dto.fechaBautismo || null,
                 // Relaciones (FKs)
@@ -83,20 +83,20 @@ export class MiembrosService {
         return this.prisma.tb_miembros.update({
             where: { idMiembro },
             data: {
+                dpi: dto.dpi || null,
                 nombre: dto.nombre,
                 apellido: dto.apellido,
                 email: dto.email || null,
                 telefono: dto.telefono || null,
-                dpi: dto.dpi || null,
                 fechanacimiento: dto.fechaNacimiento || null,
                 idGenero: dto.idGenero || null,
-                idEstado: dto.idEstado || null,
                 direccion: dto.direccion || null,
-                procesosterminado: dto.procesosTerminado || null,
-                idGrupo: dto.idGrupo || null,
-                legusta: dto.leGusta || null,
+                idEstado: dto.idEstado || null,
                 fechaLlegada: dto.fechaLlegada || null,
                 fechaBautismo: dto.fechaBautismo || null,
+                procesosterminado: dto.procesosterminado || null,
+                idGrupo: dto.idGrupo || null,
+                legusta: dto.legusta || null,
                 // Relaciones (FKs)
                 idBautizado: dto.idBautizado || null,
                 idServidor: dto.idServidor || null,
@@ -148,8 +148,8 @@ export class MiembrosService {
                 grupo: true,
                 genero: true,
                 estadoCivil: true,
-                bautizado: true, // corregido
-                servidor: true, // corregido
+                bautizado: true,
+                servidor: true,
             },
         });
     }
@@ -158,23 +158,39 @@ export class MiembrosService {
         const miembros = await this.prisma.tb_miembros.findMany({
             where: { tenantId },
             select: {
+                dpi: true,
                 idMiembro: true,
                 nombre: true,
                 apellido: true,
+                email: true,
                 telefono: true,
                 direccion: true,
+                fechanacimiento: true,
                 fechaLlegada: true,
-                procesosterminado: true,
+                fechaBautismo: true,
+                idGenero: true,
+                genero: {
+                    select: {
+                        nombregenero: true,
+                    },
+                },
+                idEstado: true,
+                estadoCivil: {
+                    select: { nombreEstado: true },
+                },
                 idGrupo: true,
                 grupo: {
                     select: { nombregrupo: true },
                 },
-                fechanacimiento: true, // temporal para calcular edad
+                procesosterminado: true,
+                legusta: true,
+                idBautizado: true,
+                idServidor: true,
             },
         });
 
-        // Calcular edad y eliminar fechanacimiento
-        const miembrosConEdad = miembros.map((m) => {
+        const miembrosFormateados = miembros.map((m) => {
+            // Calcular edad
             let edad: number | null = null;
             if (m.fechanacimiento) {
                 const today = new Date();
@@ -188,15 +204,29 @@ export class MiembrosService {
                     edad--;
                 }
             }
+
+            // Formatear fechas a YYYY-MM-DD
+            const formatDate = (date: Date | string | null | undefined) =>
+                date ? new Date(date).toISOString().split('T')[0] : null;
+
+            const fechaLlegada = formatDate(m.fechaLlegada);
+            const fechaBautismo = formatDate(m.fechaBautismo);
+
             const { fechanacimiento, ...rest } = m; // quitar fechanacimiento
-            return { ...rest, edad };
+
+            return {
+                ...rest,
+                edad,
+                fechaLlegada,
+                fechaBautismo,
+                fechanacimiento,
+            };
         });
 
-        return miembrosConEdad;
+        return miembrosFormateados;
     }
 
     async deleteMiembro(idMiembro: number, idTenant: number) {
-        // Primero verificamos que exista y pertenezca al tenant
         const miembro = await this.prisma.tb_miembros.findUnique({
             where: { idMiembro },
         });
