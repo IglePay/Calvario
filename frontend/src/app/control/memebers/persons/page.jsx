@@ -85,10 +85,8 @@ const Persons = () => {
             <h1 className="text-2xl font-bold">Listado de Miembros</h1>
 
             {/* Botones */}
-            <div className="flex gap-4 mt-4">
-                <Link
-                    href={"/control"}
-                    className="btn btn-primary btn-sm w-24 ">
+            <div className="flex gap-2 mt-4">
+                <Link href={"/control"} className="btn btn-primary btn-sm  ">
                     Regresar
                 </Link>
                 <button onClick={handledAdd} className="btn btn-accent btn-sm">

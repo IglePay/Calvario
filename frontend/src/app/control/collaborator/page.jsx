@@ -84,7 +84,7 @@ export default function Collaborator() {
             <h2 className="text-xl font-bold">Listado de Colaboradores</h2>
 
             <div className="flex gap-2 mt-4">
-                <Link href="/control" className="btn btn-primary btn-sm w-24 ">
+                <Link href="/control" className="btn btn-primary btn-sm  ">
                     Regresar
                 </Link>
                 <button

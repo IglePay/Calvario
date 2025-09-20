@@ -36,10 +36,8 @@ export default function Groups() {
         <div className=" flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
             <h2 className="text-2xl font-bold mb-4">Listado de Ministerios</h2>
 
-            <div className="flex gap-4 mt-4">
-                <Link
-                    href={"/control"}
-                    className="btn btn-primary btn-sm w-24 ">
+            <div className="flex gap-2 mt-4">
+                <Link href={"/control"} className="btn btn-primary btn-sm ">
                     {" "}
                     Regresar
                 </Link>

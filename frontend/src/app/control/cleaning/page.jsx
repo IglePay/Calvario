@@ -203,7 +203,7 @@ export default function CleaningCalendar() {
         <div className="text-center">
             <h1 className="text-2xl font-bold mt-3">Calendario de Limpieza</h1>
 
-            <div className="flex gap-4 justify-center items-center mt-3">
+            <div className="flex gap-2 justify-center items-center mt-3">
                 <Link href="/control" className="btn btn-primary">
                     Regresar
                 </Link>
