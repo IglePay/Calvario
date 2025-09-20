@@ -158,42 +158,41 @@ export default function Profile() {
                             </tr>
                         </thead>
                         <tbody className="text-center">
-                            {filteredMembers
-                                .slice(0, rowsPerPage)
-                                .map((member) => (
-                                    <tr key={member.id}>
-                                        <td>{member.id}</td>
-                                        <td>{member.role?.nombre}</td>
-                                        <td>{member.name}</td>
-                                        <td>{member.email}</td>
-                                        <td>••••••</td>
-                                        <td>{member.tb_tenants?.nombre}</td>
-                                        <td className="flex gap-2 items-center justify-center">
-                                            <button
-                                                onClick={() =>
-                                                    openModal(member)
-                                                }
-                                                className="btn btn-warning btn-xs">
-                                                <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(member.id)
-                                                }
-                                                className="btn btn-error btn-xs">
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            {filteredMembers.length === 0 && (
+                            {filteredMembers.length === 0 ? (
                                 <tr>
-                                    <td
-                                        colSpan={7}
-                                        className="text-center py-6">
+                                    <td colSpan={7} className="py-6">
                                         No hay resultados
                                     </td>
                                 </tr>
+                            ) : (
+                                filteredMembers
+                                    .slice(0, rowsPerPage)
+                                    .map((member) => (
+                                        <tr key={member.id}>
+                                            <td>{member.id}</td>
+                                            <td>{member.role?.nombre}</td>
+                                            <td>{member.name}</td>
+                                            <td>{member.email}</td>
+                                            <td>••••••</td>
+                                            <td>{member.tb_tenants?.nombre}</td>
+                                            <td className="flex gap-2 items-center justify-center">
+                                                <button
+                                                    onClick={() =>
+                                                        openModal(member)
+                                                    }
+                                                    className="btn btn-warning btn-xs">
+                                                    <i className="fas fa-edit"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(member.id)
+                                                    }
+                                                    className="btn btn-error btn-xs">
+                                                    <i className="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
                             )}
                         </tbody>
                     </table>

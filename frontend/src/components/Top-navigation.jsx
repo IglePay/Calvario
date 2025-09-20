@@ -1,27 +1,30 @@
 "use client"
 import { ThemeContext } from "@/hooks/themeContext"
+import Link from "next/link"
 import { useContext, useState } from "react"
 import MembersModal from "../app/control/memebers/components/MembersModal"
 import { useMembers } from "@/hooks/members/useMembers"
 
 export default function TopNavigation({ onMenuClick, navigation }) {
-    const navItems = ["Miembros", "Finanzas", "Asistencias", "Usuarios"]
-    const { searchQuery, handleSearch, setSearchQuery } = navigation
+    const navItems = [
+        { name: "Miembros", path: "/control/memebers/persons" },
+        { name: "Finanzas", path: "/control/finace" },
+        { name: "Asistencias", path: "/control/assists" },
+        { name: "Colaboradores", path: "/control/collaborator" },
+    ]
     const { theme, toggleTheme } = useContext(ThemeContext)
 
-    const { members, loading, error } = useMembers()
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [editData, setEditData] = useState(null)
+    //  Importamos todas las funciones y datos necesarios
+    const { createMember, grupos, generos, estados, bautizados, servidores } =
+        useMembers()
 
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    //  Solo registrar (no hay edición aquí)
     const handleSubmit = async (data) => {
         try {
-            if (editData) {
-                await updateMember(editData.idMiembro, data)
-            } else {
-                await createMember(data)
-            }
+            await createMember(data)
             setIsModalOpen(false)
-            setEditData(null)
         } catch (err) {
             console.error("Error al guardar el miembro:", err)
         }
@@ -30,51 +33,36 @@ export default function TopNavigation({ onMenuClick, navigation }) {
     return (
         <header className=" shadow-sm border-b border-gray-400">
             <div className="flex items-center justify-between px-4 md:px-6 py-4">
-                {/* Left side - Toggle and Search */}
+                {/* Left side - Toggle */}
                 <div className="flex items-center space-x-2 md:space-x-4 flex-1">
                     <button
                         onClick={onMenuClick}
                         className="text-blue-600 hover:text-blue-800 lg:hidden">
                         <i className="fas fa-bars text-lg"></i>
                     </button>
-
-                    <div className="relative flex-1 max-w-md">
-                        <input
-                            type="text"
-                            placeholder="Buscar nombre, ID o apellido"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) =>
-                                e.key === "Enter" && handleSearch(searchQuery)
-                            }
-                            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base text-gray-700 dark:text-white"
-                        />
-                        <button
-                            onClick={() => handleSearch(searchQuery)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i className="fas fa-search"></i>
-                        </button>
-                    </div>
                 </div>
-
                 {/* Right side - Navigation Menu */}
                 <nav className="hidden lg:flex items-center space-x-3">
                     {navItems.map((item, index) => (
-                        <a
+                        <Link
                             key={index}
-                            href="#"
+                            href={item.path}
                             className="text-gray-700 hover:text-blue-600 dark:text-white font-medium transition-colors whitespace-nowrap text-base">
-                            {item}
-                        </a>
+                            {item.name}
+                        </Link>
                     ))}
 
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                         Nuevo
                     </button>
                 </nav>
-
+                {/* Mobile button */}
                 <div className="flex items-center space-x-2 lg:hidden">
-                    <button className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm ml-3 md:ml-1">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm ml-3 md:ml-1">
                         <i className="fas fa-plus"></i>
                     </button>
                 </div>
@@ -84,13 +72,19 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                         className={`fa-solid ${theme === "light" ? "fa-moon text-gray-800" : "fa-sun text-yellow-400"} text-2xl`}
                     />
                 </button>
+                {/* 🔹 Modal para registrar */}
                 <MembersModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={handleSubmit}
-                    initialData={editData}
-                    mode={editData ? "edit" : "create"}
-                    grupos={[]}></MembersModal>
+                    initialData={null} // siempre nulo = registro
+                    mode="create" // 🔹 modo registro
+                    grupos={grupos}
+                    generos={generos}
+                    estados={estados}
+                    bautizados={bautizados}
+                    servidores={servidores}
+                />
             </div>
         </header>
     )

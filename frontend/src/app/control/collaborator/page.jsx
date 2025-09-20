@@ -80,7 +80,7 @@ export default function Collaborator() {
     }))
 
     return (
-        <div className="  flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
+        <div className=" flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
             <h2 className="text-xl font-bold">Listado de Colaboradores</h2>
 
             <div className="flex gap-2 mt-4">
@@ -127,7 +127,7 @@ export default function Collaborator() {
                 </select>
             </div>
 
-            <div className="overflow-x-auto rounded-box border border-base-content/5 mt-4">
+            <div className="overflow-x-auto rounded-box border border-base-content/5 mt-5 w-full max-w-5xl">
                 {error && (
                     <div className="alert alert-error">
                         <span>{error}</span>

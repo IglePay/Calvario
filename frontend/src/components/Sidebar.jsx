@@ -3,11 +3,22 @@
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
+import { useMembers } from "@/hooks/members/useMembers"
+import MembersModal from "@/app/control/memebers/components/MembersModal"
 
 export default function Sidebar({ isOpen, onClose, navigation }) {
-    const { menuItems, activeSection, handleNavigation } = navigation
+    const {
+        menuItems,
+        activeSection,
+        handleNavigation,
+        openModal,
+        setOpenModal,
+    } = navigation
     const [openMenu, setOpenMenu] = useState(null)
-    const [user, setUser] = useState(null) // estado para el usuario logueado
+    const [user, setUser] = useState(null)
+
+    const { createMember, grupos, generos, estados, bautizados, servidores } =
+        useMembers()
 
     const toggleSubmenu = (id) => {
         setOpenMenu(openMenu === id ? null : id)
@@ -29,6 +40,11 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
             localStorage.removeItem("token")
             window.location.href = "/"
         })
+    }
+
+    const handleSubmit = async (data) => {
+        await createMember(data)
+        setOpenModal(null) // cerrar modal después de guardar
     }
 
     return (
@@ -70,7 +86,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 bg-gray-900 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+                <nav className="flex-1 bg-gray-900 overflow-y-auto">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button
@@ -122,7 +138,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                 </nav>
 
                 {/* Settings and Logout */}
-                <div className="">
+                <div>
                     <button
                         onClick={handleLogout}
                         className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors w-full text-left">
@@ -131,6 +147,22 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                     </button>
                 </div>
             </div>
+
+            {/* Modal de Miembros */}
+            {openModal === "member" && (
+                <MembersModal
+                    isOpen={true}
+                    onClose={() => setOpenModal(null)}
+                    onSubmit={handleSubmit}
+                    initialData={null}
+                    mode="create"
+                    grupos={grupos}
+                    generos={generos}
+                    estados={estados}
+                    bautizados={bautizados}
+                    servidores={servidores}
+                />
+            )}
         </>
     )
 }

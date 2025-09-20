@@ -6,7 +6,7 @@ export function useNavigation() {
     const router = useRouter()
     const [activeSection, setActiveSection] = useState("escritorio")
     const [searchQuery, setSearchQuery] = useState("")
-
+    const [openModal, setOpenModal] = useState(null)
     const menuItems = [
         {
             id: "escritorio",
@@ -28,7 +28,7 @@ export function useNavigation() {
                     id: "miembros-agregar",
                     icon: "fas fa-user-plus",
                     label: "Agregar",
-                    route: "/control/memebers/createP",
+                    action: "openMemberModal",
                 },
             ],
         },
@@ -130,12 +130,13 @@ export function useNavigation() {
         setActiveSection(section.id)
         if (section.route) {
             router.push(section.route)
+        } else if (section.action === "openMemberModal") {
+            setOpenModal("member")
         }
     }
 
     const handleSearch = (query) => {
         setSearchQuery(query)
-        console.log("Searching for:", query)
     }
 
     return {
@@ -145,5 +146,7 @@ export function useNavigation() {
         handleNavigation,
         handleSearch,
         setSearchQuery,
+        openModal,
+        setOpenModal,
     }
 }
