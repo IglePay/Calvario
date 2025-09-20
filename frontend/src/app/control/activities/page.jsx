@@ -3,6 +3,7 @@ import { useState } from "react"
 import ActivityModal from "./components/ActivityModal"
 import Link from "next/link"
 import useActivities from "@/hooks/activities/useActivities"
+import { exportToExcel, exportToPDF } from "@/utils/exportData"
 
 function prettyDate(iso) {
     if (!iso) return "_"
@@ -55,6 +56,20 @@ const ActivitiesPage = () => {
         deleteActivity(id)
     }
 
+    const exportData = activities.map((act) => ({
+        ID: act.idActividad,
+        Título: act.titulo || "",
+        Descripción: act.descripcion || "-",
+        Grupo: act.grupo || "-",
+        Fecha: act.fechaActividad
+            ? new Date(act.fechaActividad).toLocaleDateString("es-GT", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+              })
+            : "-",
+    }))
+
     return (
         <div className=" flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
             <h1 className="text-2xl font-bold">Listado de Actividades</h1>
@@ -69,6 +84,18 @@ const ActivitiesPage = () => {
                     className="btn btn-accent btn-sm "
                     onClick={() => setModalOpen(true)}>
                     <i className="fas fa-plus mr-1"></i> Agregar
+                </button>
+                <button
+                    onClick={() =>
+                        exportToExcel(exportData, "Actividades.xlsx")
+                    }
+                    className="btn btn-secondary btn-sm">
+                    <i className="fas fa-file-excel mr-1"></i> Excel
+                </button>
+                <button
+                    onClick={() => exportToPDF(exportData, "Actividades.pdf")}
+                    className="btn bg-rose-800 text-white btn-sm">
+                    <i className="fas fa-print mr-1"></i> PDF
                 </button>
             </div>
 
