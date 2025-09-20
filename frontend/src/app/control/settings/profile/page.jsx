@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
 import { useUsers } from "@/hooks/profile/useUsers"
 
