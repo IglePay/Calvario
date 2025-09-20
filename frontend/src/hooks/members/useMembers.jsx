@@ -57,15 +57,15 @@ export function useMembers() {
                 : null,
             idGenero: member.idGenero ? Number(member.idGenero) : null,
             direccion: member.direccion || null,
-            idEstado: member.estadoCivil ? Number(member.estadoCivil) : null,
-            fechaLlegada: member.anioLlegada
-                ? new Date(member.anioLlegada).toISOString()
+            idEstado: member.idEstado ? Number(member.idEstado) : null,
+            fechaLlegada: member.fechaLlegada
+                ? new Date(member.fechaLlegada).toISOString()
                 : null,
-            procesosTerminado: member.procesosterminado || null,
-            idGrupo: member.grupo ? Number(member.grupo) : null,
-            leGusta: member.legusta || null,
-            fechaBautismo: member.fechabautizo
-                ? new Date(member.fechabautizo).toISOString()
+            procesosterminado: member.procesosterminado || null,
+            idGrupo: member.idGrupo ? Number(member.idGrupo) : null,
+            legusta: member.legusta || null,
+            fechaBautismo: member.fechaBautismo
+                ? new Date(member.fechaBautizo).toISOString()
                 : null,
             idBautizado: member.idBautizado ? Number(member.idBautizado) : null,
             idServidor: member.idServidor ? Number(member.idServidor) : null,
@@ -96,15 +96,15 @@ export function useMembers() {
                 : null,
             idGenero: member.idGenero ? Number(member.idGenero) : null,
             direccion: member.direccion || null,
-            idEstado: member.estadoCivil ? Number(member.estadoCivil) : null,
-            fechaLlegada: member.anioLlegada
-                ? new Date(member.anioLlegada).toISOString()
+            idEstado: member.idEstado ? Number(member.idEstado) : null,
+            fechaLlegada: member.fechaLlegada
+                ? new Date(member.fechaLlegada).toISOString()
                 : null,
-            procesosTerminado: member.procesosterminado || null,
-            idGrupo: member.grupo ? Number(member.grupo) : null,
-            leGusta: member.legusta || null,
-            fechaBautismo: member.fechabautizo
-                ? new Date(member.fechabautizo).toISOString()
+            procesosterminado: member.procesosterminado || null,
+            idGrupo: member.idGrupo ? Number(member.idGrupo) : null,
+            legusta: member.legusta || null,
+            fechaBautismo: member.fechaBautismo
+                ? new Date(member.fechaBautismo).toISOString()
                 : null,
             idBautizado: member.idBautizado ? Number(member.idBautizado) : null,
             idServidor: member.idServidor ? Number(member.idServidor) : null,

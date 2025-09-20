@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useState, useMemo } from "react"
 import { useMembers } from "@/hooks/members/useMembers"
+import { exportToExcel, exportToPDF } from "@/utils/exportData"
 import MembersModal from "../components/MembersModal"
 
 const Persons = () => {
@@ -63,6 +64,21 @@ const Persons = () => {
             console.error("Error al guardar el miembro:", err)
         }
     }
+
+    const exportData = filteredMembers.map((member) => ({
+        ID: member.idMiembro,
+        Nombre: member.nombre,
+        apellido: member.apellido,
+        Edad: member.edad,
+        Teléfono: member.telefono,
+        Dirección: member.direccion,
+        "Año de llegada": member.fechaLlegada,
+        Bautismo:
+            bautizados.find((b) => b.idBautizado === member.idBautizado)
+                ?.bautizadoEstado || "No",
+        Procesos: member.procesosterminado,
+        Grupo: member.grupo?.nombregrupo || "",
+    }))
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
@@ -137,15 +153,22 @@ const Persons = () => {
                                 .slice(0, rowsPerPage)
                                 .map((member, index) => (
                                     <tr
-                                        key={member.idMiembro ?? index} // ahora index está definido
+                                        key={member.idMiembro ?? index}
                                         className="text-center">
                                         <td>{member.idMiembro}</td>
                                         <td>{member.nombre}</td>
                                         <td>{member.edad}</td>
                                         <td>{member.telefono}</td>
                                         <td>{member.direccion}</td>
-                                        <td>{member.fechallegada}</td>
-                                        <td>{member.bautismo ? "Sí" : "No"}</td>
+                                        <td>{member.fechaLlegada}</td>
+                                        <td>
+                                            {bautizados.find(
+                                                (b) =>
+                                                    b.idBautizado ===
+                                                    member.idBautizado,
+                                            )?.bautizadoEstado || "No"}
+                                        </td>
+
                                         <td>{member.procesosterminado}</td>
                                         <td>
                                             {member.grupo?.nombregrupo || ""}

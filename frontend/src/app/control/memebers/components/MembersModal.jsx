@@ -1,5 +1,26 @@
 "use client"
 import { useState, useEffect } from "react"
+import * as Yup from "yup"
+
+// Definir el esquema de validación
+const memberSchema = Yup.object().shape({
+    dpi: Yup.string().nullable(),
+    nombre: Yup.string().required("Nombre es obligatorio"),
+    apellido: Yup.string().required("Apellido es obligatorio"),
+    email: Yup.string().email("Correo no válido").nullable(),
+    telefono: Yup.string("Son numeros de 8 digitos").nullable(),
+    fechaNacimiento: Yup.date().nullable(),
+    idGenero: Yup.number().nullable(),
+    direccion: Yup.string().nullable(),
+    idEstado: Yup.number().nullable(),
+    fechaLlegada: Yup.date().nullable(),
+    idBautizado: Yup.number().nullable(),
+    fechaBautismo: Yup.date().nullable(),
+    idServidor: Yup.number().nullable(),
+    procesosterminado: Yup.string().nullable(),
+    idGrupo: Yup.number().nullable(),
+    legusta: Yup.string().nullable(),
+})
 
 const MembersModal = ({
     isOpen,
@@ -22,50 +43,62 @@ const MembersModal = ({
         fechaNacimiento: "",
         idGenero: "",
         direccion: "",
-        estadoCivil: "",
-        anioLlegada: "",
+        idEstado: "",
+        fechaLlegada: "",
         idBautizado: "",
-        fechabautizo: "",
+        fechaBautismo: "",
         idServidor: "",
         procesosterminado: "",
-        grupo: "",
+        idGrupo: "",
         legusta: "",
     })
 
-    // 🔹 Prellenar formulario al editar
-    useEffect(() => {
-        if (mode === "create") return
+    const normalizeMemberForForm = (member) => ({
+        dpi: member.dpi || "",
+        nombre: member.nombre || "",
+        apellido: member.apellido || "",
+        email: member.email || "",
+        telefono: member.telefono || "",
+        fechaNacimiento: member.fechanacimiento
+            ? member.fechanacimiento.split("T")[0]
+            : "",
+        idGenero: member.idGenero ? String(member.idGenero) : "",
+        direccion: member.direccion || "",
+        idEstado: member.idEstado ? String(member.idEstado) : "",
+        fechaLlegada: member.fechaLlegada ? member.fechaLlegada : "",
+        idBautizado: member.idBautizado ? String(member.idBautizado) : "",
+        idServidor: member.idServidor ? String(member.idServidor) : "",
+        fechaBautismo: member.fechaBautismo || "",
+        procesosterminado: member.procesosterminado || "",
+        idGrupo: member.idGrupo ? String(member.idGrupo) : "",
+        legusta: member.legusta || "",
+    })
 
-        setFormData({
-            dpi: initialData.dpi || "",
-            nombre: initialData.nombre || "",
-            apellido: initialData.apellido || "",
-            email: initialData.email || "",
-            telefono: initialData.telefono || "",
-            fechaNacimiento: initialData.fechanacimiento
-                ? initialData.fechanacimiento.split("T")[0]
-                : "",
-            idGenero: initialData.idGenero ? String(initialData.idGenero) : "",
-            direccion: initialData.direccion || "",
-            estadoCivil: initialData.idEstado
-                ? String(initialData.idEstado)
-                : "",
-            anioLlegada: initialData.fechallegada
-                ? initialData.fechallegada.split("T")[0]
-                : "",
-            idBautizado: initialData.idBautizado
-                ? String(initialData.idBautizado)
-                : "",
-            idServidor: initialData.idServidor
-                ? String(initialData.idServidor)
-                : "",
-            fechabautizo: initialData.fechabautismo
-                ? initialData.fechabautismo.split("T")[0]
-                : "",
-            procesosterminado: initialData.procesosterminado || "",
-            grupo: initialData.idGrupo ? String(initialData.idGrupo) : "",
-            legusta: initialData.legusta || "",
-        })
+    //  Prellenar formulario al editar
+
+    useEffect(() => {
+        if (mode === "edit" && initialData) {
+            setFormData(normalizeMemberForForm(initialData))
+        } else if (mode === "create") {
+            setFormData({
+                dpi: "",
+                nombre: "",
+                apellido: "",
+                email: "",
+                telefono: "",
+                fechaNacimiento: "",
+                idGenero: "",
+                direccion: "",
+                idEstado: "",
+                fechaLlegada: "",
+                idBautizado: "",
+                fechaBautismo: "",
+                idServidor: "",
+                procesosterminado: "",
+                idGrupo: "",
+                legusta: "",
+            })
+        }
     }, [initialData, mode])
 
     const handleChange = (e) => {
@@ -81,50 +114,48 @@ const MembersModal = ({
         })
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log("formData al enviar:", formData)
 
-        const payload = {
-            dpi: formData.dpi || null,
-            nombre: formData.nombre,
-            apellido: formData.apellido,
-            email: formData.email || null,
-            telefono: formData.telefono || null,
-            fechaNacimiento: formData.fechaNacimiento
-                ? new Date(formData.fechaNacimiento).toISOString()
-                : null,
-            idGenero: formData.idGenero ? Number(formData.idGenero) : null,
-            direccion: formData.direccion || null,
-            idEstado: formData.estadoCivil
-                ? Number(formData.estadoCivil)
-                : null,
-            fechaLlegada: formData.anioLlegada
-                ? new Date(formData.anioLlegada).toISOString()
-                : null,
-            procesosTerminado: formData.procesosterminado || null,
-            idGrupo: formData.grupo ? Number(formData.grupo) : null,
-            leGusta: formData.legusta || null,
-            // fechaBautismo: formData.fechabautizo
-            //     ? new Date(formData.fechabautizo).toISOString()
-            //     : null,
-            idBautizado: formData.idBautizado
-                ? Number(formData.idBautizado)
-                : null,
-            idServidor: formData.idServidor
-                ? Number(formData.idServidor)
-                : null,
+        try {
+            // Valida el formData según el esquema
+            const validatedData = await memberSchema.validate(formData, {
+                abortEarly: false,
+                stripUnknown: true,
+            })
+
+            // Aquí puedes transformar fechas e IDs como antes
+            const payload = { ...validatedData }
+            if (payload.fechaNacimiento)
+                payload.fechaNacimiento = new Date(
+                    payload.fechaNacimiento,
+                ).toISOString()
+            if (payload.fechaLlegada)
+                payload.fechaLlegada = new Date(
+                    payload.fechaLlegada,
+                ).toISOString()
+            if (payload.fechaBautismo)
+                payload.fechaBautismo = new Date(
+                    payload.fechaBautismo,
+                ).toISOString()
+            if (payload.idGenero) payload.idGenero = Number(payload.idGenero)
+            if (payload.idEstado) payload.idEstado = Number(payload.idEstado)
+            if (payload.idGrupo) payload.idGrupo = Number(payload.idGrupo)
+            if (payload.idBautizado)
+                payload.idBautizado = Number(payload.idBautizado)
+            if (payload.idServidor)
+                payload.idServidor = Number(payload.idServidor)
+
+            console.log("payload listo para enviar:", payload)
+            onSubmit(payload)
+        } catch (err) {
+            if (err.inner) {
+                console.log("Errores de validación:", err.inner)
+            }
         }
-
-        console.log("payload para el backend:", payload)
-        onSubmit(payload)
     }
 
     if (!isOpen) return null
-
-    // 👇 Aquí mismo, dentro del componente MembersModal
-    console.log("👉 Bautizados que llegan al modal:", bautizados)
-    console.log("👉 Servidores que llegan al modal:", servidores)
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -219,8 +250,8 @@ const MembersModal = ({
                         </label>
                         <input
                             type="date"
-                            name="anioLlegada"
-                            value={formData.anioLlegada}
+                            name="fechaLlegada"
+                            value={formData.fechaLlegada}
                             onChange={handleChange}
                             className="input w-full"
                         />
@@ -230,8 +261,8 @@ const MembersModal = ({
                         <label className="label">Fecha de Bautismo</label>
                         <input
                             type="date"
-                            name="fechabautizo"
-                            value={formData.fechabautizo}
+                            name="fechaBautismo"
+                            value={formData.fechaBautismo}
                             onChange={handleChange}
                             className="input w-full"
                         />
@@ -257,8 +288,8 @@ const MembersModal = ({
                     <div className="flex flex-col">
                         <label className="label">Estado civil</label>
                         <select
-                            name="estadoCivil"
-                            value={String(formData.estadoCivil)}
+                            name="idEstado"
+                            value={String(formData.idEstado)}
                             onChange={handleChange}
                             className="input w-full">
                             <option value="">Seleccione</option>
@@ -273,8 +304,8 @@ const MembersModal = ({
                     <div className="flex flex-col">
                         <label className="label">Grupo</label>
                         <select
-                            name="grupo"
-                            value={String(formData.grupo)}
+                            name="idGrupo"
+                            value={String(formData.idGrupo)}
                             onChange={handleChange}
                             className="input w-full">
                             <option value="">Seleccione</option>
@@ -355,7 +386,7 @@ const MembersModal = ({
                     <div className="flex flex-wrap gap-2 col-span-full items-center justify-center mt-4">
                         <button
                             type="button"
-                            className="btn btn-ghost bg-gray-300"
+                            className="btn btn-ghost bg-gray-700"
                             onClick={onClose}>
                             Cancelar
                         </button>
