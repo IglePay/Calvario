@@ -72,13 +72,13 @@ export default function TopNavigation({ onMenuClick, navigation }) {
                         className={`fa-solid ${theme === "light" ? "fa-moon text-gray-800" : "fa-sun text-yellow-400"} text-2xl`}
                     />
                 </button>
-                {/* 🔹 Modal para registrar */}
+                {/* Modal para registrar */}
                 <MembersModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={handleSubmit}
                     initialData={null} // siempre nulo = registro
-                    mode="create" // 🔹 modo registro
+                    mode="create" //  modo registro
                     grupos={grupos}
                     generos={generos}
                     estados={estados}

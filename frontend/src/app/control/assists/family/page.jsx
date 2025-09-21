@@ -4,21 +4,15 @@ import Link from "next/link"
 const membersData = [
     {
         id: 1,
-        Nombre: "Esteban Belteton Caal",
-        Evento: "Servicio Dominical",
-        Entrada: "Ingreso",
-        Fecha: "30 / 01 / 2023,15:34",
+        NombreEvento: "Cumpleaños de Niños",
     },
     {
         id: 2,
-        Nombre: "Alejandra Molina",
-        Evento: "Servicio Dominical",
-        Entrada: "Ingreso",
-        Fecha: "30 / 01 / 2023,15:34",
+        NombreEvento: "Reunion de Jóvenes",
     },
 ]
 
-const Individual_Assists = () => {
+const Family = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -34,7 +28,7 @@ const Individual_Assists = () => {
         <div className="flex flex-col w-full h-full p-6 bg-base-100 ">
             {/* Controles superiores */}
             <h2 className="text-center text-xl font-bold">
-                Listado de Asistencias Individual
+                Listado de Familias
             </h2>
             <Link
                 href={"/control"}
@@ -82,10 +76,7 @@ const Individual_Assists = () => {
                     <thead className="bg-base-300 text-center">
                         <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Evento</th>
-                            <th>Acción</th>
-                            <th>Fecha/Hora</th>
+                            <th>Eventos</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -95,10 +86,7 @@ const Individual_Assists = () => {
                             .map((member, index) => (
                                 <tr key={member.id}>
                                     <td>{member.id}</td>
-                                    <td>{member.Nombre}</td>
-                                    <td>{member.Evento}</td>
-                                    <td>{member.Entrada}</td>
-                                    <td>{member.Fecha}</td>
+                                    <td>{member.NombreEvento}</td>
                                     <td className="flex gap-2">
                                         <button className="btn btn-info btn-xs">
                                             <i className="fas fa-eye"></i>
@@ -118,4 +106,4 @@ const Individual_Assists = () => {
         </div>
     )
 }
-export default Individual_Assists
+export default Family

@@ -28,7 +28,7 @@ const Events = () => {
         <div className="flex flex-col w-full h-full p-6 bg-base-100 ">
             {/* Controles superiores */}
             <h2 className="text-center text-xl font-bold">
-                Listado de eventos
+                Listado de Horarios de Servicios
             </h2>
             <Link
                 href={"/control"}

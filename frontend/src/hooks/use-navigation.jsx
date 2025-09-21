@@ -39,14 +39,14 @@ export function useNavigation() {
             route: "/control/activities",
         },
         // {
-        //     id: "areas-servicio",
+        //     id: "Servicio",
         //     icon: "fas fa-cogs",
-        //     label: "Áreas de servicio",
+        //     label: "Servicios",
         // },
         {
             id: "limpieza",
             icon: "fa fa-solid fa-broom",
-            label: "Áreas de limpieza",
+            label: "Calendario",
             route: "/control/cleaning",
         },
         {
@@ -67,9 +67,9 @@ export function useNavigation() {
             label: "Finanzas",
             children: [
                 {
-                    id: "cuentas",
+                    id: "nomeclatura",
                     icon: "fa-solid fa-wallet",
-                    label: "Cuentas",
+                    label: "Nomeclatura",
                     route: "/control/finance/accounts",
                 },
                 {
@@ -87,21 +87,21 @@ export function useNavigation() {
             children: [
                 {
                     id: "Asistencia_General",
-                    icon: "fas fa-list",
-                    label: "Asistencia General",
-                    route: "/contro/assists/general_assists",
+                    icon: "fas fa-users",
+                    label: "Familias",
+                    route: "/control/assists/family",
                 },
                 {
                     id: "Assitencia_Individual",
-                    icon: "fas fa-user-plus",
-                    label: "Asistencia Individual",
-                    route: "/control/assists/individual_assists",
+                    icon: "fas fa-user-check",
+                    label: "Asistencia",
+                    route: "/control/assists/general_assists",
                 },
                 {
                     id: "Eventos",
-                    icon: "fas fa-file-alt",
-                    label: "Eventos",
-                    route: "/control/assists/events",
+                    icon: "fas fa-clock",
+                    label: "Horarios",
+                    route: "/control/assists/hours",
                 },
             ],
         },

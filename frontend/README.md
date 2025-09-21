@@ -7,8 +7,6 @@ color de logo : #cf3476
 
 * cobro
 
-
-
 Terminar DTOs y endpoints críticos (auth, users, tenants).
 
 Conectar el frontend con hooks y probar que los endpoints funcionan correctamente.
@@ -18,7 +16,8 @@ Activar AuthGuard en backend para proteger rutas.
 Añadir RolesGuard y decorators para RBAC.
 
 Ajustar frontend para mostrar/ocultar módulos y botones según rol y tenant.
-* com.
+
+- com.
 
 ```bash
 npm run dev

@@ -41,7 +41,7 @@ const General_Assists = () => {
         <div className="flex flex-col w-full h-full p-6 bg-base-100 ">
             {/* Controles superiores */}
             <h2 className="text-center text-xl font-bold">
-                Listado de Asistencias General
+                Listado de Asistencias
             </h2>
             <Link
                 href={"/control"}
@@ -86,7 +86,7 @@ const General_Assists = () => {
             {/* Tabla */}
             <div className="overflow-x-auto rounded-box border border-base-content/5 md:mt-5 bg-base-100 ">
                 <table className="table table-zebra  text-sm items-center justify-center ">
-                    <thead className="bg-base-300 text-center">
+                    <thead className="bg-base-300">
                         <tr>
                             <th>ID</th>
                             <th>Evento</th>
