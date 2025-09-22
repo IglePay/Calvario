@@ -35,6 +35,13 @@ const Family = () => {
         cantidadfamilia: "",
     })
 
+    // filtrar
+    const filteredFamilies = families
+        .filter((f) => f && f.nombreFamilia) //  solo elementos válidos
+        .filter((f) =>
+            f.nombreFamilia.toLowerCase().includes(search.toLowerCase()),
+        )
+
     const handleSave = async () => {
         const values = {
             nombreFamilia: nombre,
@@ -80,13 +87,6 @@ const Family = () => {
             deleteFamily(id).catch((err) => alert("Error al eliminar"))
         }
     }
-
-    // filtrar
-    const filteredFamilies = families
-        .filter((f) => f && f.nombreFamilia) //  solo elementos válidos
-        .filter((f) =>
-            f.nombreFamilia.toLowerCase().includes(search.toLowerCase()),
-        )
 
     const exportData = filteredFamilies.map((f) => ({
         ID: f.idfamilia,

@@ -1,160 +1,221 @@
 "use client"
 import { useState } from "react"
 import Link from "next/link"
+import * as Yup from "yup"
+import Modal from "@/components/ModalGeneral"
+import { validateForm } from "@/utils/validator"
+import { useServices } from "../../../../hooks/servicios/useServices"
+import { exportToExcel, exportToPDF } from "@/utils/exportData"
 
-const initialEvents = [
-    { id: 1, HoraEvento: "Domingo 9:00 AM", descripcion: "Devocional" },
-    { id: 2, HoraEvento: "Domingo 7:00 PM", descripcion: "Noche de Jóvenes" },
-]
+// Schema de validación
+const serviceSchema = Yup.object().shape({
+    horario: Yup.string().required("Horario requerido"),
+    descripcion: Yup.string().required("Descripción requerida"),
+})
 
 const Hours = () => {
-    const [events, setEvents] = useState(initialEvents)
+    const { services, loading, createService, updateService, deleteService } =
+        useServices()
+
     const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [searchQuery, setSearchQuery] = useState("")
+    const [search, setSearch] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
 
     // Campos del formulario
     const [horaEvento, setHoraEvento] = useState("")
     const [descripcion, setDescripcion] = useState("")
+    const [editingId, setEditingId] = useState(null)
+    const [errors, setErrors] = useState({})
 
-    // Filtrar eventos según búsqueda
-    const filteredEvents = events.filter((event) =>
-        Object.values(event)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-    )
+    // Filtrar servicios según búsqueda
+    const filteredServices = services
+        .filter((s) =>
+            Object.values(s)
+                .join(" ")
+                .toLowerCase()
+                .includes(search.toLowerCase()),
+        )
+        .slice(0, rowsPerPage)
 
-    // Guardar nuevo evento
-    const handleAddEvent = () => {
-        if (!horaEvento || !descripcion) return
-        const newEvent = {
-            id: events.length + 1,
-            HoraEvento: horaEvento,
-            descripcion,
+    // Guardar o actualizar servicio
+    const handleSave = async () => {
+        const values = { horario: horaEvento, descripcion }
+        const validationErrors = await validateForm(serviceSchema, values)
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors)
+            return
         }
-        setEvents([...events, newEvent])
-        setHoraEvento("")
-        setDescripcion("")
-        setModalOpen(false)
+
+        try {
+            if (editingId) {
+                await updateService(editingId, values)
+                setEditingId(null)
+            } else {
+                await createService(horaEvento, descripcion)
+            }
+
+            setHoraEvento("")
+            setDescripcion("")
+            setErrors({})
+            setModalOpen(false)
+        } catch (err) {
+            console.error("Error al guardar servicio:", err)
+        }
     }
 
+    const handleEdit = (service) => {
+        setEditingId(service.idservicio)
+        setHoraEvento(service.horario)
+        setDescripcion(service.descripcion)
+        setErrors({})
+        setModalOpen(true)
+    }
+
+    const handleDelete = async (id) => {
+        if (!confirm("¿Seguro quieres eliminar este servicio?")) return
+        try {
+            await deleteService(id)
+        } catch (err) {
+            console.error("Error al eliminar servicio:", err)
+        }
+    }
+
+    const exportData = filteredServices.map((s) => ({
+        ID: s.idservicio,
+        "Horario de Servicios": s.horario,
+        Descripcion: s.descripcion,
+    }))
+
     return (
-        <div className="flex flex-col w-full h-full p-6 bg-base-100 ">
-            {/* Controles superiores */}
-            <h2 className="text-center text-xl font-bold">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
+            <h2 className="text-2xl font-bold">
                 Listado de Horarios de Servicios
             </h2>
-            <Link
-                href={"/control"}
-                className="btn btn-primary btn-sm mt-4 w-24 rounded-xl">
-                <span>Regresar</span>
-            </Link>
-            <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2 mt-5 ">
-                <div className="flex gap-2 flex-wrap">
+
+            {/* Botones */}
+            <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2 mt-5">
+                <div className="flex gap-2 mt-2">
+                    <Link href={"/control"} className="btn btn-primary btn-sm">
+                        Regresar
+                    </Link>
                     <button
                         className="btn btn-accent btn-sm"
-                        onClick={() => setModalOpen(true)}>
+                        onClick={() => {
+                            setEditingId(null)
+                            setHoraEvento("")
+                            setDescripcion("")
+                            setErrors({})
+                            setModalOpen(true)
+                        }}>
                         <i className="fas fa-plus mr-1"></i> Agregar
                     </button>
-                    <button className="btn btn-secondary btn-sm">
+                    <button
+                        onClick={() =>
+                            exportToExcel(exportData, "HorarioServicio.xlsx")
+                        }
+                        className="btn btn-secondary btn-sm">
                         <i className="fas fa-file-excel mr-1"></i> Excel
                     </button>
-                    <button className="btn btn-warning btn-sm">
-                        <i className="fas fa-print mr-1"></i> Imprimir
+                    <button
+                        onClick={() =>
+                            exportToPDF(exportData, "HorarioServicio.pdf")
+                        }
+                        className="btn bg-rose-800 text-white btn-sm">
+                        <i className="fas fa-print mr-1"></i> PDF
                     </button>
-                </div>
-
-                <div className="flex flex-col md:flex-row items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="Buscar por hora o descripción"
-                        className="input input-sm input-bordered w-full md:w-70"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <select
-                        value={rowsPerPage}
-                        onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                        className="select select-sm w-30">
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={events.length}>Todos</option>
-                    </select>
                 </div>
             </div>
 
+            {/* Filtros */}
+            <div className="flex flex-col md:flex-row items-center gap-2 mt-4 w-full max-w-6xl">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar servicio"
+                    className="input input-sm input-bordered w-full md:flex-1"
+                />
+                <select
+                    value={rowsPerPage}
+                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                    className="select select-sm w-36">
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                </select>
+            </div>
+
             {/* Tabla */}
-            <div className="overflow-x-auto rounded-box border border-base-content/5 ">
+            <div className="overflow-x-auto rounded-box border border-base-content/5 mt-5 w-full max-w-6xl">
                 <table className="table table-zebra w-full text-sm text-center">
                     <thead className="bg-base-300">
                         <tr>
                             <th>ID</th>
-                            <th>Hora</th>
+                            <th>Horario</th>
                             <th>Descripción</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredEvents.slice(0, rowsPerPage).map((event) => (
-                            <tr key={event.id}>
-                                <td>{event.id}</td>
-                                <td>{event.HoraEvento}</td>
-                                <td>{event.descripcion}</td>
-                                <td className="flex gap-2 justify-center">
-                                    <button className="btn btn-info btn-xs">
-                                        <i className="fas fa-eye"></i>
-                                    </button>
-                                    <button className="btn btn-warning btn-xs">
-                                        <i className="fas fa-edit"></i>
-                                    </button>
-                                    <button className="btn btn-error btn-xs">
-                                        <i className="fas fa-trash"></i>
-                                    </button>
-                                </td>
+                        {loading ? (
+                            <tr>
+                                <td colSpan={4}>Cargando...</td>
                             </tr>
-                        ))}
+                        ) : (
+                            filteredServices.map((service) => (
+                                <tr key={service.idservicio}>
+                                    <td>{service.idservicio}</td>
+                                    <td>{service.horario}</td>
+                                    <td>{service.descripcion}</td>
+                                    <td className="flex gap-2 justify-center">
+                                        <button
+                                            className="btn btn-warning btn-xs"
+                                            onClick={() => handleEdit(service)}>
+                                            <i className="fas fa-edit"></i>
+                                        </button>
+                                        <button
+                                            className="btn btn-error btn-xs"
+                                            onClick={() =>
+                                                handleDelete(service.idservicio)
+                                            }>
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Modal */}
-            {modalOpen && (
-                <div className="modal modal-open">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-lg">Agregar Evento</h3>
-                        <div className="mt-4 flex flex-col gap-3">
-                            <input
-                                type="text"
-                                value={horaEvento}
-                                onChange={(e) => setHoraEvento(e.target.value)}
-                                placeholder="Hora del evento"
-                                className="input input-bordered w-full"
-                            />
-                            <input
-                                type="text"
-                                value={descripcion}
-                                onChange={(e) => setDescripcion(e.target.value)}
-                                placeholder="Descripción"
-                                className="input input-bordered w-full"
-                            />
-                        </div>
-                        <div className="modal-action">
-                            <button
-                                onClick={() => setModalOpen(false)}
-                                className="btn btn-ghost">
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleAddEvent}
-                                className="btn btn-primary">
-                                Guardar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Modal usando componente ModalGeneral */}
+            <Modal
+                title={editingId ? "Editar Servicio" : "Agregar Servicio"}
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSave}>
+                <input
+                    type="text"
+                    value={horaEvento}
+                    onChange={(e) => setHoraEvento(e.target.value)}
+                    placeholder="Horario 06:00 AM"
+                    className="input input-bordered w-full"
+                />
+                {errors.horario && (
+                    <p className="text-red-500 text-sm">{errors.horario}</p>
+                )}
+
+                <input
+                    type="text"
+                    value={descripcion}
+                    onChange={(e) => setDescripcion(e.target.value)}
+                    placeholder="Descripción"
+                    className="input input-bordered w-full"
+                />
+                {errors.descripcion && (
+                    <p className="text-red-500 text-sm">{errors.descripcion}</p>
+                )}
+            </Modal>
         </div>
     )
 }

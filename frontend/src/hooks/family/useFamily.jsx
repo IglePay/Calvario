@@ -84,6 +84,5 @@ export const useFamilies = () => {
         createFamily,
         updateFamily,
         deleteFamily,
-        deleteFamily,
     }
 }
