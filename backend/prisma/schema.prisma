@@ -50,6 +50,9 @@ model tb_tenants {
   actividades tb_actividad[]
   bautizados tb_bautizados[]
   servidores tb_servidores[]
+  familia tb_familias[]
+  servicios tb_servicios[]
+  asistencia tb_asistencia[]
 
   @@map("tb_tenants")
 }
@@ -123,6 +126,24 @@ model tb_servidores {
   @@map("tb_servidores")
 }
 
+//========tb_familia======
+model tb_familias {
+  idfamilia       Int          @id @default(autoincrement())
+  tenantId        Int
+  nombreFamilia   String       @db.VarChar(100)
+  cantidadfamilia Int?         @default(0)
+  fechaCreacion   DateTime     @default(now()) @db.Timestamp(0)
+
+  // Relaciones
+  tenant      tb_tenants   @relation(fields: [tenantId], references: [id_tenant], onDelete: Cascade, onUpdate: Restrict, map: "fk_familia_tenant")
+  asistencias tb_asistencia[]
+
+  familiaMiembros tb_familia_miembro[] @relation("FamiliaToMiembros")
+
+
+  @@index([tenantId], map: "fk_familia_tenant")
+  @@map("tb_familias")
+}
 //=========tb_miembros=========
 model tb_miembros {
   idMiembro         Int       @id @default(autoincrement())
@@ -137,15 +158,14 @@ model tb_miembros {
   direccion         String?   @db.VarChar(255)
   idEstado          Int?
   fechaLlegada      DateTime? @db.Date
-  fechaBautismo    DateTime? @db.Date
+  fechaBautismo     DateTime? @db.Date
   procesosterminado String?   @db.VarChar(255)
   idGrupo           Int?
   legusta           String?   @db.Text
   fechaCreacion     DateTime  @default(now()) @db.Timestamp(0)
 
-  // Relaciones FKs
-  idBautizado       Int?      // FK a tb_bautizados
-  idServidor        Int?      // FK a tb_servidores
+  idBautizado Int?
+  idServidor  Int?
 
   // Relaciones
   tenant        tb_tenants      @relation(fields: [tenantId], references: [id_tenant], map: "fk_miembro_tenant")
@@ -159,14 +179,26 @@ model tb_miembros {
   limpiezas     tb_limpieza[]
   actividades   tb_actividad[]
 
+  familiaMiembros tb_familia_miembro[] @relation("MiembroToFamilias")
+
+
   @@index([tenantId], map: "fk_miembro_tenant")
   @@index([idGenero], map: "fk_miembro_genero")
   @@index([idEstado], map: "fk_miembro_estado")
   @@index([idGrupo], map: "fk_miembro_grupo")
   @@map("tb_miembros")
 }
+//=========tb_familia_miembro========
+model tb_familia_miembro {
+  idfamilia Int
+  idMiembro Int
 
+  familia tb_familias @relation("FamiliaToMiembros", fields: [idfamilia], references: [idfamilia], onDelete: Cascade, map: "fk_familia_miembro_familia")
+  miembro  tb_miembros @relation("MiembroToFamilias", fields: [idMiembro], references: [idMiembro], onDelete: Cascade, map: "fk_familia_miembro_miembro")
 
+  @@id([idfamilia, idMiembro])
+  @@map("tb_familia_miembro")
+}
 //=============miembroGrupo muchos a muchos===========
 model tb_miembrogrupo {
   idMiembro   Int
@@ -212,4 +244,39 @@ model tb_actividad {
   grupo         tb_grupo?    @relation(fields: [idGrupo], references: [idGrupo], onDelete: SetNull)
 
   @@map("tb_actividades")
+}
+//======tb_servicios=======
+model tb_servicios {
+  idservicio    Int       @id @default(autoincrement())
+  tenantId      Int
+  horario       String    @db.VarChar(50)
+  descripcion   String?   @db.VarChar(150)
+  fechaCreacion DateTime  @default(now()) @db.Timestamp(0)
+
+  // Relaciones
+  tenant      tb_tenants   @relation(fields: [tenantId], references: [id_tenant], onDelete: Cascade, onUpdate: Restrict, map: "fk_servicio_tenant")
+  asistencias tb_asistencia[]
+
+
+  @@index([tenantId], map: "fk_servicio_tenant")
+  @@map("tb_servicios")
+}
+//==========tb_asistencia=======
+model tb_asistencia {
+  idasistencia        Int       @id @default(autoincrement())
+  tenantId            Int
+  idfamilia           Int
+  idservicio          Int
+  cantidad_asistentes Int
+  fechaRegistro       DateTime  @default(now()) @db.Timestamp(0)
+
+  // Relaciones
+  tenant   tb_tenants   @relation(fields: [tenantId], references: [id_tenant], onDelete: Cascade, onUpdate: Restrict, map: "fk_asistencia_tenant")
+  familia  tb_familias  @relation(fields: [idfamilia], references: [idfamilia], onDelete: Cascade, onUpdate: Restrict, map: "fk_asistencia_familia")
+  servicio tb_servicios @relation(fields: [idservicio], references: [idservicio], onDelete: Cascade, onUpdate: Restrict, map: "fk_asistencia_servicio")
+
+  @@index([tenantId], map: "fk_asistencia_tenant")
+  @@index([idfamilia], map: "fk_asistencia_familia")
+  @@index([idservicio], map: "fk_asistencia_servicio")
+  @@map("tb_asistencia")
 }
