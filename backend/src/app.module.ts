@@ -13,6 +13,7 @@ import { LimpiezaModule } from './limpieza/limpieza.module';
 import { ActividadModule } from './actividades/actividad.module';
 import { ColaboradorModule } from './colaborador/colaborador.module';
 import { FamilyModule } from './family/family.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Global()
 @Module({
@@ -35,6 +36,7 @@ import { FamilyModule } from './family/family.module';
         ActividadModule,
         ColaboradorModule,
         FamilyModule,
+        ScheduleModule,
     ],
     controllers: [],
     providers: [PrismaService],
