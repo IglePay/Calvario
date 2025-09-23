@@ -14,6 +14,7 @@ import { ActividadModule } from './actividades/actividad.module';
 import { ColaboradorModule } from './colaborador/colaborador.module';
 import { FamilyModule } from './family/family.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { AsistenciaModule } from './asistencia/asistencia.module';
 
 @Global()
 @Module({
@@ -37,6 +38,7 @@ import { ScheduleModule } from './schedule/schedule.module';
         ColaboradorModule,
         FamilyModule,
         ScheduleModule,
+        AsistenciaModule,
     ],
     controllers: [],
     providers: [PrismaService],
