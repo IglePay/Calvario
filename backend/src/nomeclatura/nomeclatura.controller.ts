@@ -34,6 +34,12 @@ export class NomeclaturaController {
         );
     }
 
+    @Get('simple')
+    findSimple(@Req() req: any) {
+        const tenantId = req.user.tenantId;
+        return this.nomeclaturaService.findSimple(tenantId);
+    }
+
     @Post()
     create(@Req() req: any, @Body() dto: CreateNomeclaturaDto) {
         const tenantId = req.user.tenantId;

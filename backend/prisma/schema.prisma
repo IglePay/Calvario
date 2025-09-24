@@ -312,6 +312,7 @@ model tb_operacion {
   descripcion    String    @db.VarChar(150)
   monto          Decimal   @db.Decimal(12, 2)
   fechaCreacion  DateTime  @default(now()) @db.Timestamp(0)
+  isDeleted      Boolean   @default(false)
 
   tenant      tb_tenants    @relation(fields: [tenantId], references: [id_tenant])
   nomeclatura tb_nomeclatura @relation(fields: [idnomeclatura], references: [idnomeclatura])

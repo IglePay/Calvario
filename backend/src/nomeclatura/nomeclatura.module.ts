@@ -7,7 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
     imports: [AuthModule],
     controllers: [NomeclaturaController],
-    providers: [NomeclaturaService],
+    providers: [NomeclaturaService, PrismaService],
     exports: [NomeclaturaService],
 })
 export class NomeclaturaModule {}

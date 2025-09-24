@@ -56,6 +56,19 @@ export class NomeclaturaService {
         };
     }
 
+    // para modulo de fondos obtner los nombres
+    async findSimple(tenantId: number) {
+        return this.prisma.tb_nomeclatura.findMany({
+            where: { tenantId },
+            orderBy: { codigo: 'asc' },
+            select: {
+                idnomeclatura: true,
+                nombre: true,
+                tenantId: true,
+            },
+        });
+    }
+
     async update(id: number, tenantId: number, dto: UpdateNomeclaturaDto) {
         try {
             return await this.prisma.tb_nomeclatura.update({
