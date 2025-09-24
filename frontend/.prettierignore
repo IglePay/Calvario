@@ -1,2 +1,15 @@
 pnpm-lock.yaml
 flake.lock
+# Imágenes
+*.png
+*.jpg
+*.jpeg
+*.ico
+
+# SVGs si no quieres que los formatee
+*.svg
+
+# Archivos generados
+sitemap*.xml
+sw.js
+workbox-*.js
