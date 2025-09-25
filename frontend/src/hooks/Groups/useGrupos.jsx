@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
+import { useAuthContext } from "@/context/AuthContext"
 
 export function useGrupos() {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
 
     const [grupos, setGrupos] = useState([])
     const [loading, setLoading] = useState(false)
@@ -12,24 +12,28 @@ export function useGrupos() {
 
     //  Obtener todos los grupos
     const fetchGrupos = () => {
+        if (!user) return Promise.resolve() // si no hay user, no hace nada
+
         setLoading(true)
         setError(null)
 
-        apiFetch("/grupos", { method: "GET" })
+        return apiFetch("/grupos", { method: "GET" })
             .then((res) => {
                 if (!res.ok) throw new Error("Error al cargar los grupos")
                 return res.json()
             })
-            .then((data) => setGrupos(data))
+            .then((data) =>
+                setGrupos(Array.isArray(data) ? data : data.data || []),
+            )
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false))
     }
 
     //  Crear grupo
     const createGrupo = (grupo) => {
-        setError(null)
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
-        apiFetch("/grupos", {
+        return apiFetch("/grupos", {
             method: "POST",
             body: JSON.stringify(grupo),
         })
@@ -42,10 +46,10 @@ export function useGrupos() {
 
     //  Actualizar grupo
     const updateGrupo = (idGrupo, grupo) => {
-        setError(null)
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
-        apiFetch(`/grupos/${idGrupo}`, {
-            method: "PATCH", // PATCH es más apropiado que PUT si solo actualizas nombre
+        return apiFetch(`/grupos/${idGrupo}`, {
+            method: "PATCH",
             body: JSON.stringify(grupo),
         })
             .then((res) => {
@@ -57,9 +61,9 @@ export function useGrupos() {
 
     //  Eliminar grupo
     const deleteGrupo = (idGrupo) => {
-        setError(null)
+        if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
-        apiFetch(`/grupos/${idGrupo}`, { method: "DELETE" })
+        return apiFetch(`/grupos/${idGrupo}`, { method: "DELETE" })
             .then((res) => {
                 if (!res.ok) throw new Error("Error al eliminar grupo")
                 return fetchGrupos()
@@ -67,9 +71,10 @@ export function useGrupos() {
             .catch((err) => setError(err.message))
     }
 
+    //  Fetch inicial solo si hay user
     useEffect(() => {
-        fetchGrupos()
-    }, [])
+        if (user) fetchGrupos()
+    }, [user])
 
     return {
         grupos,

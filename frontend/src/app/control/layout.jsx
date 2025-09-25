@@ -16,8 +16,8 @@ export default function ControlLayout({ children }) {
 
     if (loading || !user) {
         return (
-            <div className="flex items-center justify-center h-screen">
-                Cargando...
+            <div className="flex items-center justify-center h-screen accent-base-300">
+                Cargando sistema...
             </div>
         )
     }

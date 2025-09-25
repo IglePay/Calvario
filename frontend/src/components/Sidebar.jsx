@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useMembers } from "@/hooks/members/useMembers"
 import MembersModal from "@/app/control/memebers/components/MembersModal"
 import { useAuthContext } from "@/context/AuthContext"
+import { apiFetch } from "@/utils/apiFetch"
 
 export default function Sidebar({ isOpen, onClose }) {
     const router = useRouter()

@@ -1,10 +1,10 @@
 "use client"
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
+import { useAuthContext } from "@/context/AuthContext"
 
 export function useUsers() {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)

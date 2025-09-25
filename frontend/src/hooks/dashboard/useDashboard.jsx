@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
 import { useAuthContext } from "@/context/AuthContext"
 
 export const useDashboard = () => {

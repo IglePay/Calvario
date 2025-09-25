@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
 import moment from "moment"
+import { useAuthContext } from "@/context/AuthContext"
 
 export const useCleaning = () => {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
 
     const [events, setEvents] = useState([])
     const [miembros, setMiembros] = useState([])

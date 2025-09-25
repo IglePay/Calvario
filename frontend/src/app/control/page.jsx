@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation"
 import Sidebar from "../../components/Sidebar.jsx"
 import TopNavigation from "../../components/Top-navigation.jsx"
 import Dashboard from "../../components/Dashboard.jsx"
-import { useAuthContext } from "@/context/AuthContext.jsx"
+import { useAuthContext } from "@/context/AuthContext"
 
 export default function Control() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [activeSection, setActiveSection] = useState("escritorio")
     const router = useRouter()
 
-    // ✅ Usamos el contexto en lugar del hook directo
-    const { user, loading, error } = useAuthContext()
+    //  Usamos el contexto en lugar del hook directo
+    const { user, loading } = useAuthContext()
 
     // Redirigir si no hay usuario
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function Control() {
                     onMenuClick={() => setSidebarOpen(true)}
                     activeSection={activeSection}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 ">
                     {activeSection === "escritorio" && <Dashboard />}
                     {activeSection !== "escritorio" && (
                         <div className="flex items-center justify-center h-full">

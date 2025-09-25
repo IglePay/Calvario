@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
+import { useAuthContext } from "@/context/AuthContext"
 
 export function useCollaborator() {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
     const [collaborators, setCollaborators] = useState([])
     const [roles, setRoles] = useState([])
     const [loading, setLoading] = useState(true)

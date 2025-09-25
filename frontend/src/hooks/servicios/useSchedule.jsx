@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../auth/useAuth"
+import { useAuthContext } from "@/context/AuthContext"
 
 export const useServices = () => {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
     const [services, setServices] = useState([])
     const [loading, setLoading] = useState(false)
 
