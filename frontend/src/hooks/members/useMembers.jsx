@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/utils/apiFetch"
-import { useAuth } from "../../hooks/auth/useAuth"
+import { useAuthContext } from "@/context/AuthContext"
 
 export function useMembers() {
-    const { user } = useAuth()
+    const { user } = useAuthContext()
     const [members, setMembers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [loadingSelectors, setLoadingSelectors] = useState(true)
 
     const [grupos, setGrupos] = useState([])
     const [generos, setGeneros] = useState([])
@@ -43,6 +44,7 @@ export function useMembers() {
             .finally(() => setLoading(false))
     }
 
+    // 🔹 Crear miembro
     const createMember = (member) => {
         if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
@@ -82,6 +84,7 @@ export function useMembers() {
             .catch((e) => setError(e.message || "Error desconocido"))
     }
 
+    // 🔹 Actualizar miembro
     const updateMember = (id, member) => {
         if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
@@ -121,6 +124,7 @@ export function useMembers() {
             .catch((e) => setError(e.message || "Error desconocido"))
     }
 
+    // 🔹 Eliminar miembro
     const deleteMember = (id) => {
         if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
@@ -132,51 +136,48 @@ export function useMembers() {
             .catch((e) => setError(e.message || "Error desconocido"))
     }
 
+    // 🔹 Fetch inicial
     useEffect(() => {
+        if (!user) return
+
         fetchMembers()
 
-        // 🔹 Traer selectores
-        apiFetch("/grupos")
-            .then((res) => res.json())
-            .then((data) =>
-                setGrupos(Array.isArray(data) ? data : data.data || []),
-            )
+        setLoadingSelectors(true)
+        Promise.all([
+            apiFetch("/grupos")
+                .then((res) => res.json())
+                .then((data) =>
+                    setGrupos(Array.isArray(data) ? data : data.data || []),
+                ),
+            apiFetch("/genero")
+                .then((res) => res.json())
+                .then((data) =>
+                    setGeneros(Array.isArray(data) ? data : data.data || []),
+                ),
+            apiFetch("/estado-civil")
+                .then((res) => res.json())
+                .then((data) =>
+                    setEstados(Array.isArray(data) ? data : data.data || []),
+                ),
+            apiFetch("/miembros/bautizados")
+                .then((res) => res.json())
+                .then((data) =>
+                    setBautizados(Array.isArray(data) ? data : data.data || []),
+                ),
+            apiFetch("/miembros/servidores")
+                .then((res) => res.json())
+                .then((data) =>
+                    setServidores(Array.isArray(data) ? data : data.data || []),
+                ),
+        ])
             .catch(console.error)
-
-        apiFetch("/genero")
-            .then((res) => res.json())
-            .then((data) =>
-                setGeneros(Array.isArray(data) ? data : data.data || []),
-            )
-            .catch(console.error)
-
-        apiFetch("/estado-civil")
-            .then((res) => res.json())
-            .then((data) =>
-                setEstados(Array.isArray(data) ? data : data.data || []),
-            )
-            .catch(console.error)
-
-        // 🔹 Bautizados
-        apiFetch("/miembros/bautizados")
-            .then((res) => res.json())
-            .then((data) =>
-                setBautizados(Array.isArray(data) ? data : data.data || []),
-            )
-            .catch(console.error)
-
-        // 🔹 Servidores
-        apiFetch("/miembros/servidores")
-            .then((res) => res.json())
-            .then((data) =>
-                setServidores(Array.isArray(data) ? data : data.data || []),
-            )
-            .catch(console.error)
+            .finally(() => setLoadingSelectors(false))
     }, [user])
 
     return {
         members,
         loading,
+        loadingSelectors,
         error,
         fetchMembers,
         createMember,

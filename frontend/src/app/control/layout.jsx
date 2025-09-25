@@ -1,35 +1,26 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useAuthContext } from "@/context/AuthContext"
 
 export default function ControlLayout({ children }) {
+    const { user, loading } = useAuthContext()
     const router = useRouter()
-    const [loading, setLoading] = useState(true)
 
+    // Si no hay usuario, redirige al login
     useEffect(() => {
-        async function checkUser() {
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-                    {
-                        credentials: "include",
-                    },
-                )
-                if (!res.ok) throw new Error("No autorizado")
-                setLoading(false)
-            } catch (err) {
-                router.replace("/login")
-            }
+        if (!loading && !user) {
+            router.replace("/login")
         }
-        checkUser()
-    }, [router])
+    }, [loading, user, router])
 
-    if (loading)
+    if (loading || !user) {
         return (
             <div className="flex items-center justify-center h-screen">
                 Cargando...
             </div>
         )
+    }
 
     return children
 }

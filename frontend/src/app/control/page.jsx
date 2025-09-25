@@ -4,42 +4,24 @@ import { useRouter } from "next/navigation"
 import Sidebar from "../../components/Sidebar.jsx"
 import TopNavigation from "../../components/Top-navigation.jsx"
 import Dashboard from "../../components/Dashboard.jsx"
-import { useNavigation } from "../../hooks/use-navigation.jsx"
+import { useAuthContext } from "@/context/AuthContext.jsx"
 
 export default function Control() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState(null)
-    const navigation = useNavigation()
+    const [activeSection, setActiveSection] = useState("escritorio")
     const router = useRouter()
 
+    // ✅ Usamos el contexto en lugar del hook directo
+    const { user, loading, error } = useAuthContext()
+
+    // Redirigir si no hay usuario
     useEffect(() => {
-        async function checkUser() {
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-                    {
-                        credentials: "include",
-                    },
-                )
-
-                if (!res.ok) {
-                    router.replace("/login")
-                    return
-                }
-
-                const data = await res.json()
-                setUser(data)
-                setLoading(false)
-            } catch (err) {
-                router.replace("/login")
-            }
+        if (!loading && !user) {
+            router.replace("/login")
         }
+    }, [loading, user, router])
 
-        checkUser()
-    }, [router])
-
-    if (loading) {
+    if (loading || !user) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <p>Cargando...</p>
@@ -52,27 +34,23 @@ export default function Control() {
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
-                navigation={navigation}
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+                user={user} // viene del contexto
             />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <TopNavigation
                     onMenuClick={() => setSidebarOpen(true)}
-                    navigation={navigation}
+                    activeSection={activeSection}
                 />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto  p-4 md:p-6">
-                    {navigation.activeSection === "escritorio" && <Dashboard />}
-                    {navigation.activeSection !== "escritorio" && (
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+                    {activeSection === "escritorio" && <Dashboard />}
+                    {activeSection !== "escritorio" && (
                         <div className="flex items-center justify-center h-full">
                             <div className="text-center">
                                 <i className="fas fa-construction text-6xl text-gray-400 mb-4"></i>
                                 <h2 className="text-2xl font-bold text-gray-600 mb-2">
-                                    {
-                                        navigation.menuItems.find(
-                                            (item) =>
-                                                item.id ===
-                                                navigation.activeSection,
-                                        )?.label
-                                    }
+                                    {activeSection}
                                 </h2>
                                 <p className="text-gray-500">
                                     Esta sección está en construcción

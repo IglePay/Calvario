@@ -1,39 +1,146 @@
 "use client"
 
 import Image from "next/image"
-import { useState, useEffect } from "react"
-import { apiFetch } from "@/utils/apiFetch"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useMembers } from "@/hooks/members/useMembers"
 import MembersModal from "@/app/control/memebers/components/MembersModal"
+import { useAuthContext } from "@/context/AuthContext"
 
-export default function Sidebar({ isOpen, onClose, navigation }) {
-    const {
-        menuItems,
-        activeSection,
-        handleNavigation,
-        openModal,
-        setOpenModal,
-    } = navigation
+export default function Sidebar({ isOpen, onClose }) {
+    const router = useRouter()
+    const [activeSection, setActiveSection] = useState("escritorio")
+    const [openModal, setOpenModal] = useState(null)
     const [openMenu, setOpenMenu] = useState(null)
-    const [user, setUser] = useState(null)
+
+    // Usamos useAuth en lugar de fetch manual
+    const { user, loading } = useAuthContext()
 
     const { createMember, grupos, generos, estados, bautizados, servidores } =
         useMembers()
 
-    const toggleSubmenu = (id) => {
-        setOpenMenu(openMenu === id ? null : id)
+    // Menú
+    const menuItems = [
+        { id: "escritorio", icon: "fas fa-desktop", label: "Escritorio" },
+        {
+            id: "miembros",
+            icon: "fas fa-users",
+            label: "Miembros",
+            children: [
+                {
+                    id: "miembros-lista",
+                    icon: "fas fa-list",
+                    label: "Listado Miembros",
+                    route: "/control/memebers/persons",
+                },
+                {
+                    id: "miembros-agregar",
+                    icon: "fas fa-user-plus",
+                    label: "Agregar",
+                    action: "openMemberModal",
+                },
+            ],
+        },
+        {
+            id: "actividades",
+            icon: "fa fa-solid fa-broom",
+            label: "Actividades",
+            route: "/control/activities",
+        },
+        {
+            id: "limpieza",
+            icon: "fas fa-calendar-alt",
+            label: "Calendario",
+            route: "/control/cleaning",
+        },
+        {
+            id: "usuarios",
+            icon: "fas fa-user",
+            label: "Colaborador",
+            route: "/control/collaborator",
+        },
+        {
+            id: "grupos",
+            icon: "fas fa-users-cog",
+            label: "Grupos",
+            route: "/control/groups",
+        },
+        {
+            id: "finanzas",
+            icon: "fas fa-dollar-sign",
+            label: "Finanzas",
+            children: [
+                {
+                    id: "nomeclatura",
+                    icon: "fa-solid fa-wallet",
+                    label: "Nomeclatura",
+                    route: "/control/finance/accounts",
+                },
+                {
+                    id: "fondos",
+                    icon: "fa-solid fa-piggy-bank",
+                    label: "Fondos",
+                    route: "/control/finance/funds",
+                },
+            ],
+        },
+        {
+            id: "asistencias",
+            icon: "fas fa-clipboard-check",
+            label: "Asistencias",
+            children: [
+                {
+                    id: "Asistencia_General",
+                    icon: "fas fa-users",
+                    label: "Familias",
+                    route: "/control/attendance/family",
+                },
+                {
+                    id: "Assitencia_Individual",
+                    icon: "fas fa-user-check",
+                    label: "Asistencia",
+                    route: "/control/attendance/generalAssistance",
+                },
+                {
+                    id: "Eventos",
+                    icon: "fas fa-clock",
+                    label: "Horarios",
+                    route: "/control/attendance/hours",
+                },
+            ],
+        },
+        {
+            id: "Ajustes",
+            icon: "fas fa-cog",
+            label: "Ajustes",
+            children: [
+                {
+                    id: "Perfil",
+                    icon: "fas fa-user-cog",
+                    label: "Perfil",
+                    route: "/control/settings/profile",
+                },
+                {
+                    id: "Preferencias",
+                    icon: "fas fa-sliders-h",
+                    label: "Datos de la Iglesia",
+                    route: "/control/settings/church_data",
+                },
+            ],
+        },
+    ]
+
+    // Funciones
+    const handleNavigation = (section) => {
+        setActiveSection(section.id)
+        if (section.route) {
+            router.push(section.route)
+        } else if (section.action === "openMemberModal") {
+            setOpenModal("member")
+        }
     }
 
-    // Obtener info del usuario logueado
-    useEffect(() => {
-        apiFetch("/auth/me")
-            .then((res) => {
-                if (!res.ok) throw new Error("No autorizado")
-                return res.json()
-            })
-            .then((data) => setUser(data))
-            .catch(() => setUser(null))
-    }, [])
+    const toggleSubmenu = (id) => setOpenMenu(openMenu === id ? null : id)
 
     const handleLogout = () => {
         apiFetch("/auth/logout", { method: "POST" }).then(() => {
@@ -44,7 +151,16 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
 
     const handleSubmit = async (data) => {
         await createMember(data)
-        setOpenModal(null) // cerrar modal después de guardar
+        setOpenModal(null)
+    }
+
+    if (loading) {
+        // Mientras carga el usuario, puedes mostrar un placeholder
+        return (
+            <div className="bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 flex items-center justify-center">
+                <i className="fas fa-spinner fa-spin text-2xl"></i>
+            </div>
+        )
     }
 
     return (
@@ -56,11 +172,7 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
             )}
 
             <div
-                className={`bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${
-                    isOpen
-                        ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
-                }`}>
+                className={`bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
                 {/* Header */}
                 <div className="p-4 border-b border-gray-700 flex flex-col items-center justify-center space-y-2">
                     <Image
@@ -91,27 +203,18 @@ export default function Sidebar({ isOpen, onClose, navigation }) {
                         <div key={item.id}>
                             <button
                                 onClick={() => {
-                                    if (item.children) {
-                                        toggleSubmenu(item.id)
-                                    } else {
+                                    if (item.children) toggleSubmenu(item.id)
+                                    else {
                                         handleNavigation(item)
                                         onClose()
                                     }
                                 }}
-                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${
-                                    activeSection === item.id
-                                        ? "bg-gray-900 border-r-4 border-r-rose-400"
-                                        : ""
-                                }`}>
+                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${activeSection === item.id ? "bg-gray-900 border-r-4 border-r-rose-400" : ""}`}>
                                 <i className={`${item.icon} w-5 mr-3`}></i>
                                 {item.label}
                                 {item.children && (
                                     <i
-                                        className={`ml-auto fas ${
-                                            openMenu === item.id
-                                                ? "fa-chevron-up"
-                                                : "fa-chevron-down"
-                                        }`}
+                                        className={`ml-auto fas ${openMenu === item.id ? "fa-chevron-up" : "fa-chevron-down"}`}
                                     />
                                 )}
                             </button>

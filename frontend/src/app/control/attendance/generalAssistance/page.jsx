@@ -164,7 +164,7 @@ const GeneralAssistance = () => {
                                 .slice(0, rowsPerPage)
                                 .map((assist, idx) => (
                                     <tr key={idx}>
-                                        <td>{idx + 1}</td>{" "}
+                                        <td>{idx + 1}</td>
                                         {/* índice visible */}
                                         <td>
                                             {assist.fechaServicio?.split(
