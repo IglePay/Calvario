@@ -91,6 +91,7 @@ export class AsistenciaService {
                 },
             },
             select: {
+                idasistencia: true,
                 cantidad_asistentes: true,
                 fechaServicio: true,
                 familia: { select: { idfamilia: true, nombreFamilia: true } },
