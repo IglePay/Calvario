@@ -46,6 +46,12 @@ export class MiembrosController {
         return this.miembrosService.getServidores(idTenant);
     }
 
+    @Get('estadisticas')
+    async getEstadisticas(@Req() req: any) {
+        const tenantId = req.user.tenantId;
+        return this.miembrosService.getEstadisticas(tenantId);
+    }
+
     // Crear miembro
     @Post()
     async create(@Body() dto: CreateMiembroDto, @Req() req) {

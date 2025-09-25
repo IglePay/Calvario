@@ -226,6 +226,74 @@ export class MiembrosService {
         return miembrosFormateados;
     }
 
+    // dashboard
+    async getEstadisticas(tenantId: number) {
+        const miembros = await this.prisma.tb_miembros.findMany({
+            where: { tenantId },
+            select: {
+                fechanacimiento: true,
+                idGenero: true,
+                idBautizado: true,
+                idEstado: true,
+                idServidor: true,
+            },
+        });
+
+        const today = new Date();
+
+        const stats = {
+            total_miembros: miembros.length,
+            hombres: 0,
+            mujeres: 0,
+            servidores: 0,
+            ninos: 0,
+            adolescentes: 0,
+            jovenes: 0,
+            adultos: 0,
+            no_bautizados: 0,
+            bautizados: 0,
+            casados: 0,
+            solteros: 0,
+        };
+
+        for (const m of miembros) {
+            // Hombres/Mujeres
+            if (m.idGenero === 1) stats.hombres++;
+            else if (m.idGenero === 2) stats.mujeres++;
+
+            // Servidores
+            if (m.idServidor === 1) stats.servidores++;
+
+            // Bautizados
+            if (m.idBautizado === 1) stats.no_bautizados++;
+            else if (m.idBautizado === 2) stats.bautizados++;
+
+            // Estado civil
+            if (m.idEstado === 1) stats.solteros++;
+            else if (m.idEstado === 2) stats.casados++;
+
+            // Edad
+            if (m.fechanacimiento) {
+                const birthDate = new Date(m.fechanacimiento);
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (
+                    monthDiff < 0 ||
+                    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+                ) {
+                    age--;
+                }
+
+                if (age < 12) stats.ninos++;
+                else if (age >= 13 && age <= 17) stats.adolescentes++;
+                else if (age >= 18 && age <= 19) stats.jovenes++;
+                else if (age >= 20) stats.adultos++;
+            }
+        }
+
+        return stats;
+    }
+
     async deleteMiembro(idMiembro: number, idTenant: number) {
         const miembro = await this.prisma.tb_miembros.findUnique({
             where: { idMiembro },
