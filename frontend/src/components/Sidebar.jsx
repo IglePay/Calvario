@@ -97,16 +97,16 @@ export default function Sidebar({ isOpen, onClose }) {
                     route: "/control/attendance/family",
                 },
                 {
-                    id: "Assitencia_Individual",
-                    icon: "fas fa-user-check",
-                    label: "Asistencia",
-                    route: "/control/attendance/generalAssistance",
-                },
-                {
                     id: "Eventos",
                     icon: "fas fa-clock",
                     label: "Horarios",
                     route: "/control/attendance/hours",
+                },
+                {
+                    id: "Assitencia_Individual",
+                    icon: "fas fa-user-check",
+                    label: "Asistencia",
+                    route: "/control/attendance/generalAssistance",
                 },
             ],
         },

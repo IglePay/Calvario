@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { apiFetch } from "@/utils/apiFetch"
 import { useAuthContext } from "@/context/AuthContext"
+
 export function useAssistance() {
     const { user } = useAuthContext()
     const [assists, setAssists] = useState([])

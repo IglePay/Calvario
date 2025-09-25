@@ -4,6 +4,7 @@ import Link from "next/link"
 import Modal from "@/components/ModalGeneral"
 import { useAssistance } from "@/hooks/attendance/useAttendace"
 import * as yup from "yup"
+import { exportToExcel, exportToPDF } from "@/utils/exportData"
 
 const GeneralAssistance = () => {
     const {
@@ -42,6 +43,11 @@ const GeneralAssistance = () => {
         setServicio("")
         setCantidad("")
         setFechaServicio("")
+
+        //fecha autmatico
+        const today = new Date().toISOString().split("T")[0] //yyyy-mm-dd
+        setFechaServicio(today)
+
         setModalOpen(true)
     }
 
@@ -109,6 +115,13 @@ const GeneralAssistance = () => {
         }
     }
 
+    const exportData = filteredAssists.map((f) => ({
+        Servicio:
+            f.servicio?.horario || f.servicio?.nombre || f.servicio?.idservicio,
+        Fecha: f.fechaServicio ? f.fechaServicio.split("T")[0] : "",
+        "Total de Asistencia": f.totalAsistentes || f.cantidad_asistentes || 0,
+    }))
+
     return (
         <div className="flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
             <h2 className="text-2xl font-bold">
@@ -123,6 +136,20 @@ const GeneralAssistance = () => {
                     className="btn btn-accent btn-sm"
                     onClick={openCreateModal}>
                     <i className="fas fa-plus mr-1"></i> Agregar
+                </button>
+                <button
+                    onClick={() =>
+                        exportToExcel(exportData, "AsistenciaGeneral.xlsx")
+                    }
+                    className="btn btn-secondary btn-sm">
+                    <i className="fas fa-file-excel mr-1"></i> Excel
+                </button>
+                <button
+                    onClick={() =>
+                        exportToPDF(exportData, "AsistenciaGeneral.pdf")
+                    }
+                    className="btn bg-rose-800 text-white btn-sm">
+                    <i className="fas fa-print mr-1"></i> PDF
                 </button>
             </div>
 
@@ -241,12 +268,12 @@ const GeneralAssistance = () => {
                         className="input input-bordered w-full"
                     />
 
-                    <input
-                        type="date"
-                        value={fechaServicio}
-                        onChange={(e) => setFechaServicio(e.target.value)}
-                        className="input input-bordered w-full"
-                    />
+                    {/* <input */}
+                    {/*     type="date" */}
+                    {/*     value={fechaServicio} */}
+                    {/*     onChange={(e) => setFechaServicio(e.target.value)} */}
+                    {/*     className="input input-bordered w-full" */}
+                    {/* /> */}
                 </Modal>
             )}
         </div>
