@@ -88,13 +88,15 @@ const Home = () => {
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100">
+                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100 flex-col flex">
                     ¿No tienes cuenta?{" "}
-                    <Link
-                        href="./register"
-                        className="text-cyan-600 font-semibold hover:underline">
-                        Regístrate
-                    </Link>
+                    <a
+                        href="https://api.whatsapp.com/send?phone=50233373935&text=Hola%2C%20solicito%20la%20creaci%C3%B3n%20de%20un%20usuario."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline dark:text-blue-400">
+                        Solicítala por WhatsApp
+                    </a>
                 </p>
             </div>
         </div>
