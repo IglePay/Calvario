@@ -35,18 +35,25 @@ export class AsistenciaService {
         });
     }
 
-    async getResumenServicios(tenantId: number) {
-        // Agrupa las asistencias por servicio y fecha
+    async getResumenServicios(
+        tenantId: number,
+        page = 1,
+        limit = 10,
+        search = '',
+    ) {
+        const skip = (page - 1) * limit;
+
+        // Agrupar por servicio y fecha
         const resumen = await this.prisma.tb_asistencia.groupBy({
             by: ['idservicio', 'fechaServicio'],
-            where: { tenantId },
-            _sum: {
-                cantidad_asistentes: true,
+            where: {
+                tenantId,
             },
+            _sum: { cantidad_asistentes: true },
         });
 
-        // Mapea cada grupo agregando los datos del servicio
-        return Promise.all(
+        // Enriquecer con datos del servicio
+        const mapped = await Promise.all(
             resumen.map(async (r) => {
                 const servicio = await this.prisma.tb_servicios.findUnique({
                     where: { idservicio: r.idservicio },
@@ -54,7 +61,6 @@ export class AsistenciaService {
                 });
 
                 if (!servicio) {
-                    // Lanzar error si el servicio no existe
                     throw new Error(
                         `Servicio con id ${r.idservicio} no encontrado`,
                     );
@@ -63,33 +69,63 @@ export class AsistenciaService {
                 return {
                     idservicio: servicio.idservicio,
                     horario: servicio.horario,
-                    fechaServicio: r.fechaServicio, // Incluye la fecha
-                    total: r._sum.cantidad_asistentes || 0, // Asegura que no sea undefined
+                    fechaServicio: r.fechaServicio,
+                    total: r._sum.cantidad_asistentes || 0,
                 };
             }),
         );
+
+        // Filtrado por búsqueda (local, sobre el resultado)
+        const filtered = search
+            ? mapped.filter((m) =>
+                  m.horario.toLowerCase().includes(search.toLowerCase()),
+              )
+            : mapped;
+
+        const total = filtered.length;
+
+        return {
+            data: filtered.slice(skip, skip + limit),
+            total,
+            totalPages: Math.ceil(total / limit),
+            page,
+        };
     }
 
     async getFamiliasPorServicio(
         tenantId: number,
         idservicio: number,
         fechaServicio: string, // "YYYY-MM-DD"
+        page = 1,
+        limit = 10,
+        search = '',
     ) {
+        const skip = (page - 1) * limit;
+
         const start = new Date(fechaServicio);
         start.setHours(0, 0, 0, 0);
 
         const end = new Date(fechaServicio);
         end.setHours(23, 59, 59, 999);
 
-        return this.prisma.tb_asistencia.findMany({
-            where: {
-                tenantId,
-                idservicio,
-                fechaServicio: {
-                    gte: start,
-                    lte: end,
+        const where: any = {
+            tenantId,
+            idservicio,
+            fechaServicio: { gte: start, lte: end },
+            ...(search && {
+                familia: {
+                    nombreFamilia: { contains: search, mode: 'insensitive' },
                 },
-            },
+            }),
+        };
+
+        const total = await this.prisma.tb_asistencia.count({ where });
+
+        const data = await this.prisma.tb_asistencia.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { idasistencia: 'asc' },
             select: {
                 idasistencia: true,
                 cantidad_asistentes: true,
@@ -98,6 +134,13 @@ export class AsistenciaService {
                 servicio: { select: { idservicio: true, horario: true } },
             },
         });
+
+        return {
+            data,
+            total,
+            totalPages: Math.ceil(total / limit),
+            page,
+        };
     }
 
     // Crear asistencia

@@ -29,9 +29,20 @@ export class AsistenciaController {
 
     // Obtener resumen por servicio + fecha
     @Get('resumen-servicios')
-    getResumenServicios(@Req() req: Request & { user: any }) {
+    getResumenServicios(
+        @Req() req: Request & { user: any },
+        @Query('page') page: string,
+        @Query('limit') limit: string,
+        @Query('search') search: string,
+    ) {
         const tenantId = req.user.tenantId;
-        return this.asistenciaService.getResumenServicios(tenantId);
+
+        return this.asistenciaService.getResumenServicios(
+            tenantId,
+            page ? Number(page) : 1,
+            limit ? Number(limit) : 10,
+            search || '',
+        );
     }
 
     // Obtener familias por servicio + fecha
@@ -40,23 +51,30 @@ export class AsistenciaController {
         @Req() req: Request & { user: any },
         @Query('idservicio') idservicio: string,
         @Query('fechaServicio') fechaServicio: string,
+        @Query('page') page: string,
+        @Query('limit') limit: string,
+        @Query('search') search: string,
     ) {
-        if (!idservicio)
+        if (!idservicio) {
             throw new BadRequestException('idservicio es requerido');
-        if (!fechaServicio)
+        }
+        if (!fechaServicio) {
             throw new BadRequestException('fechaServicio es requerido');
+        }
 
-        // solo validar que sea fecha válida
-        if (isNaN(Date.parse(fechaServicio)))
+        if (isNaN(Date.parse(fechaServicio))) {
             throw new BadRequestException('fechaServicio inválida');
+        }
 
         const tenantId = req.user.tenantId;
 
-        // PASAMOS STRING, no Date
         return this.asistenciaService.getFamiliasPorServicio(
             tenantId,
             Number(idservicio),
             fechaServicio,
+            page ? Number(page) : 1,
+            limit ? Number(limit) : 10,
+            search || '',
         );
     }
 
