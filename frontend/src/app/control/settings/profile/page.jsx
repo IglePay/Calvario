@@ -291,12 +291,12 @@ export default function Profile() {
                                 <button
                                     type="button"
                                     onClick={() => setModalOpen(false)}
-                                    className="btn">
+                                    className="btn btn-ghost bg-gray-700">
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className="btn btn-primary">
+                                    className="btn btn-accent w-auto">
                                     Guardar
                                 </button>
                             </div>

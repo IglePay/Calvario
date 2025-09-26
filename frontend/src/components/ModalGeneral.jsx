@@ -19,10 +19,12 @@ const Modal = ({
                     {children} {/* Aquí van los inputs que pase cada módulo */}
                 </div>
                 <div className="modal-action">
-                    <button onClick={onClose} className="btn btn-ghost">
+                    <button
+                        onClick={onClose}
+                        className="btn btn-ghost bg-gray-700">
                         Cancelar
                     </button>
-                    <button onClick={onSave} className="btn btn-primary">
+                    <button onClick={onSave} className="btn btn-accent w-auto">
                         {saveLabel}
                     </button>
                 </div>

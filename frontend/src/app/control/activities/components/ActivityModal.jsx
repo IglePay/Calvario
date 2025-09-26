@@ -129,11 +129,11 @@ const ActivityModal = ({
                     <div className="flex gap-2 modal-action col-span-2 justify-end mt-3">
                         <button
                             type="button"
-                            className="btn btn-ghost"
+                            className="btn btn-ghost bg-gray-700"
                             onClick={onClose}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn btn-primary">
+                        <button type="submit" className="btn btn-accent w-auto">
                             Guardar
                         </button>
                     </div>

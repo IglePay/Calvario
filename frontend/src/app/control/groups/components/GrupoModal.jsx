@@ -37,12 +37,10 @@ export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="btn btn-outline btn-sm">
+                            className="btn btn-ghost bg-gray-700">
                             Cancelar
                         </button>
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-sm">
+                        <button type="submit" className="btn btn-accent w-auto">
                             Guardar
                         </button>
                     </div>
