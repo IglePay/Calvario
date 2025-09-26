@@ -5,82 +5,105 @@ import { useAuthContext } from "@/context/AuthContext"
 
 export function useAssistance() {
     const { user } = useAuthContext()
+
     const [assists, setAssists] = useState([])
     const [services, setServices] = useState([])
     const [families, setFamilies] = useState([])
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
+    // Estados de paginación
+    const [page, setPage] = useState(1)
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [totalPages, setTotalPages] = useState(1)
+    const [total, setTotal] = useState(0)
+
     // Obtener resumen de asistencias
-    const getResumenServicios = () => {
-        if (!user) return Promise.resolve([])
+    const getResumenServicios = async (
+        search = "",
+        pageArg = page,
+        limitArg = rowsPerPage,
+    ) => {
+        if (!user) return []
 
         setLoading(true)
         setError("")
 
-        return apiFetch(
-            `/asistencia/resumen-servicios?tenantId=${user.tenantId}`,
-        )
-            .then((res) => {
-                if (!res.ok) throw new Error("Error al obtener los servicios")
-                return res.json()
-            })
-            .then((data) => {
-                const mapped = Array.isArray(data)
-                    ? data.map((d, idx) => ({
-                          key: idx, // clave interna solo para React
-                          fechaServicio: d.fechaServicio,
-                          servicio: {
-                              idservicio: d.idservicio,
-                              horario: d.horario,
-                          },
-                          totalAsistentes: d.total,
-                      }))
-                    : []
+        try {
+            const res = await apiFetch(
+                `/asistencia/resumen-servicios?page=${pageArg}&limit=${limitArg}&search=${search}`,
+            )
 
-                setAssists(mapped)
-                return mapped
-            })
-            .catch((err) => {
-                console.error("Error getResumenServicios:", err)
-                setError(err.message || "Error al cargar los datos")
-                setAssists([])
-                return []
-            })
-            .finally(() => setLoading(false))
+            if (!res.ok) throw new Error("Error al obtener los servicios")
+            const data = await res.json()
+
+            const mapped = Array.isArray(data.data)
+                ? data.data.map((d, idx) => ({
+                      key: idx,
+                      fechaServicio: d.fechaServicio,
+                      servicio: {
+                          idservicio: d.idservicio,
+                          horario: d.horario,
+                      },
+                      totalAsistentes: d.total,
+                  }))
+                : []
+
+            setAssists(mapped)
+            setTotal(data.total || 0)
+            setTotalPages(data.totalPages || 1)
+            setPage(data.page || 1)
+
+            return mapped
+        } catch (err) {
+            console.error("Error getResumenServicios:", err)
+            setError(err.message || "Error al cargar los datos")
+            setAssists([])
+            return []
+        } finally {
+            setLoading(false)
+        }
     }
 
     // Obtener familias por servicio + fecha
-    const getFamiliasPorServicio = (idservicio, fechaServicio) => {
+    const getFamiliasPorServicio = async (
+        idservicio,
+        fechaServicio,
+        search = "",
+        pageArg = page,
+        limitArg = rowsPerPage,
+    ) => {
         if (!user || !idservicio || !fechaServicio) {
-            console.warn(
-                "No se puede llamar a familias-por-servicio sin idservicio y fechaServicio",
-            )
-            return Promise.resolve([])
+            console.warn("Faltan parámetros para getFamiliasPorServicio")
+            return []
         }
 
         setLoading(true)
         setError("")
 
-        return apiFetch(
-            `/asistencia/familias-por-servicio?idservicio=${idservicio}&fechaServicio=${fechaServicio}`,
-        )
-            .then((res) =>
-                res.ok
-                    ? res.json()
-                    : Promise.reject("Error al obtener familias"),
+        try {
+            const res = await apiFetch(
+                `/asistencia/familias-por-servicio?idservicio=${idservicio}&fechaServicio=${fechaServicio}&page=${pageArg}&limit=${limitArg}&search=${search}`,
             )
-            .then((data) => {
-                setFamilies(Array.isArray(data) ? data : [])
-                return data
-            })
-            .catch((err) => {
-                console.error("Error getFamiliasPorServicio:", err)
-                setError(err.message || "Error al cargar familias")
-                setFamilies([])
-                return []
-            })
-            .finally(() => setLoading(false))
+
+            if (!res.ok) throw new Error("Error al obtener familias")
+            const data = await res.json()
+
+            setFamilies(data.data || [])
+            setTotal(data.total || 0)
+            setTotalPages(data.totalPages || 1)
+            setPage(data.page || 1)
+
+            return data.data || []
+        } catch (err) {
+            console.error("Error getFamiliasPorServicio:", err)
+            setError(err.message || "Error al cargar familias")
+            setFamilies([])
+            return []
+        } finally {
+            setLoading(false)
+        }
     }
 
     // Obtener servicios disponibles
@@ -180,12 +203,22 @@ export function useAssistance() {
     }, [user])
 
     return {
+        //datos
         assists,
         services,
         families,
+        // estados de paginación
+        page,
+        setPage,
+        rowsPerPage,
+        setRowsPerPage,
+        total,
+        totalPages,
+        //estados generales
         loading,
         error,
         refresh,
+        //funciones
         createAssist,
         updateAssist,
         deleteAssist,
