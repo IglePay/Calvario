@@ -173,7 +173,11 @@ export default function Sidebar({ isOpen, onClose }) {
             )}
 
             <div
-                className={`bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+                className={`bg-gray-900 text-white w-64 flex-shrink-0 fixed lg:relative h-screen flex flex-col z-50 transform transition-transform duration-300 ease-in-out ${
+                    isOpen
+                        ? "translate-x-0"
+                        : "-translate-x-full lg:translate-x-0"
+                }`}>
                 {/* Header */}
                 <div className="p-4 border-b border-gray-700 flex flex-col items-center justify-center space-y-2">
                     <Image
@@ -199,7 +203,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 bg-gray-900 overflow-y-auto">
+                <nav className="flex-1 overflow-y-auto">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button
@@ -210,12 +214,20 @@ export default function Sidebar({ isOpen, onClose }) {
                                         onClose()
                                     }
                                 }}
-                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${activeSection === item.id ? "bg-gray-900 border-r-4 border-r-rose-400" : ""}`}>
+                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${
+                                    activeSection === item.id
+                                        ? "bg-gray-900 border-r-4 border-r-rose-400"
+                                        : ""
+                                }`}>
                                 <i className={`${item.icon} w-5 mr-3`}></i>
                                 {item.label}
                                 {item.children && (
                                     <i
-                                        className={`ml-auto fas ${openMenu === item.id ? "fa-chevron-up" : "fa-chevron-down"}`}
+                                        className={`ml-auto fas ${
+                                            openMenu === item.id
+                                                ? "fa-chevron-up"
+                                                : "fa-chevron-down"
+                                        }`}
                                     />
                                 )}
                             </button>
@@ -241,8 +253,8 @@ export default function Sidebar({ isOpen, onClose }) {
                     ))}
                 </nav>
 
-                {/* Settings and Logout */}
-                <div>
+                {/* Footer: Logout */}
+                <div className="border-t border-gray-700">
                     <button
                         onClick={handleLogout}
                         className="flex items-center px-4 py-3 text-sm bg-gray-900 hover:bg-gray-800 transition-colors w-full text-left">

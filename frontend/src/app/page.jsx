@@ -27,8 +27,8 @@ const Home = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-rose-100 via-white to-cyan-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-white dark:bg-transparent mb-3">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+            <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-transparent dark:bg-transparent mb-3">
                 <Image
                     src="/images/iglepay.png"
                     alt="Logo Calvario"
@@ -39,8 +39,8 @@ const Home = () => {
                 />
             </div>
 
-            <div className="bg-white dark:bg-base-200 rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">
+            <div className="bg-neutral dark:bg-base-200 rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
+                <h2 className="text-2xl font-bold mb-6 text-white dark:text-white text-center">
                     Bienvenido
                 </h2>
 
@@ -53,7 +53,7 @@ const Home = () => {
                         placeholder="Correo electrónico"
                         value={form.email}
                         onChange={handleChange}
-                        className="input input-bordered w-full md:w-100 rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
+                        className="input input-bordered w-full md:w-100 rounded-xl bg-transparent text-white border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                         required
                     />
 
@@ -64,7 +64,7 @@ const Home = () => {
                             placeholder="Contraseña"
                             value={form.password}
                             onChange={handleChange}
-                            className="input input-bordered w-full md:w-100 rounded-lg border-gray-300 pr-10 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
+                            className="input input-bordered w-full md:w-100 rounded-xl bg-transparent text-white border-gray-300 pr-10 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
                             required
                         />
                         <span
@@ -83,18 +83,18 @@ const Home = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="btn bg-rose-900 hover:bg-rose-700 text-white font-semibold rounded-full w-full md:w-40">
+                        className="btn bg-rose-900 hover:bg-rose-700 text-white border-transparent  dark:bg-rose-900 dark:hover:bg-rose-700 dark:text-white font-semibold rounded-full w-full md:w-40">
                         {loading ? "Entrando..." : "Iniciar sesión"}
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-100 flex-col flex">
+                <p className="mt-4 text-center text-sm text-gray-100 dark:text-gray-100 flex-col flex">
                     ¿No tienes cuenta?{" "}
                     <a
                         href="https://api.whatsapp.com/send?phone=50233373935&text=Hola%2C%20solicito%20la%20creaci%C3%B3n%20de%20un%20usuario."
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline dark:text-blue-400">
+                        className="text-cyan-500 hover:underline dark:text-cyan-500">
                         Solicítala por WhatsApp
                     </a>
                 </p>
