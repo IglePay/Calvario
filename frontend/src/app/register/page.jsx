@@ -3,6 +3,8 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import * as Yup from "yup"
+import { validateForm } from "@/utils/validator"
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -14,6 +16,28 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirm, setShowConfirm] = useState(false)
     const [error, setError] = useState("")
+    const [formErrors, setFormErrors] = useState({})
+    //validacion
+    // Esquema Yup para registro
+    const registerSchema = Yup.object().shape({
+        name: Yup.string()
+            .required("El nombre completo es requerido")
+            .max(50, "El nombre no puede tener más de 50 caracteres")
+            .matches(
+                /^(?:[A-Z][a-z]*\s?)+$/,
+                "Cada palabra debe iniciar con mayúscula",
+            ),
+        email: Yup.string()
+            .email("Correo electrónico inválido")
+            .required("El correo electrónico es requerido"),
+        password: Yup.string()
+            .min(6, "La contraseña debe tener al menos 6 caracteres")
+            .max(20, "La contraseña no puede tener más de 20 caracteres")
+            .required("La contraseña es requerida"),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref("password"), null], "Las contraseñas no coinciden")
+            .required("Debes confirmar la contraseña"),
+    })
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -22,18 +46,22 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        // Limpiamos errores previos
+        setFormErrors({})
         setError("")
 
-        // Validación de contraseñas
-        if (form.password !== form.confirmPassword) {
-            setError("Las contraseñas no coinciden")
+        // Validamos el formulario con Yup
+        const errors = await validateForm(registerSchema, form)
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors)
+            console.log("Errores de validación:", errors) // Mantén para depuración
             return
         }
 
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -56,6 +84,7 @@ const Register = () => {
             window.location.href = "/"
         } catch (err) {
             setError(err.message)
+            console.log("Error al registrar:", err) // Mantén para depuración
         }
     }
 
@@ -89,18 +118,25 @@ const Register = () => {
                         onChange={handleChange}
                         placeholder="Nombre completo"
                         className="input input-bordered w-full rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
-                        required
                     />
+                    {formErrors.name && (
+                        <p className="text-red-500 text-sm text-center mt-1">
+                            {formErrors.name}
+                        </p>
+                    )}
                     <input
-                        type="email"
+                        type="text"
                         name="email"
                         value={form.email}
                         onChange={handleChange}
                         placeholder="Correo electrónico"
                         className="input input-bordered w-full rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
-                        required
                     />
-
+                    {formErrors.email && (
+                        <p className="text-red-500 text-sm text-center mt-1">
+                            {formErrors.email}
+                        </p>
+                    )}
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -109,10 +145,14 @@ const Register = () => {
                             onChange={handleChange}
                             placeholder="Contraseña"
                             className="input input-bordered w-80 sm:w-100 pr-10 rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
-                            required
                         />
+                        {formErrors.password && (
+                            <p className="text-red-500 text-sm text-center mt-1">
+                                {formErrors.password}
+                            </p>
+                        )}
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600"
+                            className="absolute right-3 top-1/3 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600"
                             onClick={() => setShowPassword((prev) => !prev)}>
                             {showPassword ? (
                                 <i className="fa-solid fa-eye-slash"></i>
@@ -130,10 +170,14 @@ const Register = () => {
                             onChange={handleChange}
                             placeholder="Confirmar contraseña"
                             className="input input-bordered w-80 sm:w-100 pr-10 rounded-lg border-gray-300 focus:border-cyan-600 focus:ring focus:ring-cyan-100"
-                            required
                         />
+                        {formErrors.confirmPassword && (
+                            <p className="text-red-500 text-sm text-center mt-1">
+                                {formErrors.confirmPassword}
+                            </p>
+                        )}
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600"
+                            className="absolute right-3 top-1/3 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-cyan-600 "
                             onClick={() => setShowConfirm((prev) => !prev)}>
                             {showConfirm ? (
                                 <i className="fa-solid fa-eye-slash"></i>
@@ -143,7 +187,9 @@ const Register = () => {
                         </span>
                     </div>
 
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {error && (
+                        <p className="text-red-500 text-sm mt-1">{error}</p>
+                    )}
 
                     <button
                         type="submit"

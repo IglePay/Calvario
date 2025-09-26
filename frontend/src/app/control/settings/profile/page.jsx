@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
 import { useUsers } from "@/hooks/profile/useUsers"
+import * as Yup from "yup"
+import { validateForm } from "@/utils/validator"
 
 export default function Profile() {
     const {
@@ -26,6 +28,40 @@ export default function Profile() {
         id_rol: "1",
         iglesia: "",
     })
+
+    // esquema de datos
+
+    const createSchema = Yup.object().shape({
+        usuario: Yup.string()
+            .required("El nombre de usuario es requerido")
+            .matches(/^[A-Z]/, "El nombre debe iniciar con mayúscula")
+            .max(10, "El nombre no puede tener más de 10 caracteres"),
+        email: Yup.string()
+            .required("El email es requerido")
+            .email("Email inválido"),
+        password: Yup.string()
+            .max(10, "La contraseña no puede tener más de 10 caracteres")
+            .min(6, "La contraseña debe tener al menos 6 caracteres")
+            .test(
+                "password-edit",
+                "La contraseña debe tener al menos 6 caracteres",
+                function (value) {
+                    const { id_usuario } = this.parent
+                    if (!id_usuario) {
+                        return !!value // nuevo usuario requiere contraseña
+                    }
+                    if (value) {
+                        return value.length >= 6 && value.length <= 10
+                    }
+                    return true // usuario existente puede dejarla vacía
+                },
+            ),
+        id_rol: Yup.string().required("Debe seleccionar un rol"),
+        iglesia: Yup.string().required("Debe seleccionar una iglesia"),
+    })
+
+    // estado de erros
+    const [formErrors, setFormErrors] = useState({})
 
     const handleChange = (e) =>
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -55,6 +91,16 @@ export default function Profile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        // Solo validamos si es creación
+        if (!form.id_usuario) {
+            const errors = await validateForm(createSchema, form)
+            if (Object.keys(errors).length > 0) {
+                setFormErrors(errors)
+                return
+            }
+        }
+
         try {
             await createOrUpdateUser(form)
             setModalOpen(false)
@@ -228,6 +274,11 @@ export default function Profile() {
                                             </option>
                                         ))}
                                     </select>
+                                    {formErrors.id_rol && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {formErrors.id_rol}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="form-control">
@@ -239,6 +290,11 @@ export default function Profile() {
                                         className="input input-bordered"
                                         required
                                     />
+                                    {formErrors.usuario && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {formErrors.usuario}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="form-control">
@@ -251,6 +307,11 @@ export default function Profile() {
                                         className="input input-bordered"
                                         required
                                     />
+                                    {formErrors.email && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {formErrors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="form-control">
@@ -267,6 +328,11 @@ export default function Profile() {
                                                 : ""
                                         }
                                     />
+                                    {formErrors.password && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {formErrors.password}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="form-control ">
@@ -284,6 +350,11 @@ export default function Profile() {
                                             </option>
                                         ))}
                                     </select>
+                                    {formErrors.iglesia && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {formErrors.iglesia}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
