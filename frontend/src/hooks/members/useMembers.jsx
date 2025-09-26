@@ -23,7 +23,7 @@ export function useMembers() {
         servidor: !!member.idServidor,
     })
 
-    // 🔹 Obtener miembros para la tabla
+    //  Obtener miembros para la tabla
     const fetchMembers = () => {
         if (!user) return Promise.resolve()
 
@@ -44,7 +44,7 @@ export function useMembers() {
             .finally(() => setLoading(false))
     }
 
-    // 🔹 Crear miembro
+    //  Crear miembro
     const createMember = (member) => {
         if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 
@@ -67,7 +67,7 @@ export function useMembers() {
             idGrupo: member.idGrupo ? Number(member.idGrupo) : null,
             legusta: member.legusta || null,
             fechaBautismo: member.fechaBautismo
-                ? new Date(member.fechaBautizo).toISOString()
+                ? new Date(member.fechaBautismo).toISOString()
                 : null,
             idBautizado: member.idBautizado ? Number(member.idBautizado) : null,
             idServidor: member.idServidor ? Number(member.idServidor) : null,
@@ -84,7 +84,7 @@ export function useMembers() {
             .catch((e) => setError(e.message || "Error desconocido"))
     }
 
-    // 🔹 Actualizar miembro
+    //  Actualizar miembro
     const updateMember = (id, member) => {
         if (!user) return Promise.reject(new Error("Usuario no autenticado"))
 

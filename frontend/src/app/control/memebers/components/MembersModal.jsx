@@ -114,37 +114,30 @@ const MembersModal = ({
         })
     }
 
+    const toISO = (date) => (date ? new Date(date).toISOString() : null)
+    const toNumberOrNull = (value) =>
+        value !== "" && value != null ? Number(value) : null
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
         try {
-            // Valida el formData según el esquema
             const validatedData = await memberSchema.validate(formData, {
                 abortEarly: false,
                 stripUnknown: true,
             })
 
-            // Aquí puedes transformar fechas e IDs como antes
-            const payload = { ...validatedData }
-            if (payload.fechaNacimiento)
-                payload.fechaNacimiento = new Date(
-                    payload.fechaNacimiento,
-                ).toISOString()
-            if (payload.fechaLlegada)
-                payload.fechaLlegada = new Date(
-                    payload.fechaLlegada,
-                ).toISOString()
-            if (payload.fechaBautismo)
-                payload.fechaBautismo = new Date(
-                    payload.fechaBautismo,
-                ).toISOString()
-            if (payload.idGenero) payload.idGenero = Number(payload.idGenero)
-            if (payload.idEstado) payload.idEstado = Number(payload.idEstado)
-            if (payload.idGrupo) payload.idGrupo = Number(payload.idGrupo)
-            if (payload.idBautizado)
-                payload.idBautizado = Number(payload.idBautizado)
-            if (payload.idServidor)
-                payload.idServidor = Number(payload.idServidor)
+            const payload = {
+                ...validatedData,
+                fechaNacimiento: toISO(validatedData.fechaNacimiento),
+                fechaLlegada: toISO(validatedData.fechaLlegada),
+                fechaBautismo: toISO(validatedData.fechaBautismo),
+                idGenero: toNumberOrNull(validatedData.idGenero),
+                idEstado: toNumberOrNull(validatedData.idEstado),
+                idGrupo: toNumberOrNull(validatedData.idGrupo),
+                idBautizado: toNumberOrNull(validatedData.idBautizado),
+                idServidor: toNumberOrNull(validatedData.idServidor),
+            }
 
             console.log("payload listo para enviar:", payload)
             onSubmit(payload)
