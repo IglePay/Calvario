@@ -19,6 +19,7 @@ import { JwtPayload } from './jwt-payload.interface';
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
+    isProd = process.env.NODE_ENV === 'production';
 
     @UseGuards(AuthGuard)
     @Get('me')
@@ -26,7 +27,6 @@ export class AuthController {
         const userPayload = req.user as JwtPayload;
 
         const user = await this.authService.findById(userPayload.id);
-
         if (!user) {
             throw new UnauthorizedException('Usuario no encontrado');
         }
@@ -50,19 +50,45 @@ export class AuthController {
             body.password,
         );
 
-        // Verificamos que el usuario pertenece al tenant (iglesia)
-        if (body.iglesia && user.tb_tenants.nombre !== body.iglesia) {
-            throw new UnauthorizedException('No autorizado para esta iglesia');
+        // Verificar tenant por ID en vez de nombre (más seguro)
+        if (body.iglesia && user.tenantId !== Number(body.iglesia)) {
+            throw new UnauthorizedException('No autorizado para este tenant');
         }
 
-        const token = await this.authService.login(user);
+        const tokens = await this.authService.login(user);
 
-        res.cookie('jwt', token.access_token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            maxAge: 1000 * 60 * 60 * 24,
-        });
+        const isProd = process.env.NODE_ENV === 'production';
+
+        // Set cookie con access token
+        res.cookie(
+            process.env.COOKIE_ACCESS_NAME || 'jwt',
+            tokens.access_token,
+            {
+                httpOnly: true,
+                secure: isProd,
+                sameSite: isProd ? 'strict' : 'lax',
+                maxAge:
+                    Number(process.env.COOKIE_MAX_AGE_ACCESS) || 1000 * 60 * 15, // 15m
+                domain: process.env.COOKIE_DOMAIN || undefined,
+            },
+        );
+
+        // Set cookie con refresh token
+        if (tokens.refresh_token) {
+            res.cookie(
+                process.env.COOKIE_REFRESH_NAME || 'refresh_jwt',
+                tokens.refresh_token,
+                {
+                    httpOnly: true,
+                    secure: isProd,
+                    sameSite: isProd ? 'strict' : 'lax',
+                    maxAge:
+                        Number(process.env.COOKIE_MAX_AGE_REFRESH) ||
+                        1000 * 60 * 60 * 24 * 30, // 30d
+                    domain: process.env.COOKIE_DOMAIN || undefined,
+                },
+            );
+        }
 
         return { message: 'Login exitoso' };
     }
@@ -83,7 +109,8 @@ export class AuthController {
 
     @Post('logout')
     logout(@Res({ passthrough: true }) res: Response) {
-        res.clearCookie('jwt'); // Borra la cookie del token
+        res.clearCookie(process.env.COOKIE_ACCESS_NAME || 'jwt');
+        res.clearCookie(process.env.COOKIE_REFRESH_NAME || 'refresh_jwt');
         return { message: 'Logout exitoso' };
     }
 }

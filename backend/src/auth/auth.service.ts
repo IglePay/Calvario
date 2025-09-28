@@ -26,13 +26,21 @@ export class AuthService {
             tenantId: user.tenantId,
             roleId: user.roleId,
         };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
-    }
 
-    async findByEmail(email: string) {
-        return this.usersService.findByEmail(email);
+        const accessToken = this.jwtService.sign(payload, {
+            secret: process.env.JWT_SECRET,
+            expiresIn: process.env.JWT_EXPIRES_IN || '8h', //era 15m que son 15 minutos
+        });
+
+        const refreshToken = this.jwtService.sign(
+            { sub: user.id },
+            {
+                secret: process.env.JWT_SECRET,
+                expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '30d',
+            },
+        );
+
+        return { access_token: accessToken, refresh_token: refreshToken };
     }
 
     async register(
@@ -42,7 +50,7 @@ export class AuthService {
         tenantId: number,
         roleId: number,
     ) {
-        const hashed = await bcrypt.hash(password, 10);
+        const hashed = await bcrypt.hash(password, 12);
         return this.usersService.createUser({
             name,
             email,
@@ -50,6 +58,10 @@ export class AuthService {
             tenantId,
             roleId,
         });
+    }
+
+    async findByEmail(email: string) {
+        return this.usersService.findByEmail(email);
     }
 
     async findById(id: number) {
