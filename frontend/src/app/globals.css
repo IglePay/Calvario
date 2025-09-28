@@ -28,6 +28,9 @@
 
     --color-error: #ef4444;
     --color-error-content: #f1f5f9;
+
+    --color-neutral: #191e24;
+    --color-neutral-content: #cbd1de;
 }
 
 @plugin "daisyui/theme" {
@@ -36,14 +39,15 @@
 
     --color-primary: #374151;
     --color-primary-content: #f1f5f9;
+
     --color-secondary: #4e7c13;
     --color-secondary-content: #cbd1de;
 
     --color-accent: #3358d3;
     --color-accent-content: #cbd1de;
 
-    --color-neutral-dark: #2f4235f2;
-    --color-neutral-content-dark: #cbd1de;
+    --color-neutral: #191e24;
+    --color-neutral-content: #cbd1de;
 
     --color-info: #f161cb;
     --color-info-content: #242f39;

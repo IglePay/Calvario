@@ -169,6 +169,7 @@ const MembersModal = ({
                             value={formData.dpi}
                             onChange={handleChange}
                             className="input w-full"
+                            placeholder="Son 13 digitos numerales"
                         />
                     </div>
 
@@ -213,6 +214,7 @@ const MembersModal = ({
                             value={formData.telefono}
                             onChange={handleChange}
                             className="input w-full"
+                            placeholder="ejem. 12121414"
                         />
                     </div>
                     <div className="flex flex-col">
@@ -379,7 +381,7 @@ const MembersModal = ({
                     <div className="flex flex-wrap gap-2 col-span-full items-center justify-center mt-4">
                         <button
                             type="button"
-                            className="btn btn-ghost bg-gray-700"
+                            className="btn bg-gray-700  text-white"
                             onClick={onClose}>
                             Cancelar
                         </button>

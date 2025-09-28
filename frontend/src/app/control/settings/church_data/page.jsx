@@ -78,7 +78,7 @@ export default function Iglesias() {
             <h1 className="text-2xl font-bold">Datos de la Iglesia</h1>
 
             {/* Botones */}
-            <div className="flex gap-4 mt-4">
+            <div className="flex flex-wrap gap-4 md:gap-2 mt-4">
                 <Link href={"/control"} className="btn btn-primary btn-sm  ">
                     Regresar
                 </Link>
@@ -270,11 +270,11 @@ export default function Iglesias() {
                                 </div>
                             </div>
 
-                            <div className="modal-action">
+                            <div className="modal-action justify-center">
                                 <button
                                     type="button"
                                     onClick={() => setModalOpen(false)}
-                                    className="btn btn-ghost bg-gray-700">
+                                    className="btn text-white bg-gray-700">
                                     Cancelar
                                 </button>
                                 <button

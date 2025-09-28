@@ -10,13 +10,13 @@ export default function ControlLayout({ children }) {
     // Si no hay usuario, redirige al login
     useEffect(() => {
         if (!loading && !user) {
-            router.replace("/login")
+            router.replace("/")
         }
     }, [loading, user, router])
 
     if (loading || !user) {
         return (
-            <div className="flex items-center justify-center h-screen accent-base-300">
+            <div className="flex items-center justify-center h-screen bg-transparent ">
                 Cargando sistema...
             </div>
         )

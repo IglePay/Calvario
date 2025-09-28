@@ -21,7 +21,7 @@ const Modal = ({
                 <div className="modal-action">
                     <button
                         onClick={onClose}
-                        className="btn btn-ghost bg-gray-700">
+                        className="btn text-white bg-gray-700">
                         Cancelar
                     </button>
                     <button onClick={onSave} className="btn btn-accent w-auto">

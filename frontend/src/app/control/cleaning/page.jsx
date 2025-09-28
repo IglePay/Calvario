@@ -204,7 +204,7 @@ export default function CleaningCalendar() {
             <h1 className="text-2xl font-bold mt-3">Calendario General</h1>
 
             <div className="flex gap-2 justify-center items-center mt-3">
-                <Link href="/control" className="btn btn-primary">
+                <Link href="/control" className="btn text-white bg-gray-700">
                     Regresar
                 </Link>
                 <button
@@ -297,13 +297,21 @@ export default function CleaningCalendar() {
                             />
                         </div>
 
-                        <div className="flex justify-end gap-2 mt-4">
+                        <div className="flex justify-center gap-2 mt-4">
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false)
+                                    setErrorMessage("")
+                                }}
+                                className="btn bg-gray-700 text-white rounded-xl px-4">
+                                Cancelar
+                            </button>
                             {mode === "create" ? (
                                 <button
                                     onClick={() =>
                                         handleAddOrUpdateEvent(false)
                                     }
-                                    className="btn btn-primary rounded-xl px-4">
+                                    className="btn btn-accent rounded-xl px-4">
                                     Registrar
                                 </button>
                             ) : (
@@ -312,24 +320,16 @@ export default function CleaningCalendar() {
                                         onClick={() =>
                                             handleAddOrUpdateEvent(true)
                                         }
-                                        className="btn btn-primary rounded-xl px-4">
-                                        Editar
+                                        className="btn btn-warning btn-md rounded-xl">
+                                        <i className="fas fa-edit"></i>
                                     </button>
                                     <button
                                         onClick={handleDeleteEvent}
-                                        className="btn btn-error rounded-xl px-4">
-                                        Eliminar
+                                        className="btn btn-error btn-md rounded-xl">
+                                        <i className="fas fa-trash"></i>
                                     </button>
                                 </>
                             )}
-                            <button
-                                onClick={() => {
-                                    setIsOpen(false)
-                                    setErrorMessage("")
-                                }}
-                                className="btn btn-ghost rounded-xl px-4">
-                                Cancelar
-                            </button>
                         </div>
                     </div>
                 </div>

@@ -183,9 +183,9 @@ export default function Sidebar({ isOpen, onClose }) {
                     <Image
                         src="/images/iglepay.png"
                         alt="Logo"
-                        width={100}
-                        height={100}
-                        className="rounded-full"
+                        width={90}
+                        height={90}
+                        className="rounded-full border-2 border-rose-500 border-line w-20 md:w-25"
                         priority
                     />
                     {user && (
@@ -197,8 +197,8 @@ export default function Sidebar({ isOpen, onClose }) {
                     )}
                     <button
                         onClick={onClose}
-                        className="lg:hidden text-white hover:text-gray-300">
-                        <i className="fas fa-times text-lg"></i>
+                        className="lg:hidden text-white hover:text-gray-300  rounded-full">
+                        <i className="fa-regular fa-circle-xmark text-2xl"></i>
                     </button>
                 </div>
 

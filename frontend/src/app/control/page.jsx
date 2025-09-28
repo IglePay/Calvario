@@ -17,7 +17,7 @@ export default function Control() {
     // Redirigir si no hay usuario
     useEffect(() => {
         if (!loading && !user) {
-            router.replace("/login")
+            router.replace("/")
         }
     }, [loading, user, router])
 

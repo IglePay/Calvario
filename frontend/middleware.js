@@ -5,7 +5,7 @@ export function middleware(request) {
     const url = request.nextUrl.clone()
 
     if (!token && url.pathname.startsWith("/control")) {
-        url.pathname = "/login"
+        url.pathname = "/"
         return NextResponse.redirect(url)
     }
 

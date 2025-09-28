@@ -126,10 +126,10 @@ const ActivityModal = ({
                         />
                     </div>
 
-                    <div className="flex gap-2 modal-action col-span-2 justify-end mt-3">
+                    <div className="flex gap-2 modal-action col-span-2 justify-center mt-3">
                         <button
                             type="button"
-                            className="btn btn-ghost bg-gray-700"
+                            className="btn text-white bg-gray-700"
                             onClick={onClose}>
                             Cancelar
                         </button>

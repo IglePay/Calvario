@@ -277,7 +277,7 @@ export default function Collaborator() {
                                 <button
                                     type="button"
                                     onClick={() => setModalOpen(false)}
-                                    className="btn btn-ghost bg-gray-700">
+                                    className="btn text-white bg-gray-700">
                                     Cancelar
                                 </button>
                                 <button

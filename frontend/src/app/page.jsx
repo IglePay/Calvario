@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { useLogin } from "../hooks/login/useLogin"
 
@@ -39,7 +38,7 @@ const Home = () => {
                 />
             </div>
 
-            <div className="bg-neutral dark:bg-base-200 rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
+            <div className="bg-neutral dark:bg-neutral rounded-2xl shadow-lg w-auto md:w-full max-w-md p-8 border border-cyan-600">
                 <h2 className="text-2xl font-bold mb-6 text-white dark:text-white text-center">
                     Bienvenido
                 </h2>
@@ -91,7 +90,7 @@ const Home = () => {
                 <p className="mt-4 text-center text-sm text-gray-100 dark:text-gray-100 flex-col flex">
                     ¿No tienes cuenta?{" "}
                     <a
-                        href="https://api.whatsapp.com/send?phone=50233373935&text=Hola%2C%20solicito%20la%20creaci%C3%B3n%20de%20un%20usuario."
+                        href={`https://api.whatsapp.com/send?phone=${process.env.NEXT_PUBLIC_WHATSAPP_PHONE}&text=${encodeURIComponent(process.env.NEXT_PUBLIC_WHATSAPP_TEXT)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-cyan-500 hover:underline dark:text-cyan-500">

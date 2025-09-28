@@ -136,6 +136,7 @@ const Persons = () => {
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
+                                <th>Apellido</th>
                                 <th>Edad</th>
                                 <th>Teléfono</th>
                                 <th>Dirección</th>
@@ -155,6 +156,7 @@ const Persons = () => {
                                         className="text-center">
                                         <td>{member.idMiembro}</td>
                                         <td>{member.nombre}</td>
+                                        <td>{member.apellido}</td>
                                         <td>{member.edad}</td>
                                         <td>{member.telefono}</td>
                                         <td>{member.direccion}</td>
