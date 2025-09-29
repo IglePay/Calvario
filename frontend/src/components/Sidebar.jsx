@@ -203,7 +203,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 overflow-y-auto">
+                <nav className="flex-1 overflow-y-auto scroll-auto">
                     {menuItems.map((item) => (
                         <div key={item.id}>
                             <button

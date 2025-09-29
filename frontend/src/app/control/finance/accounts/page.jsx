@@ -108,13 +108,13 @@ const Accounts = () => {
         Código: acc.codigo,
         Nombre: acc.nombre,
         Tipo: acc.tipoIE,
-        // Fecha: acc.fechaCreacion
-        //     ? new Date(acc.fechaCreacion).toLocaleDateString("es-GT", {
-        //           year: "numeric",
-        //           month: "short",
-        //           day: "numeric",
-        //       })
-        //     : "-",
+        Fecha: acc.fechaCreacion
+            ? new Date(acc.fechaCreacion).toLocaleDateString("es-GT", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+              })
+            : "-",
     }))
 
     return (

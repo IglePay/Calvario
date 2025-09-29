@@ -2,6 +2,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Modal from "@/components/ModalGeneral"
+import Pagination from "@/components/Paginacion"
 import { useAssistance } from "@/hooks/attendance/useAttendace"
 import * as yup from "yup"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
@@ -9,18 +10,25 @@ import { exportToExcel, exportToPDF } from "@/utils/exportData"
 const GeneralAssistance = () => {
     const {
         assists,
-        services,
-        families,
         loading,
         error,
+        page,
+        setPage,
+        rowsPerPage,
+        setRowsPerPage,
+        totalPages,
+        total,
+        getResumenServicios,
+        services,
+        families,
         refresh,
         createAssist,
         updateAssist,
         deleteAssist,
     } = useAssistance()
 
+    // const [rowsPerPage, setRowsPerPage] = useState(10)
     const [searchQuery, setSearchQuery] = useState("")
-    const [rowsPerPage, setRowsPerPage] = useState(10)
     const [modalOpen, setModalOpen] = useState(false)
     const [editingAssist, setEditingAssist] = useState(null) // null = crear
 
@@ -29,12 +37,25 @@ const GeneralAssistance = () => {
     const [cantidad, setCantidad] = useState("")
     const [fechaServicio, setFechaServicio] = useState("")
 
-    const filteredAssists = assists.filter((assist) =>
-        Object.values(assist)
-            .join(" ")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-    )
+    const filteredAssists = assists.filter((assist) => {
+        let fecha = ""
+        if (assist.fechaServicio) {
+            const d = new Date(assist.fechaServicio)
+            const yyyy = d.getFullYear()
+            const mm = String(d.getMonth() + 1).padStart(2, "0")
+            const dd = String(d.getDate()).padStart(2, "0")
+            fecha = `${yyyy}-${mm}-${dd}`
+        }
+
+        const horario = assist.servicio?.horario || ""
+        const familia = assist.familia?.nombreFamilia || ""
+
+        return (
+            fecha.includes(searchQuery) ||
+            horario.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            familia.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    })
 
     // Abrir modal para crear
     const openCreateModal = () => {
@@ -156,18 +177,28 @@ const GeneralAssistance = () => {
             <div className="flex flex-col md:flex-row items-center gap-2 mt-4 w-full max-w-6xl">
                 <input
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar por servicio o fecha"
+                    onChange={(e) => {
+                        const value = e.target.value
+                        setSearchQuery(value)
+                        setPage(1)
+                        getResumenServicios(value, 1, rowsPerPage) //  backend filtra
+                    }}
+                    placeholder="Buscar por servicio"
                     className="input input-sm input-bordered w-full md:flex-1"
                 />
                 <select
-                    value={rowsPerPage}
-                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                    onChange={(e) => {
+                        const value = Number(e.target.value)
+                        setRowsPerPage(value)
+                        setPage(1)
+                        getResumenServicios(searchQuery, 1, value) //  consulta API con nuevo limit
+                    }}
                     className="select select-sm w-36">
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                     <option value={50}>50</option>
+                    <option value={75}>75</option>
+                    <option value={100}>100</option>
                 </select>
             </div>
 
@@ -190,9 +221,10 @@ const GeneralAssistance = () => {
                             {filteredAssists
                                 .slice(0, rowsPerPage)
                                 .map((assist, idx) => (
-                                    <tr key={idx}>
-                                        <td>{idx + 1}</td>
-                                        {/* índice visible */}
+                                    <tr key={`${assist.idasistencia}-${idx}`}>
+                                        <td>
+                                            {(page - 1) * rowsPerPage + idx + 1}
+                                        </td>
                                         <td>
                                             {assist.fechaServicio?.split(
                                                 "T",
@@ -224,6 +256,16 @@ const GeneralAssistance = () => {
                     </table>
                 )}
             </div>
+            {/* Paginación */}
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                onPageChange={(newPage) => {
+                    setPage(newPage)
+                    getResumenServicios(searchQuery, newPage, rowsPerPage)
+                }}
+            />
 
             {modalOpen && (
                 <Modal
