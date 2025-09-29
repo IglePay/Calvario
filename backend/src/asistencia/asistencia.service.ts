@@ -46,9 +46,7 @@ export class AsistenciaService {
         // Agrupar por servicio y fecha
         const resumen = await this.prisma.tb_asistencia.groupBy({
             by: ['idservicio', 'fechaServicio'],
-            where: {
-                tenantId,
-            },
+            where: { tenantId },
             _sum: { cantidad_asistentes: true },
         });
 
@@ -69,17 +67,23 @@ export class AsistenciaService {
                 return {
                     idservicio: servicio.idservicio,
                     horario: servicio.horario,
-                    fechaServicio: r.fechaServicio,
+                    fechaServicio: r.fechaServicio, // tipo Date
                     total: r._sum.cantidad_asistentes || 0,
                 };
             }),
         );
 
-        // Filtrado por búsqueda (local, sobre el resultado)
+        // Filtrado por búsqueda (horario o fecha)
         const filtered = search
-            ? mapped.filter((m) =>
-                  m.horario.toLowerCase().includes(search.toLowerCase()),
-              )
+            ? mapped.filter((m) => {
+                  const fechaStr = m.fechaServicio
+                      ? m.fechaServicio.toISOString().split('T')[0]
+                      : '';
+                  return (
+                      m.horario.toLowerCase().includes(search.toLowerCase()) ||
+                      fechaStr.includes(search)
+                  );
+              })
             : mapped;
 
         const total = filtered.length;
