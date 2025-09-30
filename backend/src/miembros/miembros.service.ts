@@ -7,6 +7,76 @@ import { UpdateMiembroDto } from './dto/update.miembro.dto';
 export class MiembrosService {
     constructor(private readonly prisma: PrismaService) {}
 
+    // miembros.service.ts
+    // Obtener usuarios filtrados por rol, búsqueda y paginación
+    async getUsuariosByRolForTenant(
+        roleId: number,
+        page = 1,
+        limit = 10,
+        search?: string,
+    ) {
+        // Obtener el nombre del rol del usuario
+        const userRole = await this.prisma.tb_role.findUnique({
+            where: { id: roleId },
+            select: { nombre: true },
+        });
+
+        if (!userRole) throw new Error('Rol no encontrado');
+
+        //  Determinar roles permitidos según el rol actual
+        let allowedRoles: string[] = [];
+        if (userRole.nombre === 'admin') {
+            allowedRoles = ['admin', 'pastor', 'miembro'];
+        } else if (userRole.nombre === 'pastor') {
+            allowedRoles = ['secretario', 'tesorero', 'coordinador'];
+        }
+
+        //  Construir condiciones WHERE
+        const whereCondition: any = {
+            role: { nombre: { in: allowedRoles } },
+        };
+
+        if (search) {
+            // Prisma 6+ no tiene "mode: insensitive", hacemos todo en lowercase en JS
+            const searchLower = search.toLowerCase();
+            whereCondition.OR = [
+                { name: { contains: searchLower } },
+                { email: { contains: searchLower } },
+                {
+                    tb_tenants: {
+                        nombre: { contains: searchLower },
+                    },
+                },
+            ];
+        }
+
+        //  Obtener datos y total en una transacción
+        const [data, total] = await this.prisma.$transaction([
+            this.prisma.tb_user.findMany({
+                where: whereCondition,
+                skip: (page - 1) * limit,
+                take: limit,
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: { select: { nombre: true } },
+                    tb_tenants: { select: { nombre: true } },
+                },
+            }),
+            this.prisma.tb_user.count({ where: whereCondition }),
+        ]);
+
+        // Devolver datos con paginado
+        return {
+            data,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        };
+    }
+
     async findAllForTable() {
         return this.prisma.tb_miembros.findMany({
             select: {
@@ -154,7 +224,7 @@ export class MiembrosService {
         });
     }
 
-    // tabla
+    // tabla userrio assignar role y tenant
     async findAllForTableForTenant(
         tenantId: number,
         page = 1,

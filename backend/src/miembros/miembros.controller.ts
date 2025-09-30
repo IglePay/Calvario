@@ -43,6 +43,26 @@ export class MiembrosController {
         );
     }
 
+    // miembros.controller.ts
+    // miembros.controller.ts
+    @Get('asignar-rolportenant')
+    async getUsuariosByRolForTenant(
+        @Req() req: any,
+        @Query('page') page = 1,
+        @Query('limit') limit = 10,
+        @Query('search') search?: string,
+    ) {
+        console.log('REQ.USER:', req.user); // <-- verifica el usuario del JWT
+        console.log('Query Params:', { page, limit, search });
+        const roleId = req.user.roleId;
+        return this.miembrosService.getUsuariosByRolForTenant(
+            roleId,
+            Number(page),
+            Number(limit),
+            search,
+        );
+    }
+
     // Obtener bautizados para select
     @Get('bautizados')
     async getBautizados(@Req() req) {

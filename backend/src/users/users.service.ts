@@ -59,7 +59,7 @@ export class UsersService {
         });
         if (!tenant) throw new Error('Tenant no válido');
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const hashedPassword = await bcrypt.hash(data.password, 12);
         return this.prisma.tb_user.create({
             data: {
                 name: data.name,
@@ -88,7 +88,7 @@ export class UsersService {
 
         // Si envían contraseña, la encriptamos
         if (data.password) {
-            updateData.password = await bcrypt.hash(data.password, 10);
+            updateData.password = await bcrypt.hash(data.password, 12);
         }
 
         // Conectar rol si se envía
