@@ -236,9 +236,9 @@ export default function CleaningCalendar() {
             </div>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-base-200 rounded-xl p-6 w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-2">
+                <div className="modal modal-open">
+                    <div className="modal-box">
+                        <h2 className="text-xl font-bold">
                             {mode === "create"
                                 ? "Registrar Limpieza"
                                 : "Editar / Eliminar Limpieza"}

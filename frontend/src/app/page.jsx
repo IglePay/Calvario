@@ -26,7 +26,7 @@ const Home = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
             <div className="flex items-center justify-center w-35 h-35 rounded-full border-4 border-rose-500 shadow-md bg-transparent dark:bg-transparent mb-3">
                 <Image
                     src="/images/iglepay.png"

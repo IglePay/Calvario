@@ -151,9 +151,9 @@ const MembersModal = ({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-base-200 w-full max-w-5xl p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
-                <h2 className="text-xl font-bold mb-4">
+        <div className="modal modal-open">
+            <div className="modal-box">
+                <h2 className="text-lg font-bold ">
                     {mode === "create" ? "Nuevo Miembro" : "Editar Miembro"}
                 </h2>
 

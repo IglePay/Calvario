@@ -18,9 +18,9 @@ export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-base-100 p-6 rounded shadow-lg w-96">
-                <h2 className="text-xl font-bold mb-4">
+        <div className="modal modal-open">
+            <div className="modal-box">
+                <h2 className="text-xl font-bold mb-3">
                     {initialData ? "Editar Grupo" : "Agregar Grupo"}
                 </h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -33,11 +33,11 @@ export default function GrupoModal({ isOpen, onClose, onSave, initialData }) {
                         required
                     />
 
-                    <div className="flex justify-end gap-2 mt-4">
+                    <div className="modal-action justify-center">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="btn btn-ghost bg-gray-700">
+                            className="btn text-white bg-gray-700">
                             Cancelar
                         </button>
                         <button type="submit" className="btn btn-accent w-auto">

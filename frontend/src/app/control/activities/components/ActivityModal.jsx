@@ -49,14 +49,12 @@ const ActivityModal = ({
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
-            <div className="bg-base-100 p-6 rounded-lg w-full max-w-md">
+        <div className="modal modal-open">
+            <div className="modal-box">
                 <h3 className="text-lg font-bold mb-4">
                     {initialData ? "Editar Actividad" : "Nueva Actividad"}
                 </h3>
-                <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3 ">
                     <div className="form-control">
                         <label className="label">Título</label>
                         <input
