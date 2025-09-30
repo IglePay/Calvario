@@ -11,6 +11,13 @@ export function useUsers() {
     const [roles, setRoles] = useState([])
     const [tenants, setTenants] = useState([])
 
+    // --- estados nuevos para paginado y búsqueda ---
+    const [page, setPage] = useState(1) //pagina actual
+    const [limit, setLimit] = useState(10) // selector: 10,25,50,100
+    const [search, setSearch] = useState("") //fitrar por texto
+    const [totalPages, setTotalPages] = useState(1) //boton  paginado
+
+    // Roles y tenants (no se toca)
     const fetchRolesAndTenants = () => {
         if (!user?.tenantId) return
         setError(null)
@@ -26,26 +33,33 @@ export function useUsers() {
             .catch((err) => console.error(err))
     }
 
-    //  Cargar usuarios SOLO del tenant actual
+    //  Nuevo fetchUsers con paginado, búsqueda y selector
     const fetchUsers = () => {
-        if (!user?.tenantId) return //  protege
+        if (!user) return
 
         setLoading(true)
         setError(null)
 
-        return apiFetch(`/users/full?tenantId=${user.tenantId}`) // filtras por tenant
+        const query = new URLSearchParams({
+            page: page.toString(),
+            limit: limit.toString(),
+            ...(search ? { search } : {}),
+        })
+
+        return apiFetch(`/miembros/asignar-rolportenant?${query}`)
             .then((res) => {
                 if (!res.ok) throw new Error("No se pudo cargar usuarios")
                 return res.json()
             })
-            .then((data) =>
-                setUsers(Array.isArray(data) ? data : (data.data ?? [])),
-            )
+            .then((data) => {
+                setUsers(data.data ?? [])
+                setTotalPages(data.totalPages ?? 1)
+            })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false))
     }
 
-    //  Crear o actualizar usuario dentro del tenant actual
+    // Crear o actualizar usuario
     const createOrUpdateUser = (form) => {
         if (!user?.tenantId) return Promise.reject("No hay tenant activo")
         setError(null)
@@ -75,7 +89,7 @@ export function useUsers() {
             })
     }
 
-    //  Eliminar usuario
+    // Eliminar usuario
     const deleteUser = (id) => {
         if (!user?.tenantId) return Promise.reject("No hay tenant activo")
         setError(null)
@@ -91,12 +105,13 @@ export function useUsers() {
             })
     }
 
+    // Fetch cuando cambian user, page, limit o search
     useEffect(() => {
         if (user?.tenantId) {
             fetchUsers()
             fetchRolesAndTenants()
         }
-    }, [user])
+    }, [user, page, limit, search])
 
     return {
         user,
@@ -108,5 +123,13 @@ export function useUsers() {
         fetchUsers,
         createOrUpdateUser,
         deleteUser,
+        //  agregamos estos para manejar el frontend
+        page,
+        setPage,
+        limit,
+        setLimit,
+        search,
+        setSearch,
+        totalPages,
     }
 }

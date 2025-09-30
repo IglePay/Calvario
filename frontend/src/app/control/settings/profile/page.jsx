@@ -6,6 +6,7 @@ import { exportToExcel, exportToPDF } from "@/utils/exportData"
 import { useUsers } from "@/hooks/profile/useUsers"
 import * as Yup from "yup"
 import { validateForm } from "@/utils/validator"
+import Pagination from "@/components/Paginacion"
 
 export default function Profile() {
     const {
@@ -16,9 +17,16 @@ export default function Profile() {
         tenants,
         createOrUpdateUser,
         deleteUser,
+        page,
+        setPage,
+        limit,
+        setLimit,
+        search,
+        setSearch,
+        totalPages,
     } = useUsers()
+
     const [modalOpen, setModalOpen] = useState(false)
-    const [search, setSearch] = useState("")
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [form, setForm] = useState({
         id_usuario: null,
@@ -165,13 +173,19 @@ export default function Profile() {
                 <input
                     type="text"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        setSearch(e.target.value)
+                        setPage(1) // resetear a página 1 al buscar
+                    }}
                     placeholder="Buscar por usuario, email o iglesia"
                     className="input input-sm input-bordered w-full md:flex-1"
                 />
                 <select
-                    value={rowsPerPage}
-                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                    value={limit}
+                    onChange={(e) => {
+                        setLimit(Number(e.target.value))
+                        setPage(1) // resetear a página 1 al cambiar filas
+                    }}
                     className="select select-sm w-36">
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -204,46 +218,51 @@ export default function Profile() {
                             </tr>
                         </thead>
                         <tbody className="text-center">
-                            {filteredMembers.length === 0 ? (
+                            {users.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="py-6">
                                         No hay resultados
                                     </td>
                                 </tr>
                             ) : (
-                                filteredMembers
-                                    .slice(0, rowsPerPage)
-                                    .map((member) => (
-                                        <tr key={member.id}>
-                                            <td>{member.id}</td>
-                                            <td>{member.role?.nombre}</td>
-                                            <td>{member.name}</td>
-                                            <td>{member.email}</td>
-                                            <td>••••••</td>
-                                            <td>{member.tb_tenants?.nombre}</td>
-                                            <td className="flex gap-2 items-center justify-center">
-                                                <button
-                                                    onClick={() =>
-                                                        openModal(member)
-                                                    }
-                                                    className="btn btn-warning btn-xs">
-                                                    <i className="fas fa-edit"></i>
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(member.id)
-                                                    }
-                                                    className="btn btn-error btn-xs">
-                                                    <i className="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
+                                users.map((member) => (
+                                    <tr key={member.id}>
+                                        <td>{member.id}</td>
+                                        <td>{member.role?.nombre}</td>
+                                        <td>{member.name}</td>
+                                        <td>{member.email}</td>
+                                        <td>••••••</td>
+                                        <td>{member.tb_tenants?.nombre}</td>
+                                        <td className="flex gap-2 items-center justify-center">
+                                            <button
+                                                onClick={() =>
+                                                    openModal(member)
+                                                }
+                                                className="btn btn-warning btn-xs">
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(member.id)
+                                                }
+                                                className="btn btn-error btn-xs">
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>
                 )}
             </div>
+
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={users.length} // opcional
+                onPageChange={(p) => setPage(p)}
+            />
 
             {/* Modal (opcional). Si usas daisyUI, puedes montar aquí tu formulario usando `modalOpen` */}
             {modalOpen && (

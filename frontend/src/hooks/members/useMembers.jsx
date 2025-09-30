@@ -74,7 +74,7 @@ export function useMembers() {
         }
     }
 
-    // 🔹 Crear miembro
+    //  Crear miembro
     const createMember = async (member) => {
         if (!user) throw new Error("Usuario no autenticado")
 
