@@ -3,22 +3,42 @@ import { useState, useEffect } from "react"
 import * as Yup from "yup"
 
 // Definir el esquema de validación
-const memberSchema = Yup.object().shape({
+const createMemberSchema = Yup.object().shape({
     dpi: Yup.string().nullable(),
     nombre: Yup.string().required("Nombre es obligatorio"),
     apellido: Yup.string().required("Apellido es obligatorio"),
     email: Yup.string().email("Correo no válido").nullable(),
     telefono: Yup.string("Son numeros de 8 digitos").nullable(),
     fechaNacimiento: Yup.date().nullable(),
-    idGenero: Yup.number().nullable(),
+    idGenero: Yup.number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+        )
+        .nullable(),
     direccion: Yup.string().nullable(),
-    idEstado: Yup.number().nullable(),
+    idEstado: Yup.number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+        )
+        .nullable(),
     fechaLlegada: Yup.date().nullable(),
-    idBautizado: Yup.number().nullable(),
+    idBautizado: Yup.number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+        )
+        .nullable(),
     fechaBautismo: Yup.date().nullable(),
-    idServidor: Yup.number().nullable(),
+    idServidor: Yup.number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+        )
+        .nullable(),
     procesosterminado: Yup.string().nullable(),
-    idGrupo: Yup.number().nullable(),
+    idGrupo: Yup.number()
+        .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+        )
+        .nullable(),
     legusta: Yup.string().nullable(),
 })
 
@@ -41,17 +61,20 @@ const MembersModal = ({
         email: "",
         telefono: "",
         fechaNacimiento: "",
-        idGenero: "",
+        idGenero: "", //era 0
         direccion: "",
-        idEstado: "",
+        idEstado: "", // 0
         fechaLlegada: "",
-        idBautizado: "",
+        idBautizado: "", //0
         fechaBautismo: "",
-        idServidor: "",
+        idServidor: "", //0
         procesosterminado: "",
-        idGrupo: "",
+        idGrupo: "", //0
         legusta: "",
     })
+
+    // Para trackear solo los campos modificados
+    const [changedFields, setChangedFields] = useState({})
 
     const normalizeMemberForForm = (member) => ({
         dpi: member.dpi || "",
@@ -74,11 +97,10 @@ const MembersModal = ({
         legusta: member.legusta || "",
     })
 
-    //  Prellenar formulario al editar
-
     useEffect(() => {
         if (mode === "edit" && initialData) {
             setFormData(normalizeMemberForForm(initialData))
+            setChangedFields({})
         } else if (mode === "create") {
             setFormData({
                 dpi: "",
@@ -98,52 +120,98 @@ const MembersModal = ({
                 idGrupo: "",
                 legusta: "",
             })
+            setChangedFields({})
         }
     }, [initialData, mode])
 
+    // Función para manejar cambios en los inputs
     const handleChange = (e) => {
         const { name, value, type, checked, files } = e.target
-        setFormData({
-            ...formData,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                    : type === "file"
-                      ? files[0]
-                      : value,
-        })
-    }
+        const newValue =
+            type === "checkbox" ? checked : type === "file" ? files[0] : value
 
-    const toISO = (date) => (date ? new Date(date).toISOString() : null)
-    const toNumberOrNull = (value) =>
-        value !== "" && value != null ? Number(value) : null
+        // Actualizar el formulario completo
+        setFormData((prev) => ({
+            ...prev,
+            [name]: newValue,
+        }))
+
+        // Solo marcar como cambiado si estamos editando
+        if (mode === "edit") {
+            setChangedFields((prev) => ({
+                ...prev,
+                [name]: newValue,
+            }))
+        }
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        try {
-            const validatedData = await memberSchema.validate(formData, {
-                abortEarly: false,
-                stripUnknown: true,
-            })
+        let payload = {}
 
-            const payload = {
-                ...validatedData,
-                fechaNacimiento: toISO(validatedData.fechaNacimiento),
-                fechaLlegada: toISO(validatedData.fechaLlegada),
-                fechaBautismo: toISO(validatedData.fechaBautismo),
-                idGenero: toNumberOrNull(validatedData.idGenero),
-                idEstado: toNumberOrNull(validatedData.idEstado),
-                idGrupo: toNumberOrNull(validatedData.idGrupo),
-                idBautizado: toNumberOrNull(validatedData.idBautizado),
-                idServidor: toNumberOrNull(validatedData.idServidor),
+        try {
+            // Validar según el modo
+            if (mode === "create") {
+                // Yup valida los campos y descarta lo desconocido
+                payload = await createMemberSchema.validate(formData, {
+                    abortEarly: false,
+                    stripUnknown: true,
+                })
+            } else {
+                // En edit, tomamos todo el formData (o solo los modificados si quieres)
+                payload = { ...formData }
             }
 
-            console.log("payload listo para enviar:", payload)
-            onSubmit(payload)
+            // Convertir fechas a ISO o null
+            const dateFields = [
+                "fechaNacimiento",
+                "fechaLlegada",
+                "fechaBautismo",
+            ]
+            dateFields.forEach((field) => {
+                payload[field] =
+                    payload[field] && payload[field] !== ""
+                        ? new Date(payload[field]).toISOString()
+                        : null
+            })
+
+            // Convertir números a 0 si están vacíos
+            const numberFields = [
+                "idGenero",
+                "idEstado",
+                "idGrupo",
+                "idBautizado",
+                "idServidor",
+            ]
+            numberFields.forEach((field) => {
+                payload[field] =
+                    payload[field] != null && payload[field] !== ""
+                        ? Number(payload[field])
+                        : 0
+            })
+
+            // Strings opcionales: convertir null a ""
+            const stringFields = [
+                "dpi",
+                "email",
+                "telefono",
+                "direccion",
+                "procesosterminado",
+                "legusta",
+            ]
+            stringFields.forEach((field) => {
+                payload[field] = payload[field] || ""
+            })
+
+            console.log("Payload listo para enviar:", payload)
+            await onSubmit(payload)
         } catch (err) {
-            if (err.inner) {
-                console.log("Errores de validación:", err.inner)
+            if (err.name === "ValidationError") {
+                // Mostrar errores de validación (opcional)
+                console.error("Errores de validación:", err.errors)
+            } else {
+                console.error(err)
             }
         }
     }
@@ -152,8 +220,8 @@ const MembersModal = ({
 
     return (
         <div className="modal modal-open">
-            <div className="modal-box">
-                <h2 className="text-lg font-bold ">
+            <div className="bg-base-200 w-85 md:w-auto p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
+                <h2 className="text-lg font-bold mb-4">
                     {mode === "create" ? "Nuevo Miembro" : "Editar Miembro"}
                 </h2>
 
@@ -217,6 +285,7 @@ const MembersModal = ({
                             placeholder="ejem. 12121414"
                         />
                     </div>
+
                     <div className="flex flex-col">
                         <label className="label">Dirección actual</label>
                         <input
@@ -227,6 +296,7 @@ const MembersModal = ({
                             className="input w-full"
                         />
                     </div>
+
                     {/* Fechas */}
                     <div className="flex flex-col">
                         <label className="label">Fecha de nacimiento</label>
@@ -333,7 +403,6 @@ const MembersModal = ({
                         </select>
                     </div>
 
-                    {/* Servidor */}
                     <div className="flex flex-col">
                         <label className="label">Servidor</label>
                         <select

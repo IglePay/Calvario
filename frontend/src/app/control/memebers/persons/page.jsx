@@ -1,9 +1,10 @@
 "use client"
 import Link from "next/link"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { useMembers } from "@/hooks/members/useMembers"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
 import MembersModal from "../components/MembersModal"
+import Pagination from "../../../../components/Paginacion"
 
 const Persons = () => {
     const {
@@ -18,22 +19,19 @@ const Persons = () => {
         estados,
         bautizados,
         servidores,
+        page,
+        setPage,
+        rowsPerPage,
+        setRowsPerPage,
+        total,
+        totalPages,
+        search,
+        setSearch,
+        fetchMembers, //  forzar refetch si quieres
     } = useMembers()
 
-    const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [searchQuery, setSearchQuery] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editData, setEditData] = useState(null)
-
-    const filteredMembers = useMemo(() => {
-        if (!members) return []
-        return members.filter((member) =>
-            Object.values(member)
-                .join(" ")
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()),
-        )
-    }, [members, searchQuery])
 
     const handledAdd = () => {
         setEditData(null)
@@ -65,10 +63,20 @@ const Persons = () => {
         }
     }
 
-    const exportData = filteredMembers.map((member) => ({
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value)
+        setPage(1) // resetear a página 1 al buscar
+    }
+
+    const handleRowsPerPageChange = (e) => {
+        setRowsPerPage(Number(e.target.value))
+        setPage(1) // resetear a página 1 al cambiar el límite
+    }
+
+    const exportData = members.map((member) => ({
         ID: member.idMiembro,
         Nombre: member.nombre,
-        apellido: member.apellido,
+        Apellido: member.apellido,
         Edad: member.edad,
         Teléfono: member.telefono,
         Dirección: member.direccion,
@@ -86,7 +94,7 @@ const Persons = () => {
 
             {/* Botones */}
             <div className="flex gap-2 mt-4">
-                <Link href={"/control"} className="btn btn-primary btn-sm  ">
+                <Link href={"/control"} className="btn btn-primary btn-sm">
                     Regresar
                 </Link>
                 <button onClick={handledAdd} className="btn btn-accent btn-sm">
@@ -108,14 +116,14 @@ const Persons = () => {
             <div className="flex flex-col md:flex-row items-center gap-2 mt-4 w-full max-w-6xl">
                 <input
                     type="text"
-                    placeholder="Buscar por nombre, teléfono, año"
+                    placeholder="Buscar por nombre, apellido, teléfono..."
                     className="input input-sm input-bordered w-full md:flex-1"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={search}
+                    onChange={handleSearchChange}
                 />
                 <select
                     value={rowsPerPage}
-                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                    onChange={handleRowsPerPageChange}
                     className="select select-sm w-36">
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -148,55 +156,57 @@ const Persons = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredMembers
-                                .slice(0, rowsPerPage)
-                                .map((member, index) => (
-                                    <tr
-                                        key={member.idMiembro ?? index}
-                                        className="text-center">
-                                        <td>{member.idMiembro}</td>
-                                        <td>{member.nombre}</td>
-                                        <td>{member.apellido}</td>
-                                        <td>{member.edad}</td>
-                                        <td>{member.telefono}</td>
-                                        <td>{member.direccion}</td>
-                                        <td>{member.fechaLlegada}</td>
-                                        <td>
-                                            {bautizados.find(
-                                                (b) =>
-                                                    b.idBautizado ===
-                                                    member.idBautizado,
-                                            )?.bautizadoEstado || "No"}
-                                        </td>
-
-                                        <td>{member.procesosterminado}</td>
-                                        <td>
-                                            {member.grupo?.nombregrupo || ""}
-                                        </td>
-                                        <td className="flex gap-2 items-center justify-center">
-                                            <button
-                                                onClick={() =>
-                                                    handlEdit(member)
-                                                }
-                                                className="btn btn-warning btn-xs">
-                                                <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        member.idMiembro,
-                                                    )
-                                                }
-                                                className="btn btn-error btn-xs">
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                            {members.map((member, index) => (
+                                <tr
+                                    key={member.idMiembro ?? index}
+                                    className="text-center">
+                                    <td>
+                                        {(page - 1) * rowsPerPage + index + 1}
+                                    </td>
+                                    <td>{member.nombre}</td>
+                                    <td>{member.apellido}</td>
+                                    <td>{member.edad}</td>
+                                    <td>{member.telefono}</td>
+                                    <td>{member.direccion}</td>
+                                    <td>{member.fechaLlegada}</td>
+                                    <td>
+                                        {bautizados.find(
+                                            (b) =>
+                                                b.idBautizado ===
+                                                member.idBautizado,
+                                        )?.bautizadoEstado || "No"}
+                                    </td>
+                                    <td>{member.procesosterminado}</td>
+                                    <td>{member.grupo?.nombregrupo || ""}</td>
+                                    <td className="flex gap-2 items-center justify-center">
+                                        <button
+                                            onClick={() => handlEdit(member)}
+                                            className="btn btn-warning btn-xs">
+                                            <i className="fas fa-edit"></i>
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(member.idMiembro)
+                                            }
+                                            className="btn btn-error btn-xs">
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 )}
             </div>
+
+            {/* Paginación */}
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                onPageChange={setPage}
+            />
+
             <MembersModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -207,7 +217,8 @@ const Persons = () => {
                 generos={generos}
                 estados={estados}
                 bautizados={bautizados}
-                servidores={servidores}></MembersModal>
+                servidores={servidores}
+            />
         </div>
     )
 }
