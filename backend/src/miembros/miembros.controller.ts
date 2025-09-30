@@ -8,6 +8,7 @@ import {
     Req,
     UseGuards,
     Delete,
+    Query,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { MiembrosService } from './miembros.service';
@@ -27,9 +28,19 @@ export class MiembrosController {
 
     // Obtener datos solo para tabla
     @Get('table')
-    async getAllForTable(@Req() req) {
+    async getAllForTable(
+        @Req() req: Request & { user: any },
+        @Query('page') page = 1,
+        @Query('limit') limit = 10,
+        @Query('search') search?: string,
+    ) {
         const idTenant = req.user.tenantId;
-        return this.miembrosService.findAllForTableForTenant(idTenant);
+        return this.miembrosService.findAllForTableForTenant(
+            idTenant,
+            Number(page),
+            Number(limit),
+            search,
+        );
     }
 
     // Obtener bautizados para select

@@ -154,43 +154,58 @@ export class MiembrosService {
         });
     }
 
-    async findAllForTableForTenant(tenantId: number) {
-        const miembros = await this.prisma.tb_miembros.findMany({
-            where: { tenantId },
-            select: {
-                dpi: true,
-                idMiembro: true,
-                nombre: true,
-                apellido: true,
-                email: true,
-                telefono: true,
-                direccion: true,
-                fechanacimiento: true,
-                fechaLlegada: true,
-                fechaBautismo: true,
-                idGenero: true,
-                genero: {
-                    select: {
-                        nombregenero: true,
-                    },
+    // tabla
+    async findAllForTableForTenant(
+        tenantId: number,
+        page = 1,
+        limit = 10,
+        search?: string,
+    ) {
+        const skip = (page - 1) * limit;
+
+        const where: any = { tenantId };
+
+        if (search) {
+            where.OR = [
+                { nombre: { contains: search, mode: 'insensitive' } },
+                { apellido: { contains: search, mode: 'insensitive' } },
+                { telefono: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        const [total, miembros] = await Promise.all([
+            this.prisma.tb_miembros.count({ where }),
+            this.prisma.tb_miembros.findMany({
+                where,
+                skip,
+                take: limit,
+                select: {
+                    dpi: true,
+                    idMiembro: true,
+                    nombre: true,
+                    apellido: true,
+                    email: true,
+                    telefono: true,
+                    direccion: true,
+                    fechanacimiento: true,
+                    fechaLlegada: true,
+                    fechaBautismo: true,
+                    idGenero: true,
+                    genero: { select: { nombregenero: true } },
+                    idEstado: true,
+                    estadoCivil: { select: { nombreEstado: true } },
+                    idGrupo: true,
+                    grupo: { select: { nombregrupo: true } },
+                    procesosterminado: true,
+                    legusta: true,
+                    idBautizado: true,
+                    idServidor: true,
                 },
-                idEstado: true,
-                estadoCivil: {
-                    select: { nombreEstado: true },
-                },
-                idGrupo: true,
-                grupo: {
-                    select: { nombregrupo: true },
-                },
-                procesosterminado: true,
-                legusta: true,
-                idBautizado: true,
-                idServidor: true,
-            },
-        });
+                orderBy: { nombre: 'asc' },
+            }),
+        ]);
 
         const miembrosFormateados = miembros.map((m) => {
-            // Calcular edad
             let edad: number | null = null;
             if (m.fechanacimiento) {
                 const today = new Date();
@@ -205,25 +220,26 @@ export class MiembrosService {
                 }
             }
 
-            // Formatear fechas a YYYY-MM-DD
             const formatDate = (date: Date | string | null | undefined) =>
                 date ? new Date(date).toISOString().split('T')[0] : null;
 
-            const fechaLlegada = formatDate(m.fechaLlegada);
-            const fechaBautismo = formatDate(m.fechaBautismo);
-
-            const { fechanacimiento, ...rest } = m; // quitar fechanacimiento
-
             return {
-                ...rest,
+                ...m,
                 edad,
-                fechaLlegada,
-                fechaBautismo,
-                fechanacimiento,
+                fechaLlegada: formatDate(m.fechaLlegada),
+                fechaBautismo: formatDate(m.fechaBautismo),
             };
         });
 
-        return miembrosFormateados;
+        return {
+            data: miembrosFormateados,
+            meta: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit),
+            },
+        };
     }
 
     // dashboard
