@@ -127,6 +127,12 @@ export default function Sidebar({ isOpen, onClose }) {
                     label: "Datos de la Iglesia",
                     route: "/control/settings/church_data",
                 },
+                {
+                    id: "role-permiso",
+                    icon: "fa-solid fa-lock",
+                    label: "Roles y Permisos",
+                    route: "/control/settings/rolepermiso",
+                },
             ],
         },
     ]
