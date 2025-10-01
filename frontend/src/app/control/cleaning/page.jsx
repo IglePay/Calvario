@@ -240,8 +240,8 @@ export default function CleaningCalendar() {
                     <div className="modal-box">
                         <h2 className="text-xl font-bold">
                             {mode === "create"
-                                ? "Registrar Limpieza"
-                                : "Editar / Eliminar Limpieza"}
+                                ? "Registrar Evento"
+                                : "Editar / Eliminar Evento"}
                         </h2>
 
                         {errorMessage && (
