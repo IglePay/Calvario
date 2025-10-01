@@ -174,7 +174,7 @@ const Accounts = () => {
             {/* Tabla */}
             <div className="overflow-x-auto rounded-box border border-base-content/5 mt-5 w-full max-w-6xl">
                 {error && (
-                    <div className="alert alert-error">
+                    <div className="alert alert-error bg-red-500">
                         <span>{error}</span>
                     </div>
                 )}
