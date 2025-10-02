@@ -14,6 +14,8 @@ import { FundsService } from './funds.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateFundDto } from './dto/create-fund.dto';
 import { UpdateFundDto } from './dto/update-fund.dto';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('funds')
@@ -21,6 +23,7 @@ export class FundsController {
     constructor(private readonly fundsService: FundsService) {}
 
     @Get()
+    @Permissions('ver_finanzas')
     findAll(
         @Req() req: any,
         @Query('page') page = '1',

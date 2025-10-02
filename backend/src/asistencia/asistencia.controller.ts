@@ -74,7 +74,7 @@ export class AsistenciaController {
             fechaServicio,
             page ? Number(page) : 1,
             limit ? Number(limit) : 10,
-            search || '',
+            (search = (search || '').trim()),
         );
     }
 
@@ -97,6 +97,7 @@ export class AsistenciaController {
         return this.asistenciaService.update(tenantId, Number(id), dto);
     }
 
+    //elimnar registros de horario
     @Delete(':id')
     remove(@Req() req: Request & { user: any }, @Param('id') id: string) {
         const tenantId = req.user.tenantId;

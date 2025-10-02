@@ -17,10 +17,17 @@ export class UsersService {
 
     async findByIdWithRelations(id: number) {
         return this.prisma.tb_user.findUnique({
-            where: { id: id },
+            where: { id },
             include: {
-                role: true, // relación a tb_role
-                tb_tenants: true, // relación a tb_tenants
+                role: {
+                    include: {
+                        rolePermissions: {
+                            //  relación intermedia
+                            include: { permiso: true }, //  permisos vinculados
+                        },
+                    },
+                },
+                tb_tenants: true,
             },
         });
     }
@@ -29,7 +36,13 @@ export class UsersService {
         return this.prisma.tb_user.findUnique({
             where: { email },
             include: {
-                role: true,
+                role: {
+                    include: {
+                        rolePermissions: {
+                            include: { permiso: true },
+                        },
+                    },
+                },
                 tb_tenants: true,
             },
         });

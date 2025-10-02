@@ -68,7 +68,8 @@ export class AuthController {
                 secure: isProd,
                 sameSite: isProd ? 'strict' : 'lax',
                 maxAge:
-                    Number(process.env.COOKIE_MAX_AGE_ACCESS) || 1000 * 60 * 15, // 15m
+                    Number(process.env.COOKIE_MAX_AGE_ACCESS) ||
+                    1000 * 60 * 60 * 8, //  formato 1000 *60*15 15m
                 domain: process.env.COOKIE_DOMAIN || undefined,
             },
         );

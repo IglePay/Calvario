@@ -21,15 +21,20 @@ export class AuthService {
     }
 
     async login(user: any) {
+        // Extraer los permisos del rol
+        const permisos =
+            user.role?.rolePermissions?.map((rp) => rp.permiso.nombre) || [];
+
         const payload = {
             sub: user.id,
             tenantId: user.tenantId,
             roleId: user.roleId,
+            permisos, // agregamos permisos
         };
 
         const accessToken = this.jwtService.sign(payload, {
             secret: process.env.JWT_SECRET,
-            expiresIn: process.env.JWT_EXPIRES_IN || '8h', //era 15m que son 15 minutos
+            expiresIn: process.env.JWT_EXPIRES_IN || '8h', // era 15 minutos
         });
 
         const refreshToken = this.jwtService.sign(

@@ -17,6 +17,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { AsistenciaModule } from './asistencia/asistencia.module';
 import { NomeclaturaModule } from './nomeclatura/nomeclatura.module';
 import { FundsModule } from './funds/funds.module';
+import { RolPermisoModule } from './rolpermiso/rolpermiso.module';
 
 @Global()
 @Module({
@@ -43,6 +44,7 @@ import { FundsModule } from './funds/funds.module';
         AsistenciaModule,
         NomeclaturaModule,
         FundsModule,
+        RolPermisoModule,
     ],
     controllers: [],
     providers: [PrismaService],

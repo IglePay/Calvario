@@ -25,13 +25,37 @@ model tb_user {
 }
 //=============Roles===========
 model tb_role {
-  id          Int     @id @default(autoincrement()) @map("id_rol")
-  nombre      String  @unique(map: "nombre") @map("nombre") @db.VarChar(50)
-  descripcion String? @db.VarChar(255)
-  users       tb_user[]  @relation("UserRole")
+  id          Int                  @id @default(autoincrement()) @map("id_rol")
+  nombre      String               @unique(map: "nombre") @map("nombre") @db.VarChar(50)
+  descripcion String?              @db.VarChar(255)
+  users       tb_user[]            @relation("UserRole")
+
+  rolePermissions tb_role_permissions[]
 
   @@map("tb_roles")
 }
+
+model tb_permission {
+  id          Int                  @id @default(autoincrement())
+  nombre      String               @unique @db.VarChar(100)
+  descripcion String?              @db.VarChar(255)
+
+  rolePermissions tb_role_permissions[]
+
+  @@map("tb_permission")
+}
+
+model tb_role_permissions {
+  role_id      Int
+  permission_id Int
+
+  role    tb_role      @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permiso tb_permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@id([role_id, permission_id])
+  @@map("tb_role_permissions")
+}
+
 //=============tenants por iglesia===========
 model tb_tenants {
   id_tenant      Int       @id @default(autoincrement())
