@@ -3,7 +3,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Modal from "@/components/ModalGeneral"
 import Pagination from "@/components/Paginacion"
-import { useAssistance } from "@/hooks/attendance/useAttendace"
+import { useResumenServicios } from "../../../../hooks/attendance/useResumenServicio"
 import * as yup from "yup"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
 
@@ -24,8 +24,7 @@ const GeneralAssistance = () => {
         refresh,
         createAssist,
         updateAssist,
-        deleteAssist,
-    } = useAssistance()
+    } = useResumenServicios()
 
     // const [rowsPerPage, setRowsPerPage] = useState(10)
     const [searchQuery, setSearchQuery] = useState("")
@@ -38,22 +37,12 @@ const GeneralAssistance = () => {
     const [fechaServicio, setFechaServicio] = useState("")
 
     const filteredAssists = assists.filter((assist) => {
-        let fecha = ""
-        if (assist.fechaServicio) {
-            const d = new Date(assist.fechaServicio)
-            const yyyy = d.getFullYear()
-            const mm = String(d.getMonth() + 1).padStart(2, "0")
-            const dd = String(d.getDate()).padStart(2, "0")
-            fecha = `${yyyy}-${mm}-${dd}`
-        }
-
-        const horario = assist.servicio?.horario || ""
-        const familia = assist.familia?.nombreFamilia || ""
+        const fecha = assist.fechaServicio || "" // YYYY-MM-DD
+        const horario = assist.horario || ""
 
         return (
-            fecha.includes(searchQuery) ||
-            horario.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            familia.toLowerCase().includes(searchQuery.toLowerCase())
+            fecha.includes(searchQuery) || // coincide si escriben "2025-09-26" o "2025-09"
+            horario.toLowerCase().includes(searchQuery.toLowerCase())
         )
     })
 
@@ -125,17 +114,6 @@ const GeneralAssistance = () => {
         }
     }
 
-    const handleDelete = async (id) => {
-        if (!confirm("¿Eliminar esta asistencia?")) return
-        try {
-            await deleteAssist(id)
-            refresh()
-        } catch (err) {
-            console.error(err)
-            alert("Error al eliminar la asistencia")
-        }
-    }
-
     const exportData = filteredAssists.map((f) => ({
         Servicio:
             f.servicio?.horario || f.servicio?.nombre || f.servicio?.idservicio,
@@ -181,11 +159,12 @@ const GeneralAssistance = () => {
                         const value = e.target.value
                         setSearchQuery(value)
                         setPage(1)
-                        getResumenServicios(value, 1, rowsPerPage) //  backend filtra
+                        getResumenServicios(value, 1, rowsPerPage) // backend filtra
                     }}
-                    placeholder="Buscar por servicio"
+                    placeholder="Buscar por fecha 2020-03-21 o horario"
                     className="input input-sm input-bordered w-full md:flex-1"
                 />
+
                 <select
                     onChange={(e) => {
                         const value = Number(e.target.value)
@@ -221,34 +200,20 @@ const GeneralAssistance = () => {
                             {filteredAssists
                                 .slice(0, rowsPerPage)
                                 .map((assist, idx) => (
-                                    <tr key={`${assist.idasistencia}-${idx}`}>
+                                    <tr
+                                        key={`${assist.idservicio}-${assist.fechaServicio}-${idx}`}>
                                         <td>
                                             {(page - 1) * rowsPerPage + idx + 1}
                                         </td>
-                                        <td>
-                                            {assist.fechaServicio?.split(
-                                                "T",
-                                            )[0] || "—"}
-                                        </td>
-                                        <td>
-                                            {assist.servicio?.horario || "—"}
-                                        </td>
-                                        <td>{assist.totalAsistentes || "—"}</td>
+                                        <td>{assist.fechaServicio || "—"}</td>
+                                        <td>{assist.horario || "—"}</td>
+                                        <td>{assist.total || 0}</td>
                                         <td className="flex gap-2 justify-center">
                                             <Link
-                                                href={`/control/attendance/summary?idservicio=${assist.servicio.idservicio}&fechaServicio=${assist.fechaServicio?.split("T")[0]}`}
+                                                href={`/control/attendance/summary?idservicio=${assist.idservicio}&fechaServicio=${assist.fechaServicio}`}
                                                 className="btn btn-info btn-xs">
                                                 <i className="fas fa-eye"></i>
                                             </Link>
-                                            <button
-                                                className="btn btn-error btn-xs"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        assist.idasistencia,
-                                                    )
-                                                }>
-                                                <i className="fas fa-trash"></i>
-                                            </button>
                                         </td>
                                     </tr>
                                 ))}
