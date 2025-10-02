@@ -208,20 +208,14 @@ const Funds = () => {
                     <tbody className="text-center">
                         {filteredFunds.length > 0 ? (
                             filteredFunds.map((fund, index) => (
-                                <tr key={fund.id}>
-                                    {/* Mostrar el índice + 1 en lugar del id de la BD */}
-                                    <td>{index + 1}</td>
+                                <tr key={fund.id ?? index}>
+                                    {/* Índice global según la página */}
+                                    <td>
+                                        {(page - 1) * rowsPerPage + index + 1}
+                                    </td>
                                     <td>{fund.nombre}</td>
                                     <td>{fund.descripcion}</td>
-                                    <td>
-                                        {new Date(
-                                            fund.fecha,
-                                        ).toLocaleDateString("es-GT", {
-                                            year: "numeric",
-                                            month: "short",
-                                            day: "numeric",
-                                        })}
-                                    </td>
+                                    <td>{fund.fecha}</td>
                                     <td>{fund.tipo}</td>
                                     <td>Q{fund.monto}</td>
                                     <td>Q{fund.saldo}</td>
@@ -311,9 +305,10 @@ const Funds = () => {
             </div>
 
             {/* Paginación */}
+
             <Pagination
                 page={page}
-                setPage={setPage}
+                onPageChange={(p) => setPage(p)}
                 totalPages={totalPages}
                 total={total}
                 rowsPerPage={rowsPerPage}
