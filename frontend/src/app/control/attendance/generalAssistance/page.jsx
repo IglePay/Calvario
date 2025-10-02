@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Modal from "@/components/ModalGeneral"
 import Pagination from "@/components/Paginacion"
@@ -19,11 +19,12 @@ const GeneralAssistance = () => {
         totalPages,
         total,
         getResumenServicios,
-        services,
         families,
+        fetchFamilies,
         refresh,
-        createAssist,
-        updateAssist,
+        createAsistencia,
+        services,
+        fetchServicios,
     } = useResumenServicios()
 
     // const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -90,9 +91,9 @@ const GeneralAssistance = () => {
                 (value, originalValue) => new Date(originalValue + "T00:00:00"),
             ),
     })
-
     const handleSave = async () => {
         try {
+            // Validar datos
             const dto = await asistenciaSchema.validate({
                 idfamilia: Number(familia),
                 idservicio: Number(servicio),
@@ -100,19 +101,22 @@ const GeneralAssistance = () => {
                 fechaServicio,
             })
 
-            if (editingAssist) {
-                await updateAssist(editingAssist.idasistencia, dto)
-            } else {
-                await createAssist(dto)
-            }
+            // Crear asistencia usando el hook
+            await createAsistencia(dto)
 
+            // Cerrar modal y refrescar lista
             setModalOpen(false)
-            refresh()
+            await getResumenServicios()
         } catch (err) {
             console.error("Error validando asistencia:", err)
             alert(err.message || "Error al guardar la asistencia")
         }
     }
+
+    useEffect(() => {
+        fetchFamilies()
+        fetchServicios()
+    }, [])
 
     const exportData = filteredAssists.map((f) => ({
         Servicio:
@@ -123,9 +127,7 @@ const GeneralAssistance = () => {
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
-            <h2 className="text-2xl font-bold">
-                Listado de Asistencia General
-            </h2>
+            <h2 className="text-2xl font-bold">Asistencia General</h2>
 
             <div className="flex gap-2 mt-2">
                 <Link href={"/control"} className="btn btn-primary btn-sm">
@@ -182,7 +184,9 @@ const GeneralAssistance = () => {
             </div>
 
             <div className="overflow-x-auto rounded-box border border-base-content/5 mt-5 w-full max-w-6xl">
-                {error && <div className="alert alert-error">{error}</div>}
+                {error && (
+                    <div className="alert alert-error text-white">{error}</div>
+                )}
                 {loading ? (
                     <div className="p-6 text-center">Cargando...</div>
                 ) : (

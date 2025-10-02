@@ -72,7 +72,7 @@ const ActivitiesPage = () => {
 
     return (
         <div className=" flex flex-col items-center justify-start min-h-screen bg-base-100 p-6">
-            <h1 className="text-2xl font-bold">Listado de Actividades</h1>
+            <h1 className="text-2xl font-bold">Actividades</h1>
 
             <div className="flex gap-2 mt-4">
                 <Link href={"/control"} className="btn btn-primary btn-sm ">

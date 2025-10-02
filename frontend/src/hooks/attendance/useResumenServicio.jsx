@@ -14,6 +14,9 @@ export function useResumenServicios() {
     const [total, setTotal] = useState(0)
     const [search, setSearch] = useState("")
 
+    const [families, setFamilies] = useState([])
+    const [services, setServices] = useState([])
+
     const getResumenServicios = async (
         searchArg = search,
         pageArg = page,
@@ -44,6 +47,69 @@ export function useResumenServicios() {
         }
     }
 
+    const createAsistencia = async (asistenciaData) => {
+        if (!user) return null
+        setLoading(true)
+        setError("")
+        try {
+            const res = await apiFetch("/asistencia", {
+                method: "POST",
+                body: JSON.stringify(asistenciaData),
+            })
+
+            if (!res.ok) {
+                const text = await res.text()
+                throw new Error(
+                    text || `Error al crear asistencia (status ${res.status})`,
+                )
+            }
+
+            const created = await res.json()
+
+            // refrescar lista después de crear
+            await getResumenServicios()
+
+            return created
+        } catch (err) {
+            console.error("[useResumenServicios] create error:", err)
+            setError(err.message || "Error al crear asistencia")
+            return null
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Obtener familias desde la API
+    const fetchFamilies = () => {
+        if (!user) return
+        setLoading(true)
+        return apiFetch("/family")
+            .then((res) => res.json())
+            .then((data) => {
+                setFamilies(Array.isArray(data) ? data : [])
+            })
+            .catch((err) => {
+                console.error("Error fetchFamilies:", err)
+                setFamilies([])
+            })
+            .finally(() => setLoading(false))
+    }
+
+    const fetchServicios = () => {
+        if (!user) return
+        setLoading(true)
+        return apiFetch("/service")
+            .then((res) => res.json())
+            .then((data) => {
+                setServices(Array.isArray(data) ? data : [])
+            })
+            .catch((err) => {
+                console.error("Error fetchServicios:", err)
+                setServices([])
+            })
+            .finally(() => setLoading(false))
+    }
+
     useEffect(() => {
         if (user) getResumenServicios()
     }, [user])
@@ -61,5 +127,10 @@ export function useResumenServicios() {
         search,
         setSearch,
         getResumenServicios,
+        families,
+        fetchFamilies,
+        services,
+        fetchServicios,
+        createAsistencia,
     }
 }
