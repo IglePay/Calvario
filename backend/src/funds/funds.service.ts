@@ -9,6 +9,7 @@ export class FundsService {
 
     async findAll(tenantId: number, page = 1, limit = 10, search = '') {
         const skip = (page - 1) * limit;
+
         // Filtro opcional por búsqueda
         const where: any = {
             tenantId,
@@ -34,7 +35,7 @@ export class FundsService {
             where,
             skip,
             take: limit,
-            orderBy: { fecha: 'asc' },
+            orderBy: { fecha: 'desc' },
             include: {
                 nomeclatura: true,
             },
@@ -48,12 +49,15 @@ export class FundsService {
                 saldo -= Number(op.monto);
             }
 
+            // Formatear solo la fecha: YYYY-MM-DD
+            const fechaFormateada = op.fecha.toISOString().split('T')[0];
+
             return {
                 id: op.idoperacion,
                 idnomeclatura: op.idnomeclatura,
                 nombre: op.nomeclatura.nombre,
                 descripcion: op.descripcion,
-                fecha: op.fecha,
+                fecha: fechaFormateada, // <-- solo fecha
                 tipo: op.nomeclatura.tipoIE,
                 monto: Number(op.monto),
                 saldo,
