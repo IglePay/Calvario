@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useMembers } from "@/hooks/members/useMembers"
 import MembersModal from "@/app/control/memebers/components/MembersModal"
 import { useAuthContext } from "@/context/AuthContext"
+import { hasPermission } from "@/utils/permissions"
 import { apiFetch } from "@/utils/apiFetch"
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -16,7 +17,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
     // Usamos useAuth en lugar de fetch manual
     const { user, loading } = useAuthContext()
-
+    console.log(user)
     const { createMember, grupos, generos, estados, bautizados, servidores } =
         useMembers()
 
@@ -27,6 +28,7 @@ export default function Sidebar({ isOpen, onClose }) {
             id: "miembros",
             icon: "fas fa-users",
             label: "Miembros",
+            permiso: "ver_miembros",
             children: [
                 {
                     id: "miembros-lista",
@@ -47,12 +49,14 @@ export default function Sidebar({ isOpen, onClose }) {
             icon: "fa fa-solid fa-broom",
             label: "Actividades",
             route: "/control/activities",
+            permiso: "ver_actividades",
         },
         {
-            id: "limpieza",
+            id: "Calendario",
             icon: "fas fa-calendar-alt",
             label: "Calendario",
             route: "/control/cleaning",
+            permiso: "ver_calendario",
         },
         {
             id: "usuarios",
@@ -65,11 +69,13 @@ export default function Sidebar({ isOpen, onClose }) {
             icon: "fas fa-users-cog",
             label: "Grupos",
             route: "/control/groups",
+            permiso: "ver_grupos",
         },
         {
             id: "finanzas",
             icon: "fas fa-dollar-sign",
             label: "Finanzas",
+            permiso: "ver_finanzas",
             children: [
                 {
                     id: "nomeclatura",
@@ -120,18 +126,21 @@ export default function Sidebar({ isOpen, onClose }) {
                     icon: "fas fa-user-cog",
                     label: "Perfil",
                     route: "/control/settings/profile",
+                    permiso: "ver_usuario",
                 },
                 {
                     id: "Preferencias",
                     icon: "fas fa-sliders-h",
                     label: "Datos de la Iglesia",
                     route: "/control/settings/church_data",
+                    permiso: "ver_tenant",
                 },
                 {
                     id: "role-permiso",
                     icon: "fa-solid fa-lock",
                     label: "Roles y Permisos",
                     route: "/control/settings/rolepermiso",
+                    permiso: "ver_rolpermiso",
                 },
             ],
         },
@@ -209,54 +218,78 @@ export default function Sidebar({ isOpen, onClose }) {
                 </div>
 
                 {/* Navigation Menu */}
-                <nav className="flex-1 overflow-y-auto scroll-auto">
-                    {menuItems.map((item) => (
-                        <div key={item.id}>
-                            <button
-                                onClick={() => {
-                                    if (item.children) toggleSubmenu(item.id)
-                                    else {
-                                        handleNavigation(item)
-                                        onClose()
-                                    }
-                                }}
-                                className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${
-                                    activeSection === item.id
-                                        ? "bg-gray-900 border-r-4 border-r-rose-400"
-                                        : ""
-                                }`}>
-                                <i className={`${item.icon} w-5 mr-3`}></i>
-                                {item.label}
-                                {item.children && (
-                                    <i
-                                        className={`ml-auto fas ${
-                                            openMenu === item.id
-                                                ? "fa-chevron-up"
-                                                : "fa-chevron-down"
-                                        }`}
-                                    />
-                                )}
-                            </button>
 
-                            {item.children && openMenu === item.id && (
-                                <div className="ml-8 mt-2 space-y-1">
-                                    {item.children.map((child) => (
-                                        <button
-                                            key={child.id}
-                                            onClick={() => {
-                                                handleNavigation(child)
-                                                onClose()
-                                            }}
-                                            className="w-full flex items-center px-3 py-2 text-sm hover:bg-gray-500 rounded">
-                                            <i
-                                                className={`${child.icon} w-4 mr-2`}></i>
-                                            {child.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                <nav className="flex-1 overflow-y-auto scroll-auto">
+                    {menuItems.map((item) => {
+                        // Si el item tiene un permiso definido y el usuario no lo tiene, lo ocultamos
+                        if (
+                            item.permiso &&
+                            !hasPermission(user.permisos, item.permiso)
+                        )
+                            return null
+
+                        return (
+                            <div key={item.id}>
+                                <button
+                                    onClick={() => {
+                                        if (item.children)
+                                            toggleSubmenu(item.id)
+                                        else {
+                                            handleNavigation(item)
+                                            onClose()
+                                        }
+                                    }}
+                                    className={`w-full flex items-center px-4 py-3 text-sm hover:bg-gray-800 transition-colors text-left ${
+                                        activeSection === item.id
+                                            ? "bg-gray-900 border-r-4 border-r-rose-400"
+                                            : ""
+                                    }`}>
+                                    <i className={`${item.icon} w-5 mr-3`}></i>
+                                    {item.label}
+                                    {item.children && (
+                                        <i
+                                            className={`ml-auto fas ${
+                                                openMenu === item.id
+                                                    ? "fa-chevron-up"
+                                                    : "fa-chevron-down"
+                                            }`}
+                                        />
+                                    )}
+                                </button>
+
+                                {item.children && openMenu === item.id && (
+                                    <div className="ml-8 mt-2 space-y-1">
+                                        {item.children
+                                            .filter((child) => {
+                                                // Filtramos submenús según permiso
+                                                if (
+                                                    child.permiso &&
+                                                    !hasPermission(
+                                                        user.permisos,
+                                                        child.permiso,
+                                                    )
+                                                )
+                                                    return false
+                                                return true
+                                            })
+                                            .map((child) => (
+                                                <button
+                                                    key={child.id}
+                                                    onClick={() => {
+                                                        handleNavigation(child)
+                                                        onClose()
+                                                    }}
+                                                    className="w-full flex items-center px-3 py-2 text-sm hover:bg-gray-500 rounded">
+                                                    <i
+                                                        className={`${child.icon} w-4 mr-2`}></i>
+                                                    {child.label}
+                                                </button>
+                                            ))}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    })}
                 </nav>
 
                 {/* Footer: Logout */}

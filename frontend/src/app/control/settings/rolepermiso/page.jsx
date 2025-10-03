@@ -31,16 +31,15 @@ export default function RolPermiso() {
     const [modalOpenEditar, setModalOpenEditar] = useState(false)
     const [editRoleId, setEditRoleId] = useState(null)
 
-    const handleDelete = async (roleId, permisoId) => {
-        if (!confirm("¿Deseas eliminar este permiso del rol?")) return
-
-        try {
-            await removePermisoFromRol(roleId, permisoId)
-            alert("Permiso eliminado correctamente")
-        } catch (err) {
-            console.error(err)
-            alert("Error eliminando permiso del rol")
-        }
+    const handleDelete = (roleId, permisoId) => {
+        removePermisoFromRol(roleId, permisoId)
+            .then(() => {
+                // Aquí ya se eliminó, no hacemos nada más
+            })
+            .catch((err) => {
+                console.error(err)
+                // Solo logueamos el error, no alertamos
+            })
     }
 
     return (

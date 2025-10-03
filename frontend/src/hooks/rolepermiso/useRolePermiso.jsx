@@ -85,7 +85,10 @@ export const useRolPermiso = () => {
             `/rolpermiso/rol/${roleId}/permiso/${permisoId}`,
             { method: "POST" },
         )
-        if (!res.ok) throw new Error("Error asignando permiso a rol")
+        if (!res.ok)
+            throw new Error(
+                "Error asignando permiso a rol, rol ya tiene ese permiso",
+            )
         await fetchRoles()
         return res.json()
     }

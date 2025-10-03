@@ -12,19 +12,22 @@ export default function ModalAsignarPermiso({
         useRolPermiso()
 
     const [selectedPermisoId, setSelectedPermisoId] = useState("")
+    const [error, setError] = useState("") // <-- nuevo estado para errores
 
-    // Limpiar permiso al abrir/cerrar modal
+    // Limpiar permiso y error al abrir/cerrar modal
     useEffect(() => {
         if (!isOpen) {
             setSelectedPermisoId("")
+            setError("")
         }
     }, [isOpen])
 
     if (!isOpen) return null
 
     const handleSave = async () => {
-        if (!selectedRoleId) return alert("Selecciona un rol")
-        if (!selectedPermisoId) return alert("Selecciona un permiso")
+        if (!selectedRoleId) return setError("Selecciona un rol")
+        if (!selectedPermisoId) return setError("Selecciona un permiso")
+        setError("") // limpiar errores previos
         try {
             await assignPermisoToRol(
                 Number(selectedRoleId),
@@ -32,9 +35,10 @@ export default function ModalAsignarPermiso({
             )
             setSelectedPermisoId("")
             onClose()
-        } catch (error) {
-            console.error(error)
-            alert("Ocurrió un error al asignar el permiso")
+        } catch (err) {
+            console.error(err)
+            // Aquí podemos leer el mensaje enviado desde el backend
+            setError(err?.message || "Ocurrió un error al asignar el permiso")
         }
     }
 
@@ -68,6 +72,11 @@ export default function ModalAsignarPermiso({
                         </option>
                     ))}
                 </select>
+
+                {/* Mostrar error debajo */}
+                {error && (
+                    <div className="text-red-500 text-sm mb-2">{error}</div>
+                )}
 
                 <div className="flex justify-end gap-2">
                     <button className="btn btn-ghost" onClick={onClose}>
