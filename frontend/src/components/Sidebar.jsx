@@ -17,7 +17,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
     // Usamos useAuth en lugar de fetch manual
     const { user, loading } = useAuthContext()
-    console.log(user)
+
     const { createMember, grupos, generos, estados, bautizados, servidores } =
         useMembers()
 
@@ -63,6 +63,7 @@ export default function Sidebar({ isOpen, onClose }) {
             icon: "fas fa-user",
             label: "Colaborador",
             route: "/control/collaborator",
+            permiso: "ver_colaborador",
         },
         {
             id: "grupos",
@@ -101,18 +102,21 @@ export default function Sidebar({ isOpen, onClose }) {
                     icon: "fas fa-users",
                     label: "Familias",
                     route: "/control/attendance/family",
+                    permiso: "ver_familias",
                 },
                 {
                     id: "Eventos",
                     icon: "fas fa-clock",
                     label: "Horarios",
                     route: "/control/attendance/hours",
+                    permiso: "ver_horario",
                 },
                 {
                     id: "Assitencia_Individual",
                     icon: "fas fa-user-check",
                     label: "Asistencia",
                     route: "/control/attendance/generalAssistance",
+                    permiso: "Ver_asistencia",
                 },
             ],
         },
