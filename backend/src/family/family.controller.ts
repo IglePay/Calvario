@@ -13,13 +13,16 @@ import { FamilyService } from './family.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateFamilyDto } from './dto/create-family.dto';
 import { UpdateFamilyDto } from './dto/update-family.dto';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('family')
 export class FamilyController {
     constructor(private readonly familyService: FamilyService) {}
 
     @Get()
+    @Permissions('ver_familias')
     findAll(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.familyService.findAll(tenantId);
