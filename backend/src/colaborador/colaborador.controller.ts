@@ -11,12 +11,16 @@ import {
 } from '@nestjs/common';
 import { ColaboradorService } from './colaborador.service';
 import { AuthGuard } from '../auth/auth.guard';
-@UseGuards(AuthGuard)
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('colaborador')
 export class ColaboradorController {
     constructor(private readonly service: ColaboradorService) {}
 
     @Get()
+    @Permissions('ver_colaborador')
     async findAll(@Req() req: any) {
         const tenantId = req.user.tenantId;
         return this.service.findAll(tenantId);
