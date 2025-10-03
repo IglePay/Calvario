@@ -21,7 +21,7 @@ export class TenantsController {
     constructor(private tenantsService: TenantsService) {}
 
     @Get()
-    // @Permissions('ver_tenant')
+    @Permissions('ver_tenant')
     findAll() {
         return this.tenantsService.findAll();
     }
