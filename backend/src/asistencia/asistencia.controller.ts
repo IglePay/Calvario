@@ -15,13 +15,16 @@ import { AsistenciaService } from './asistencia.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateAsistenciaDto } from './dto/create-asistencia.dto';
 import { UpdateAsistenciaDto } from './dto/update-asistencia.dto';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('asistencia')
 export class AsistenciaController {
     constructor(private readonly asistenciaService: AsistenciaService) {}
 
     @Get()
+    @Permissions('Ver_asistencia')
     findAll(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.asistenciaService.findAll(tenantId);
