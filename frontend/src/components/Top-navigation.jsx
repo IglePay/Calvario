@@ -7,7 +7,7 @@ import { useMembers } from "@/hooks/members/useMembers"
 
 export default function TopNavigation({ onMenuClick, navigation }) {
     const navItems = [
-        { name: "Miembros", path: "/control/memebers/persons" },
+        { name: "Miembros", path: "/control/memebers" },
         { name: "Finanzas", path: "/control/finance/funds" },
         { name: "Asistencias", path: "/control/attendance/generalAssistance" },
         { name: "Colaboradores", path: "/control/collaborator" },

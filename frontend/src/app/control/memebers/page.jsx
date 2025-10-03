@@ -3,8 +3,8 @@ import Link from "next/link"
 import { useState } from "react"
 import { useMembers } from "@/hooks/members/useMembers"
 import { exportToExcel, exportToPDF } from "@/utils/exportData"
-import MembersModal from "../components/MembersModal"
-import Pagination from "../../../../components/Paginacion"
+import MembersModal from "./components/MembersModal"
+import Pagination from "../../../components/Paginacion"
 
 const Persons = () => {
     const {
@@ -27,7 +27,6 @@ const Persons = () => {
         totalPages,
         search,
         setSearch,
-        fetchMembers, //  forzar refetch si quieres
     } = useMembers()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -116,7 +115,7 @@ const Persons = () => {
             <div className="flex flex-col md:flex-row items-center gap-2 mt-4 w-full max-w-6xl">
                 <input
                     type="text"
-                    placeholder="Buscar por nombre, apellido, teléfono..."
+                    placeholder="Buscar por nombre, apellido..."
                     className="input input-sm input-bordered w-full md:flex-1"
                     value={search}
                     onChange={handleSearchChange}

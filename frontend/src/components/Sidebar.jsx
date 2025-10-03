@@ -32,7 +32,7 @@ export default function Sidebar({ isOpen, onClose }) {
                     id: "miembros-lista",
                     icon: "fas fa-list",
                     label: "Listado Miembros",
-                    route: "/control/memebers/persons",
+                    route: "/control/memebers",
                 },
                 {
                     id: "miembros-agregar",
