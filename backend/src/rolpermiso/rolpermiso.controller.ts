@@ -8,6 +8,7 @@ import {
     ParseIntPipe,
     UseGuards,
     Query,
+    Delete,
 } from '@nestjs/common';
 import { RolPermisoService } from './rolpermiso.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -82,5 +83,13 @@ export class RolPermisoController {
         @Body('permisos') permisos: string[],
     ) {
         return this.rolPermisoService.updatePermisosRol(roleId, permisos);
+    }
+
+    @Delete('rol/:roleId/permiso/:permisoId')
+    async removePermisoFromRol(
+        @Param('roleId', ParseIntPipe) roleId: number,
+        @Param('permisoId', ParseIntPipe) permisoId: number,
+    ) {
+        return this.rolPermisoService.removePermisoFromRol(roleId, permisoId);
     }
 }

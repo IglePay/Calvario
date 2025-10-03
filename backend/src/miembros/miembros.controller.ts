@@ -14,13 +14,16 @@ import { AuthGuard } from '../auth/auth.guard';
 import { MiembrosService } from './miembros.service';
 import { CreateMiembroDto } from './dto/create.miembro.dto';
 import { UpdateMiembroDto } from './dto/update.miembro.dto';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('miembros')
 export class MiembrosController {
     constructor(private readonly miembrosService: MiembrosService) {}
 
     @Get()
+    @Permissions('ver_miembros')
     findAll(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.miembrosService.findAllForTenant(tenantId);

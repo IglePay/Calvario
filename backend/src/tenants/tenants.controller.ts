@@ -12,13 +12,16 @@ import { TenantsService } from './tenants.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('tenants')
 export class TenantsController {
     constructor(private tenantsService: TenantsService) {}
 
     @Get()
+    // @Permissions('ver_tenant')
     findAll() {
         return this.tenantsService.findAll();
     }

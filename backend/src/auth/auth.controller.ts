@@ -37,6 +37,9 @@ export class AuthController {
             tenant: user.tb_tenants?.nombre,
             role: user.role?.nombre,
             tenantId: user.tenantId,
+            permisos:
+                user.role?.rolePermissions?.map((rp) => rp.permiso.nombre) ||
+                [],
         };
     }
 

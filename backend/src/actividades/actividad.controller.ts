@@ -14,8 +14,10 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CreateActividadDto } from './dto/create-actividad.dto';
 import { UpdateActividadDto } from './dto/update-actividad.dto';
 import { Request } from 'express';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('actividades')
 export class ActividadController {
     constructor(private readonly actividadService: ActividadService) {}

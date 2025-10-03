@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -14,6 +14,21 @@ export class RolPermisoService {
 
     // Asignar un permiso a un rol
     async assignPermisoToRol(roleId: number, permisoId: number) {
+        //  Verificar si ya existe el permiso para ese rol
+        const exists = await this.prisma.tb_role_permissions.findFirst({
+            where: {
+                role_id: roleId,
+                permission_id: permisoId,
+            },
+        });
+
+        if (exists) {
+            throw new BadRequestException(
+                'Este rol ya tiene asignado ese permiso',
+            );
+        }
+
+        // Si no existe, lo creamos
         return this.prisma.tb_role_permissions.create({
             data: {
                 role_id: roleId,
@@ -134,5 +149,34 @@ export class RolPermisoService {
     // Listar todos los permisos disponibles
     async getAllPermisos() {
         return this.prisma.tb_permission.findMany();
+    }
+
+    // Eliminar un permiso de un rol
+    async removePermisoFromRol(roleId: number, permisoId: number) {
+        // Verificar si existe
+        const exists = await this.prisma.tb_role_permissions.findUnique({
+            where: {
+                role_id_permission_id: {
+                    role_id: roleId,
+                    permission_id: permisoId,
+                },
+            },
+        });
+
+        if (!exists) {
+            throw new BadRequestException(
+                'Este rol no tiene asignado ese permiso',
+            );
+        }
+
+        // Borramos la relación usando la clave compuesta
+        return this.prisma.tb_role_permissions.delete({
+            where: {
+                role_id_permission_id: {
+                    role_id: roleId,
+                    permission_id: permisoId,
+                },
+            },
+        });
     }
 }

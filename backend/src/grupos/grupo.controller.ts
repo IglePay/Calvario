@@ -14,8 +14,10 @@ import { GrupoService } from './grupo.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateGrupoDto } from './dto/create-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('grupos')
 export class GrupoController {
     constructor(private readonly grupoService: GrupoService) {}

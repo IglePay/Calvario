@@ -10,12 +10,16 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
     @Get()
+    @Permissions('ver_usuario')
     findAll() {
         return this.usersService.findAll();
     }

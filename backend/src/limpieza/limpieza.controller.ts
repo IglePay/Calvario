@@ -15,12 +15,14 @@ import type { Request } from 'express';
 import { CreateLimpiezaDto } from './dto/create-limpieza.dto';
 import { UpdateLimpiezaDto } from './dto/update-limpieza.dto';
 import { JwtPayload } from '../auth/jwt-payload.interface';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 interface AuthenticatedRequest extends Request {
     user: JwtPayload;
 }
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('limpieza')
 export class LimpiezaController {
     constructor(private readonly limpiezaService: LimpiezaService) {}

@@ -17,7 +17,7 @@ import { UpdateFundDto } from './dto/update-fund.dto';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('funds')
 export class FundsController {
     constructor(private readonly fundsService: FundsService) {}
