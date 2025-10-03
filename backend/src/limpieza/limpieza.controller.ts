@@ -28,6 +28,7 @@ export class LimpiezaController {
     constructor(private readonly limpiezaService: LimpiezaService) {}
 
     @Get()
+    @Permissions('ver_calendario')
     findAll(@Req() req: AuthenticatedRequest) {
         return this.limpiezaService.findAll(req.user.tenantId);
     }
