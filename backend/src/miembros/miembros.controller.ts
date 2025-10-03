@@ -44,7 +44,6 @@ export class MiembrosController {
     }
 
     // miembros.controller.ts
-    // miembros.controller.ts
     @Get('asignar-rolportenant')
     async getUsuariosByRolForTenant(
         @Req() req: any,

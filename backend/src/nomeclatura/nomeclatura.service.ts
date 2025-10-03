@@ -31,7 +31,7 @@ export class NomeclaturaService {
         const [data, total] = await this.prisma.$transaction([
             this.prisma.tb_nomeclatura.findMany({
                 where: { tenantId },
-                orderBy: { codigo: 'asc' },
+                orderBy: { codigo: 'desc' },
                 skip,
                 take: limit,
                 select: {
@@ -60,7 +60,7 @@ export class NomeclaturaService {
     async findSimple(tenantId: number) {
         return this.prisma.tb_nomeclatura.findMany({
             where: { tenantId },
-            orderBy: { codigo: 'asc' },
+            orderBy: { codigo: 'desc' },
             select: {
                 idnomeclatura: true,
                 nombre: true,
