@@ -13,14 +13,17 @@ import {
 import { RolPermisoService } from './rolpermiso.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PrismaService } from 'prisma/prisma.service';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('rolpermiso')
 export class RolPermisoController {
     constructor(private readonly rolPermisoService: RolPermisoService) {}
 
     // GET /rolpermiso/roles -> listar todos los roles
     @Get('roles')
+    @Permissions('ver_rolpermiso')
     async getRoles(
         @Query('page') page: string,
         @Query('limit') limit: string,
