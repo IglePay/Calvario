@@ -26,7 +26,7 @@ export class MiembrosController {
         return this.miembrosService.findAllForTenant(tenantId);
     }
 
-    // Obtener datos solo para tabla
+    // Obtener datos solo para tabla miembros
     @Get('table')
     async getAllForTable(
         @Req() req: Request & { user: any },

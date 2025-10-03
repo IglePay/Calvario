@@ -8,7 +8,7 @@ export class MiembrosService {
     constructor(private readonly prisma: PrismaService) {}
 
     // miembros.service.ts
-    // Obtener usuarios filtrados por rol, búsqueda y paginación
+    // Obtener usuarios filtrados por rol, búsqueda y paginació
     async getUsuariosByRolForTenant(
         roleId: number,
         page = 1,
@@ -25,8 +25,8 @@ export class MiembrosService {
 
         //  Determinar roles permitidos según el rol actual
         let allowedRoles: string[] = [];
-        if (userRole.nombre === 'admin') {
-            allowedRoles = ['admin', 'pastor', 'miembro'];
+        if (userRole.nombre === 'Admin') {
+            allowedRoles = ['Admin', 'pastor', 'miembro'];
         } else if (userRole.nombre === 'pastor') {
             allowedRoles = ['secretario', 'tesorero', 'coordinador'];
         }
@@ -224,7 +224,7 @@ export class MiembrosService {
         });
     }
 
-    // tabla userrio assignar role y tenant
+    // tabla del modulo de miembros
     async findAllForTableForTenant(
         tenantId: number,
         page = 1,
@@ -236,10 +236,10 @@ export class MiembrosService {
         const where: any = { tenantId };
 
         if (search) {
+            const searchLower = search.toLowerCase();
             where.OR = [
-                { nombre: { contains: search, mode: 'insensitive' } },
-                { apellido: { contains: search, mode: 'insensitive' } },
-                { telefono: { contains: search, mode: 'insensitive' } },
+                { nombre: { contains: searchLower } },
+                { apellido: { contains: searchLower } },
             ];
         }
 
@@ -271,7 +271,7 @@ export class MiembrosService {
                     idBautizado: true,
                     idServidor: true,
                 },
-                orderBy: { nombre: 'asc' },
+                orderBy: { nombre: 'desc' },
             }),
         ]);
 
