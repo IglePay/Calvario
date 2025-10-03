@@ -23,11 +23,13 @@ export class GrupoController {
     constructor(private readonly grupoService: GrupoService) {}
 
     @Get()
+    @Permissions('ver_grupos')
     findAll(@Req() req) {
         return this.grupoService.findAllByTenant(req.user.tenantId);
     }
 
     @Get(':id')
+    @Permissions('ver_grupos')
     findOne(@Param('id') id: string, @Req() req) {
         return this.grupoService.findOneByTenant(+id, req.user.tenantId);
     }
