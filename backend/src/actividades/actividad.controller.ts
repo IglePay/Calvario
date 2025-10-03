@@ -21,23 +21,32 @@ import { Permissions } from 'src/common/decorators/permissions.decorator';
 @Controller('actividades')
 export class ActividadController {
     constructor(private readonly actividadService: ActividadService) {}
-
     @Get()
+    @Permissions('ver_actividades')
     findAll(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.actividadService.findAll(tenantId);
     }
 
     @Get('miembros')
+    @Permissions('ver_miembros')
     findAllMiembros(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.actividadService.findAllMiembros(tenantId);
     }
 
     @Get('grupos')
+    @Permissions('ver_grupos')
     findAllGrupos(@Req() req: Request & { user: any }) {
         const tenantId = req.user.tenantId;
         return this.actividadService.findAllGrupos(tenantId);
+    }
+
+    @Get(':id')
+    @Permissions('ver_actividades')
+    findOne(@Param('id') id: string, @Req() req: Request & { user: any }) {
+        const tenantId = req.user.tenantId;
+        return this.actividadService.findOne(+id, tenantId);
     }
 
     @Post()
@@ -47,12 +56,6 @@ export class ActividadController {
     ) {
         const tenantId = req.user.tenantId;
         return this.actividadService.create(createActividadDto, tenantId);
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string, @Req() req: Request & { user: any }) {
-        const tenantId = req.user.tenantId;
-        return this.actividadService.findOne(+id, tenantId);
     }
 
     @Patch(':id')
